@@ -6,7 +6,7 @@ from .transformer import RemoveNewlinesAndUnsupported
 from .error_handler import missing_arg_error_handler
 
 # +
-GRAMMAR_PATH = os.path.join(os.path.dirname(__file__), "grammar", "lammps.lark")
+GRAMMAR_PATH = os.path.join(os.path.dirname(__file__), "grammar", "lammps_grammar.lark")
 
 # Ensure the grammar file exists before loading
 if not os.path.exists(GRAMMAR_PATH):
