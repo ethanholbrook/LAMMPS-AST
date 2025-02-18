@@ -12,7 +12,7 @@ setup(
     packages=find_packages(include=["lammps_ast", "lammps_ast.*"]),
     include_package_data=True,
     package_data={
-        "lammps_parser": ["grammar/*.lark"],
+        "lammps_ast": ["grammar/*.lark"],
     },
     install_requires=[
         "lark-parser>=0.12.0",
