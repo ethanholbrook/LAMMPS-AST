@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name="lammps-ast",
-    version="0.0.6",
+    version="0.0.7",
     author="Juan C. Verduzco, Ethan W. Holbrook",
-    author_email="eholbrooe@purdue.edu",
+    author_email="holbrooe@purdue.edu",
     description="A LAMMPS script parser and sanitizer using Lark",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
