@@ -9,7 +9,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/ethanholbrook/LAMMPS-AST",
-    packages=find_packages(),
+    packages=find_packages(include=["lammps_ast", "lammps_ast.*"]),
     include_package_data=True,
     package_data={
         "lammps_parser": ["grammar/*.lark"],
