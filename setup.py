@@ -18,7 +18,8 @@ setup(
         "lark-parser>=0.12.0",
         "colorama",
         "graphviz",
-        "zss",  
+        "zss", 
+        "pydot", 
     ],
     python_requires=">=3.10",
     classifiers=[
