@@ -1,1 +1,17 @@
-initial_set
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment (if present)
+venv/
+.env/
+
+# Other metadata
+pip-wheel-metadata/
+
