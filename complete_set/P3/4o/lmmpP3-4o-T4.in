@@ -1,0 +1,50 @@
+# LAMMPS script for spall failure in Nb single crystals
+
+# Initialize simulation
+units           metal
+dimension       3
+boundary        p p s         # Periodic boundary conditions in [100] and [010], free in [001]
+atom_style      atomic
+
+# Create lattice and regions
+lattice         bcc 3.30      # Nb lattice parameter (in Angstroms)
+region          projectile block 0 20 0 20 0 20 units lattice
+region          target block 0 20 0 20 21 61 units lattice
+region          system union 2 projectile target
+
+# Create the simulation box and atoms
+create_box      1 system
+create_atoms    1 region projectile
+create_atoms    1 region target
+
+# Define interatomic potential (downloaded from openKIM)
+pair_style      eam
+pair_coeff      * * Nb_eam_Fellinger.eam
+
+# Define groups
+group           projectile region projectile
+group           target region target
+
+# Set initial velocities
+velocity        all create 300 12345 mom yes rot yes dist gaussian
+
+# Equilibrate system at 300 K for 100 ps
+fix             1 all nvt temp 300 300 0.1
+run             50000            # 100 ps with timestep 2 fs
+
+# Unfix thermostat
+unfix           1
+
+# Set impact velocity of 2 km/s to the projectile along [001] direction
+velocity        projectile set 0.0 0.0 2000.0 units box
+
+# Run the impact and subsequent dynamics adiabatically
+fix             2 all nve
+run             100000           # Adjust according to the duration of the simulation needed
+
+# Output settings
+thermo          1000
+thermo_style    custom step temp pe ke etotal press
+dump            1 all atom 1000 dump.spall
+
+# End of script

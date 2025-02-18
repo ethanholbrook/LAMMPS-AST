@@ -1,0 +1,122 @@
+# ----------------------------
+# 2D Lennard-Jones Drop Simulation
+# ----------------------------
+# This script simulates a 2D drop of N = 100 Lennard-Jones particles 
+# interacting via a truncated–shifted potential:
+#
+#    V(r) = 4*ε*[(σ/r)^12 – (σ/r)^6 – (σ/rc)^12 + (σ/rc)^6]   for r < rc,
+#    V(r) = 0                                              for r ≥ rc,
+#
+# with rc = 3σ.
+#
+# The simulation uses LJ units (m = σ = ε = 1) so that the natural time
+# unit is t_LJ = sqrt(m σ^2/ε). However, following the method,
+# we define t0 = sqrt(m σ^2/(48 ε)) so that the integration time step is
+#   Δt = 0.0025 t0 ≈ 0.00036084  (LJ units).
+#
+# The drop is “created” to have a density ρ and N = 100. (Here ρ is the density
+# of the parent system from which the drop would be cut.) For a circular drop we have
+#
+#      Area = 100/ρ = π R_drop^2   =>  R_drop = sqrt(100/(π ρ)).
+#
+# Four sets of parameters can be run by adjusting the variables below.
+# (For example: (ρ=0.75, E=-1.1); (ρ=0.75, E=-0.55); (ρ=0.75, E=0.8); (ρ=0.8, E=-0.3).)
+# ----------------------------
+
+# ----- USER-DEFINED PARAMETERS -----
+variable rho   equal 0.75        # density [1/σ^2] (modify as needed: 0.75 or 0.8)
+variable Etot  equal -1.1        # desired total energy [ε] (modify as needed)
+variable N     equal 100         # number of particles
+
+# Define π and compute drop radius so that N/(π*R_drop^2)=rho
+variable pi       equal 3.141592653589793
+variable R_drop   equal sqrt(${N}/(v_pi*${rho}))
+# (For ρ=0.75, R_drop ~ 6.52; for ρ=0.8, R_drop ~ 6.31)
+
+# For free-drop evolution, choose a simulation box that comfortably contains the drop.
+variable margin   equal 5.0
+variable L_box    equal ${R_drop}+${margin}
+
+# Define integration time step corresponding to Δt = 0.0025 t0.
+# In LJ units, t0 = 1/sqrt(48) ≈ 0.144337, so Δt ≈ 0.0025/6.9282 ≈ 0.00036084.
+variable dt_drop  equal 0.00036084
+
+# ----- INITIALIZATION -----
+units           lj
+dimension       2
+boundary        f f f    # free boundaries (nonperiodic) for drop evolution
+atom_style      atomic
+
+# Create a simulation box that will contain the drop.
+region box block -${L_box} ${L_box} -${L_box} ${L_box} -0.5 0.5
+create_box 1 box
+
+# ----- CREATE DROP CONFIGURATION -----
+# Define a circular region (centered at 0,0) with radius R_drop.
+region drop_circle circle 0.0 0.0 ${R_drop}
+# Create N particles randomly within the drop region.
+create_atoms 1 random ${N} 12345 drop_circle
+
+# ----- INTERATOMIC INTERACTIONS -----
+# Use Lennard-Jones potential with cutoff rc = 3.0.
+pair_style lj/cut 3.0
+# Shift the potential so that V(rc)=0.
+pair_modify shift yes
+pair_coeff 1 1 1.0 1.0 3.0
+
+# ----- INITIAL EQUILIBRATION (NVT) -----
+# It is common to first “thermalize” the drop.
+# (In the original method the drop is cut from a thermalized periodic system.)
+# Here we equilibrate for 10,000 steps with a moderate time step.
+timestep 0.005
+velocity all create 1.0 12345       # assign initial velocities corresponding to T=1.0
+fix 1 all nvt temp 1.0 1.0 0.1
+thermo 1000
+run 10000
+unfix 1
+
+# (Optional:) Write out the thermalized configuration.
+write_data thermalized.data
+
+# ----- PRE-PRODUCTION: RESCALING VELOCITIES? -----
+# To target a desired total energy Etot, one may wish to rescale velocities.
+# Here you would (for example) compute the current potential energy U and kinetic energy K,
+# then scale velocities by a factor sqrt((Etot - U)/K).
+# This step is nontrivial in an input script.
+# For now we continue with the current velocities.
+# (Users can add a velocity scaling step here if needed.)
+
+# ----- DROP EVOLUTION (NVE) -----
+# Now switch to the desired (small) integration time step.
+timestep ${dt_drop}
+fix 2 all nve
+
+# Set thermo output (energy, temperature, etc.).
+thermo 1000
+thermo_style custom step temp pe ke etotal
+
+# Dump atom positions and velocities for visualization.
+dump 1 all custom 1000 drop.lammpstrj id type x y vx vy
+
+# ----- OPTIONAL: ANALYSIS OF CONCENTRIC REGIONS -----
+# To analyze the collective expansion we wish to compute the mean radial velocity
+# in ten concentric circular rings (bins) about the center.
+#
+# First, define a per-atom variable for radial velocity:
+compute pos all property/atom x y
+compute vel all property/atom vx vy
+# Note: To avoid division by zero at the center, we add a small number.
+variable vrad atom (c_pos[1]*c_vel[1] + c_pos[2]*c_vel[2]) / sqrt(c_pos[1]*c_pos[1] + c_pos[2]*c_pos[2] + 1.0e-8)
+
+# Next, use a “chunk” command to bin atoms into 10 concentric rings.
+# Here we use the binning by a cylinder (with axis along z) centered at (0,0,0).
+# The bin width is R_drop/10; bins cover radii 0 to R_drop.
+compute myChunk all chunk/atom bin/cylinder 10 0.0 0.0 0.0 0.0 0.0 1.0 ${R_drop}/10 0.0 ${R_drop}
+# Now average the per-atom radial velocity in each bin.
+fix avgRad all ave/chunk 100 10 1000 myChunk v_vrad file radial.dat mode vector
+
+# ----- PRODUCTION RUN -----
+# Run the simulation for the drop evolution.
+run 500000
+
+# ----- END OF SIMULATION -----

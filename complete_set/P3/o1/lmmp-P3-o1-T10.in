@@ -1,0 +1,122 @@
+# ---------------------------------------------------------------------
+# LAMMPS input script for high-velocity impact (2 km/s) spall simulation
+# in a Nb single crystal using the EAM potential of Fellinger et al.
+# ---------------------------------------------------------------------
+# References:
+# [1] Fellinger MR, Park H, Wilkins JW. Phys. Rev. B. 2010;81(14):144119.
+# [2] https://doi.org/10.25950/befb2eea
+# ---------------------------------------------------------------------
+
+# ---------- SETTINGS ----------
+
+units           metal
+dimension       3
+atom_style      atomic
+
+# Impact direction is [001]. Periodic along x ([100]) and y ([010]),
+# free along z ([001]).
+boundary        p p f
+
+# Choose an appropriate timestep for metals, e.g. 1 fs.
+timestep        0.001
+
+# Nb lattice parameter in Angstroms (approx. 3.30 from Fellinger potential).
+variable        a equal 3.30
+
+# Number of unit cells for projectile and target
+variable        Nx equal 20
+variable        Ny equal 20
+variable        Nz_proj equal 20
+variable        Nz_targ equal 40
+
+# Define a 1.5 nm gap = 15 Å
+variable        gap equal 15.0
+
+# Convert projectile impact speed 2 km/s into LAMMPS metal units (Å/fs).
+# 1 Å/fs = 1e5 m/s, so 2 km/s = 2,000 m/s = 0.02 Å/fs.
+variable        vimpact equal 0.02
+
+# Equilibration temperature and runs
+variable        Tinit equal 300
+variable        TequilSteps equal 100000  # 100 ps at 1 fs/step
+variable        TimpactSteps equal 200000 # example: 200 ps post-impact
+
+# ---------- CREATE ATOMS ----------
+
+# Define the overall simulation box in absolute coordinates (units = box).
+# x from 0 to Nx*a, y from 0 to Ny*a, z from 0 to (Nz_proj + Nz_targ)*a + gap
+variable        Lx equal ${Nx}*${a}
+variable        Ly equal ${Ny}*${a}
+variable        Lz_proj equal ${Nz_proj}*${a}
+variable        Lz_targ equal ${Nz_targ}*${a}
+variable        LzTotal equal ${Lz_proj}+${Lz_targ}+${gap}
+
+region          box block 0.0 ${Lx} 0.0 ${Ly} 0.0 ${LzTotal} units box
+create_box      1 box
+
+# Define region for projectile (z from 0 to Lz_proj)
+region          projectile block 0.0 ${Lx} 0.0 ${Ly} 0.0 ${Lz_proj} units box
+# Define region for target (z from [Lz_proj+gap] to [Lz_proj+gap + Lz_targ])
+variable        zlo_targ equal ${Lz_proj}+${gap}
+variable        zhi_targ equal ${zlo_targ}+${Lz_targ}
+region          target block 0.0 ${Lx} 0.0 ${Ly} ${zlo_targ} ${zhi_targ} units box
+
+# Define the lattice as BCC oriented along x=[100], y=[010], z=[001].
+lattice         bcc ${a}
+
+# Create atoms for projectile and target
+create_atoms    1 region projectile
+create_atoms    1 region target
+
+# ---------- PAIR POTENTIAL ----------
+
+# Example using the openKIM version of the Fellinger Nb potential.
+# Ensure you have installed and linked the openKIM package correctly,
+# and replace the model name with the one on your system as needed.
+# If using a standalone EAM file, use "pair_style eam" or "eam/fs" and "pair_coeff" accordingly.
+pair_style      kim EAM_Fellinger_Niobium__MO_898155457345_002
+pair_coeff      * * Nb
+
+# Neighbor/neighbor-modify settings
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+# ---------- GROUPS ----------
+
+group           projectile region projectile
+group           target region target
+group           all type 1
+
+# ---------- EQUILIBRATION (NVT) ----------
+
+# Initialize velocities to Tinit
+velocity        all create ${Tinit} 12345 mom yes rot yes
+
+# Fix NVT for isothermal, isochoric MD (the box is not changing size).
+fix             equil all nvt temp ${Tinit} ${Tinit} 0.1
+
+# Equilibrate for 100 ps
+thermo          1000
+thermo_style    custom step time temp etotal press
+run             ${TequilSteps}
+
+# Unfix the thermostat
+unfix           equil
+
+# ---------- SET IMPACT VELOCITY ----------
+
+# Add 2 km/s in the +z direction to the projectile only
+# (keep equilibrated thermal velocities, so use "sum yes").
+velocity        projectile set 0.0 0.0 ${vimpact} sum yes
+
+# ---------- IMPACT SIMULATION (NVE/Adiabatic) ----------
+
+fix             impact all nve
+
+# Optionally, output more frequent thermo data during impact
+thermo          1000
+
+# Run after impact (e.g., 200 ps)
+run             ${TimpactSteps}
+
+# ---------- END OF SCRIPT ----------

@@ -1,0 +1,56 @@
+# LAMMPS Input Script for Melting of Ni
+# Using Mishin et al. (1999) EAM potential from OpenKIM
+
+# ---------- INITIALIZATION ----------
+clear
+units         metal
+dimension     3
+boundary      p p p
+atom_style    atomic
+
+# ---------- ATOM DEFINITION ----------
+variable      latparam equal 3.52       # Approx. lattice constant for Ni
+lattice       fcc ${latparam}
+region        box block 0 10 0 10 0 10
+create_box    1 box
+create_atoms  1 box
+
+# ---------- POTENTIAL DEFINITION ----------
+# Option A: If using a local EAM file:
+pair_style    eam      # or eam/alloy, eam/fs as appropriate
+pair_coeff    * * Ni_Mishin1999.eam  # Make sure your file name matches
+
+# Option B: If using pair_style kim:
+# pair_style   kim Ni_Mishin1999_005 metal
+# pair_coeff   * * Ni
+
+mass          1 58.6934  # Atomic mass of Ni
+
+# ---------- VELOCITIES ----------
+# Even though the overall ramp starts at 300 K, the method states
+# the initial velocities are drawn at 600 K:
+velocity      all create 600.0 12345 mom yes rot yes dist gaussian
+
+# ---------- SETTINGS ----------
+timestep      0.001     # 1 fs per MD step in 'metal' units
+thermo        1000      # Print thermo info every 1000 steps
+thermo_style  custom step temp press etotal enthalpy
+
+# Optionally, dump atom coordinates for visualization/analysis:
+dump          1 all custom 500 dump.ni_melt.lammpstrj id type x y z vx vy vz
+
+# ---------- EQUILIBRATION / HEATING ----------
+# We continuously heat from 300 K to 2500 K over 220 ps
+# at 1 atm (1 bar in 'metal' units).
+# The difference in temperature is (2500 - 300) = 2200 K.
+# At 10 K/ps, total time = 220 ps = 220,000 steps (at 1 fs per step).
+
+fix           1 all npt temp 300.0 2500.0 0.1 iso 1.0 1.0 1.0
+# Explanation of fix npt parameters:
+#   temp Tstart Tstop Tdamp
+#   iso Pstart Pstop Pdamp
+# Where 1.0 is the pressure in bar for 1 atm.
+
+run           220000    # 220 ps total
+
+# ---------- END OF SCRIPT ----------

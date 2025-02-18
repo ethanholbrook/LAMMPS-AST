@@ -1,0 +1,86 @@
+# LAMMPS script for Nb spall via projectile impact at 2 km/s
+# Based on the description provided in the prompt.
+
+# ---------- INITIALIZATION ----------
+units          metal
+atom_style     atomic
+boundary       p p s        # Periodic in x,y; free (shrink-wrapped) in z
+dimension      3
+
+# ---------- VARIABLES & PARAMETERS ----------
+variable       aNb     equal 3.30          # Approx. lattice parameter (Å) for Nb
+variable       gapDist equal 15.0          # 1.5 nm gap in Å
+variable       nx      equal 20            # Replication along x
+variable       ny      equal 20            # Replication along y
+variable       nzT     equal 40            # Replication along z for target
+variable       nzP     equal 20            # Replication along z for projectile
+
+# Compute physical lengths
+variable       lx      equal ${nx}*${aNb}
+variable       ly      equal ${ny}*${aNb}
+variable       lzT     equal ${nzT}*${aNb}   # target extent along z
+variable       lzP     equal ${nzP}*${aNb}   # projectile extent along z
+variable       boxZ    equal ${lzT}+${gapDist}+${lzP}
+
+# ---------- CREATE BOX & ATOMS ----------
+# Define an overall simulation box that includes target + gap + projectile
+region         box block 0.0 ${lx} 0.0 ${ly} 0.0 ${boxZ} units box
+create_box     1 box
+
+# Define regions for target, gap, and projectile
+region         target      block 0.0 ${lx} 0.0 ${ly} 0.0 ${lzT}             units box
+region         gap         block 0.0 ${lx} 0.0 ${ly} ${lzT} ${lzT}+${gapDist} units box
+region         projectile  block 0.0 ${lx} 0.0 ${ly} ${lzT}+${gapDist} ${lzT}+${gapDist}+${lzP} units box
+
+# Use a bcc lattice for creating atoms
+lattice       bcc ${aNb}
+create_atoms  1 region target
+create_atoms  1 region projectile
+# (No atoms in gap region)
+
+# Nb atomic mass
+mass 1 92.9064
+
+# ---------- FORCE FIELD ----------
+# Use EAM (or KIM) potential for Nb by Fellinger et al.
+# If you have the EAM file locally, do for example:
+pair_style    eam/fs
+pair_coeff    * * Nb_Fellinger.eam.fs Nb
+# Or use the KIM pair_style if you downloaded a KIM model:
+# pair_style    kim <model_name> Nb
+# pair_coeff    * * Nb
+
+# ---------- EQUILIBRATION (NVT) ----------
+# Equilibrate at 300 K for 100 ps with isochoric (constant volume) MD
+# Timestep in metal units is 1 fs
+timestep       1.0                   # 1 fs
+thermo         1000
+thermo_style   custom step time temp pe ke etotal press
+
+# Group definitions
+group          gTarget region target
+group          gProj   region projectile
+group          allgrp  union gTarget gProj
+
+# Initialize velocities to 300 K
+velocity       allgrp create 300.0 12345 mom yes dist gaussian
+
+fix            NVT allgrp nvt temp 300.0 300.0 0.1
+run            100000               # 100 ps = 100000 steps at 1 fs/step
+
+unfix          NVT
+
+# ---------- IMPACT SETUP (Add 2 km/s to projectile) ----------
+# 2 km/s = 2000 m/s = 20 Å/ps in metal units (1 m/s = 0.01 Å/ps)
+variable       vImpact equal 20.0
+velocity       gProj set 0.0 0.0 ${vImpact} sum yes
+
+# ---------- IMPACT SIMULATION (adiabatic MD) ----------
+fix            NVE allgrp nve
+# Optionally remove thermostat to simulate adiabatic expansion
+# or switch to NVE + possible thermostat in non-shock region
+
+thermo         1000
+run            200000               # Adjust as needed
+
+# ---------- END OF SCRIPT ----------

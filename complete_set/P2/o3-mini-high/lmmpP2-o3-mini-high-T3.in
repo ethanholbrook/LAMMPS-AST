@@ -1,0 +1,76 @@
+# Ni melting simulation using Mishin EAM potential
+# Method: 
+# - Create a bulk Ni sample by replicating the FCC Ni unit cell 10 times in each direction.
+# - Assign initial velocities from a Maxwell-Boltzmann distribution at 600 K.
+# - Heat the system continuously from 300 K to 2500 K at 10 K/ps
+#   under isothermal/isobaric (NPT) conditions at 1 atm.
+#
+# Note: The heating run lasts 220 ps (i.e. (2500-300)/10 = 220 ps).
+#       With a timestep of 0.001 ps (1 fs), that equals 220000 timesteps.
+
+# ----------------------------
+# 1. Initialization
+# ----------------------------
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# ----------------------------
+# 2. Create the simulation cell
+# ----------------------------
+# Define an FCC lattice with a lattice constant ~3.52 Å (typical for Ni)
+lattice         fcc 3.52
+# Create a simulation region by replicating the unit cell 10 times in each direction
+region          simbox block 0 10 0 10 0 10
+create_box      1 simbox
+create_atoms    1 box
+
+# ----------------------------
+# 3. Set atomic properties and potential
+# ----------------------------
+# Set the atomic mass for Ni (amu)
+mass            1 58.6934
+
+# Define the interatomic potential: Mishin EAM potential for Ni (cubic hermite tabulation)
+pair_style      eam/cubic
+pair_coeff      * * Ni_Mishin.eam Ni
+
+# ----------------------------
+# 4. Define initial velocities
+# ----------------------------
+# Draw velocities from a Maxwell-Boltzmann distribution at 600 K.
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# ----------------------------
+# 5. Neighbor settings
+# ----------------------------
+neighbor        2.0 bin
+neigh_modify    delay 10
+
+# ----------------------------
+# 6. Time integration and temperature/pressure control
+# ----------------------------
+# Set timestep (1 fs = 0.001 ps)
+timestep        0.001
+
+# Use an NPT ensemble to maintain 1 atm pressure.
+# Temperature is ramped from 300 K to 2500 K with a damping parameter of 0.1 ps,
+# and pressure is maintained at 1 atm (with a damping parameter of 1.0 ps).
+fix             1 all npt temp 300.0 2500.0 0.1 iso 1.0 1.0 1.0
+
+# ----------------------------
+# 7. Output settings
+# ----------------------------
+# Print thermo info every 1000 steps.
+thermo          1000
+thermo_style    custom step temp press vol
+
+# Dump atomic configurations every 5000 steps (useful for visualization/analysis)
+dump            1 all atom 5000 dump.melt.lammpstrj
+
+# ----------------------------
+# 8. Run the simulation
+# ----------------------------
+# Run for 220000 steps (220 ps total) corresponding to a heating rate of 10 K/ps.
+run             220000

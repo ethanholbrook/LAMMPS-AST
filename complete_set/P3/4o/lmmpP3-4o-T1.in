@@ -1,0 +1,44 @@
+# Spall failure simulation on Nb single crystal
+units           metal
+dimension       3
+boundary        p p s  # Periodic boundaries in x and y, free boundary in z
+atom_style      atomic
+
+# Create lattice and regions
+lattice         bcc 3.30  # Lattice constant for Nb in Angstroms
+region          projectile block 0 20 0 20 0 20 units lattice
+region          target block 0 20 0 20 22 62 units lattice
+region          gap block 0 20 0 20 20 22 units lattice
+region          whole union 3 projectile target gap units lattice
+
+# Create the simulation box
+create_box      1 whole
+create_atoms    1 region projectile
+create_atoms    1 region target
+
+# Set atomic mass and potential
+mass            1 92.906  # Atomic mass of Nb
+pair_style      eam/alloy
+pair_coeff      * * Nb_eam_alloy_Fellinger.eam.alloy Nb
+
+# Initial velocities and temperature setup
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+
+# Equilibration step: NVT ensemble at 300 K for 100 ps
+fix             1 all nvt temp 300.0 300.0 0.1
+timestep        0.001  # 1 fs timestep
+run             100000  # 100 ps equilibration
+
+# Remove thermostat for adiabatic MD
+unfix           1
+
+# Apply impact velocity to the projectile atoms
+velocity        projectile set 0.0 0.0 -2000.0 units box
+
+# Run adiabatic simulation after impact
+fix             2 all nve
+run             500000  # Simulate for 500 ps after impact
+
+# Output settings
+thermo          1000
+dump            1 all custom 1000 dump.spall id type x y z vx vy vz

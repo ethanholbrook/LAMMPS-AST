@@ -1,0 +1,130 @@
+# ------------------------------------------------------------------------------
+# LAMMPS input script for a 2D Lennard-Jones drop of N=100 atoms
+# with cutoff rc = 3 sigma and total energy E specified by the user.
+# ------------------------------------------------------------------------------
+clear
+units           lj
+dimension       2
+atom_style      atomic
+boundary        f f p    # free boundaries in x,y, periodic in 'dummy' z
+
+# ------------
+# VARIABLES: Adjust these as needed for your runs
+# ------------
+variable        rho     index 0.75    # Areal density (in sigma^-2)
+variable        Etot    index -1.10   # Target total energy per epsilon
+variable        N       equal 100     # number of atoms
+
+# ------------
+# SETUP: define box and create initial geometry
+# We want area = N / rho = 100 / 0.75 = ~133.3 (for rho=0.75)
+# Define a box that is large enough, then cut a circle of the desired area.
+# ------------
+variable        area    equal ${N}/${rho}    # area in sigma^2
+variable        R       equal sqrt(${area}/3.14159)  # radius of circle
+
+# Print out the target radius for your reference:
+print "Target circular drop radius = ${R} (sigma units)"
+
+# Create a 'big' box that definitely encloses that circle
+# For safety, choose side ~ 2*R + some margin
+variable        boxSide equal 2.5*${R}
+
+region          bigBox block 0 ${boxSide} 0 ${boxSide} -0.1 0.1 units box
+create_box      1 bigBox
+
+# Create a 2D lattice. We'll choose a hex lattice with spacing = 1.0
+# You may need to adjust this if the number of atoms in the circle is not close to 100.
+lattice         hex 1.0
+create_atoms    1 box
+
+# Now define a circular region for the "drop" in the center of bigBox.
+variable        cx  equal 0.5*${boxSide}
+variable        cy  equal 0.5*${boxSide}
+region          drop circle ${cx} ${cy} ${R} side in units box
+
+# Delete all atoms that are OUTSIDE the drop
+delete_atoms    region drop negate
+
+# Check how many atoms we ended up with:
+variable        natoms equal count(all)
+print "Number of atoms after cutting out the circle: ${natoms}"
+
+# ------------
+# DEFINE INTERACTIONS
+# ------------
+pair_style      lj/cut 3.0
+pair_modify     shift yes    # shift the LJ potential to be zero at cutoff
+pair_coeff      1 1 1.0 1.0 3.0   # epsilon=1.0, sigma=1.0, rc=3.0
+
+# ------------
+# NEIGHBORS
+# ------------
+neighbor        0.3 bin
+neigh_modify    delay 0 every 1 check yes
+
+# ------------
+# MINIMIZE (optional)
+# A short minimization can remove bad contacts before setting velocities.
+# ------------
+reset_timestep  0
+fix            1 all box/relax anisotropic 0.0
+minimize       1.0e-10 1.0e-10 1000 1000
+unfix          1
+
+# ------------
+# MEASURE POTENTIAL ENERGY
+# ------------
+variable        pe0 equal pe
+thermo_style    custom step temp etotal pe ke
+thermo          50
+
+# ------------
+# SET VELOCITIES TO REACH THE DESIRED TOTAL ENERGY
+# E = PE + KE  => KE_needed = E - PE
+# "velocity all create" sets random velocities at some T, then we scale to match KE_needed
+# ------------
+variable        e_des  equal ${Etot}*${natoms}  # total E in LJ units * number of atoms
+variable        ke_des equal v_e_des - v_pe0    # desired total KE
+print "Initial potential energy = ${pe0}, Desired total energy = ${e_des}"
+print "Desired kinetic energy = ${ke_des}"
+
+# If ke_des < 0, you might have an issue. Usually means E < PE. Adjust carefully.
+if "${ke_des} < 0.0" then &
+   "print 'Warning: Desired total energy < potential energy => negative KE?!'"
+
+# We'll create velocities at some nominal temperature, then rescale:
+velocity        all create 1.0 12345 mom yes rot yes dist gaussian
+fix             velScale all temp/rescale 1 1.0 1.0 0.01 1.0
+
+run 100 post no  # quick run to equilibrate velocities
+unfix           velScale
+
+# Now measure actual KE:
+variable        ke_now equal ke
+variable        scaleFactor equal sqrt(${ke_des}/${ke_now})
+print "KE_now= ${ke_now}, scaleFactor= ${scaleFactor}"
+
+velocity        all scale ${scaleFactor}
+
+# ------------
+# INTEGRATION
+# ------------
+reset_timestep  0
+timestep        0.00036    # ~ (0.0025 / sqrt(48))
+
+fix             1 all nve
+thermo_style    custom step time temp etotal pe ke lx ly
+thermo          500
+
+# ------------
+# RUN THE SIMULATION
+# ------------
+run             100000   # adjust as desired for your production run
+
+# ------------
+# POST-PROCESSING / ANALYSIS
+# ------------
+# At this point, you can write dumps and analyze radial properties, expansions, etc.
+
+write_dump all custom final_config_rho_${rho}_E_${Etot}.dump id type x y vx vy

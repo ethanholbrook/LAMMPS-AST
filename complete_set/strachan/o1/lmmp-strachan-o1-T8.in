@@ -1,0 +1,60 @@
+# -----------------------------
+# LAMMPS input for 2D LJ cluster (N=100) with cutoff = 3.0 sigma
+# Example for one (rho, E) parameter set.
+# -----------------------------
+
+units       lj
+dimension   2
+atom_style  atomic
+
+# Use 'shrink-wrapped' or 'fixed' boundaries in x,y for a cluster in vacuum.
+# (Either 's s' or 'f f' is common for a non-periodic 2D drop.)
+boundary    s s f
+
+# ------------
+# Read in the initial drop configuration
+# This file should have 100 atoms arranged in a circular drop at the correct density
+# and with velocities that give total energy E.
+# ------------
+read_data   drop_rho_0.75_E_-1.1.data
+
+# ------------
+# Define the LJ potential with cutoff = 3.0 sigma
+# 'shift yes' ensures V(r_c) = 0, matching the method:
+#   V(r) = 4 epsilon [ (sigma/r)^12 - (sigma/r)^6 - (sigma/r_c)^12 + (sigma/r_c)^6 ] for r < r_c
+#   V(r) = 0 for r >= r_c
+# ------------
+pair_style   lj/cut 3.0
+pair_modify  shift yes
+pair_coeff   * * 1.0 1.0 3.0
+
+# Neighbor settings
+neighbor     0.3 bin
+neigh_modify every 1 delay 0 check yes
+
+# ------------
+# Integrate in the microcanonical ensemble to conserve total energy
+# The given method indicates a time step of 0.0025 * t0,
+# with t0 = sqrt(m sigma^2 / (48 epsilon)).
+# In "units lj", the standard LJ time unit is sqrt(m sigma^2 / epsilon) = 1.0,
+# so t0 ~ 1/sqrt(48) ~ 0.1443; thus dt ~ 0.0025 * 0.1443 ~ 0.00036
+# ------------
+timestep     0.00036
+fix          1 all nve
+
+# ------------
+# Thermodynamic output every 500 steps
+# We track step, time, temp, total energy, and pressure
+# (Pressure won't be too meaningful for a free cluster, but is listed for completeness)
+# ------------
+thermo_style custom step time temp etotal press
+thermo       500
+
+# ------------
+# Run for (for example) 100k steps
+# (Increase or decrease as needed for your analysis)
+# ------------
+run          100000
+
+# Optionally write final positions & velocities
+write_data   final_rho_0.75_E_-1.1.data

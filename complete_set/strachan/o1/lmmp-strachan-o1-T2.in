@@ -1,0 +1,119 @@
+# -------------------------------
+# LAMMPS Input Script for 2D LJ
+# -------------------------------
+
+# ==============
+# USER VARIABLES
+# ==============
+# Adjust these for each run:
+
+variable rho    index 0.75         # Example: 0.75 or 0.80
+variable Etarg  index -1.1         # Example: -1.1, -0.55, 0.8, -0.3 (energy per particle if desired)
+variable seed   index 12345        # Random seed for velocities
+
+# -----------
+# Basic Setup
+# -----------
+units       lj
+dimension   2
+boundary    p p f            # Periodic in x,y; free or shrink-wrapped in z
+atom_style  atomic
+
+# ------------
+# Create Box
+# ------------
+# We want N=100 atoms in a 2D region with density = rho = N/(Area).
+# Solve for area => Area = N / rho,  so radius^2 = Area/pi => radius = sqrt(N/(rho*pi)).
+
+variable N       equal 100
+variable area    equal ${N}/${rho}
+variable radius  equal sqrt(${area}/PI)
+
+# Create a sufficiently large bounding box to enclose the circular drop
+# We'll center it at (0,0) for convenience.
+variable box_edge equal 2.2*${radius}  # a bit bigger than the drop diameter
+region box block \
+       -${box_edge}  ${box_edge} \
+       -${box_edge}  ${box_edge} \
+       -0.1  0.1     # tiny thickness in z just to define a 3D "box"
+create_box 1 box
+
+# Define the circular region that will hold the drop
+region drop circle 0.0 0.0 ${radius} side in
+
+# Create exactly 100 atoms randomly within that circle
+create_atoms 1 region drop
+
+mass 1 1.0
+
+# ---------------------
+# Define LJ Interactions
+# ---------------------
+# We set sigma=1, epsilon=1 in LJ units, cutoff rc=3.0 sigma
+pair_style  lj/cut 3.0
+pair_modify shift yes
+pair_coeff  1 1 1.0 1.0 3.0
+
+# Optionally enforce purely 2D motion (no z motion)
+fix freezeZ all enforce2d
+
+# -------------------------
+# Set Velocities and Energy
+# -------------------------
+# Here, we do a simple "create" with some temperature guess.
+# Then we can rescale or adjust if we want a certain total E or T.
+
+velocity all create 1.0 ${seed} mom yes rot yes dist gaussian
+
+# In many studies, you might do an equilibration in NVT or NVE + thermostat
+# then measure the actual total energy, and scale if needed. 
+# For a purely energy-defined initial condition, you'd:
+#   1) compute the potential energy (PE),
+#   2) adjust velocity scale to get desired KE so that (PE + KE) / N = E_targ.
+# That step is somewhat manual or done via a small loop in LAMMPS script.
+
+# Example: a quick velocity scaling to attempt hitting a certain target KE
+# (uncomment if you want to do iterative scaling)
+# compute pe all pe
+# variable KEdesired equal (${Etarg}*${N} - c_pe)
+# if "${KEdesired} < 0.0" then "variable KEdesired equal 0.0" 
+# velocity all scale sqrt(2*${KEdesired}/(3*${N}))  # 3*N if it was 3D dof, for 2D do 2*N
+
+# --------------
+# Time Integration
+# --------------
+timestep 3.6e-4         # ~ 0.0025/sqrt(48) in LJ units
+fix     1 all nve
+
+# ---------------------
+# Radial Binning (10 bins)
+# ---------------------
+# We'll measure radial velocities and local temps in 10 concentric rings
+# from r=0 to r=some max (~the radius of the drop or a bit more).
+# NOTE: The 'bin/sphere' style lumps atoms based on their distance from (x0,y0).
+#   - center at (0,0) with 10 bins from r=0 -> r=radius (or a bit beyond).
+
+compute   myChunks all chunk/atom bin/sphere 0.0 0.0 10 0.0 ${radius} units box
+
+# (A) Compute the average velocity in each chunk
+compute   vchunk   all vcm/chunk  myChunks
+
+# (B) Compute local temperature per chunk
+# "compute temp/chunk" with 'com yes' subtracts the chunk’s center-of-mass velocity from each atom’s velocity
+compute   Tchunk   all temp/chunk myChunks temp com yes
+
+# We can output these chunk-based calculations periodically:
+fix       avgVel   all ave/time 10 1 10 c_vchunk[1] c_vchunk[2] file radial_vel.txt mode vector
+fix       avgTemp  all ave/time 10 1 10 c_Tchunk    file radial_temp.txt mode vector
+
+# -----------
+# Output
+# -----------
+thermo      100
+thermo_style custom step time etotal ke pe temp
+dump         1 all custom 500 dump.lj2d id type x y vx vy
+
+# -----------
+# Run
+# -----------
+run          10000    # Example: adapt as needed

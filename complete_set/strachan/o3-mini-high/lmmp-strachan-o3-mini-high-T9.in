@@ -1,0 +1,88 @@
+# LAMMPS input script for a 2D Lennard-Jones drop simulation
+# =============================================================
+
+# ---------- Initialization ----------
+units           lj
+dimension       2
+boundary        f f f        # free (nonperiodic) boundaries to simulate an isolated drop
+atom_style      atomic
+
+# ---------- Simulation Parameters ----------
+# Total number of particles:
+variable        N equal 100
+
+# Choose one set of parameters by setting:
+#    Set 1: rho = 0.75, E_target = -1.1
+#    Set 2: rho = 0.75, E_target = -0.55
+#    Set 3: rho = 0.75, E_target = 0.8
+#    Set 4: rho = 0.8,  E_target = -0.3
+variable        rho equal 0.75       # density in 1/sigma^2
+variable        E_target equal -1.1   # target total energy (in LJ units); adjust initial temperature accordingly
+
+# Define π (needed to compute drop radius)
+variable        pi equal 3.141592653589793
+
+# Compute the drop radius from area = N/ρ  →  R = sqrt( (N/ρ)/π )
+variable        R equal sqrt(${N}/(${rho}*${pi}))
+
+# ---------- Create Simulation Box and Atoms ----------
+# Create a simulation box that is large enough so that the drop does not interact with the boundaries
+region          simbox block -20 20 -20 20 -0.1 0.1 units box
+create_box      1 simbox
+
+# Define a circular region (the drop) centered at (0,0) with radius R
+region          drop circle 0.0 0.0 ${R} units box
+
+# Create N atoms randomly within the drop region
+create_atoms    1 random ${N} 12345 drop
+
+# ---------- Define Interactions ----------
+# Lennard-Jones potential with cutoff rc = 3 (i.e. r_c = 3*σ) and shifted so that V(r_c)=0.
+pair_style      lj/cut 3.0
+pair_modify     shift yes
+pair_coeff      1 1 1.0 1.0 3.0
+
+# Set the particle mass (m = 1 in LJ units)
+mass            1 1.0
+
+# ---------- Time Integration Parameters ----------
+# The simulation method uses a time unit t0 = sqrt(m*sigma^2/(48*epsilon)) with m=1, σ=1, ε=1.
+variable        t0 equal sqrt(1.0/48.0)
+# The integration timestep is set to dt = 0.0025*t0.
+variable        dt equal 0.0025*${t0}
+timestep        ${dt}
+
+# ---------- Initial Velocities ----------
+# Here we assign an initial Maxwell-Boltzmann distribution at temperature "temp".
+# NOTE: To achieve the desired total energy E_target, you may need to adjust "temp"
+# (since total energy = kinetic + potential energy).
+variable        temp equal 0.5
+velocity        all create ${temp} 9876
+
+# Optionally remove any net linear momentum:
+velocity        all zero 1.0
+
+# ---------- Optional: Compute Radial Quantities ----------
+# We compute the drop's center-of-mass and then define per-atom variables for the radial
+# position and radial velocity (i.e., the component of velocity along the line from the center).
+compute         com_all all com
+variable        rx atom (x - c_com_all[1])
+variable        ry atom (y - c_com_all[2])
+variable        rmag atom sqrt(v_rx*v_rx + v_ry*v_ry)
+variable        vr atom ((x - c_com_all[1])*vx + (y - c_com_all[2])*vy)/v_rmag
+
+# ---------- Output Settings ----------
+# Print thermo info every 1000 steps
+thermo          1000
+thermo_style    custom step temp pe ke etotal
+
+# Dump atom positions, velocities, and computed radial velocity every 1000 steps.
+dump            1 all custom 1000 dump.lammpstrj id type x y vx vy v_vr
+dump_modify     1 sort id
+
+# ---------- Run the Simulation ----------
+# Use NVE integration for energy-conserving dynamics.
+fix             1 all nve
+
+# Run for 10000 timesteps (adjust as needed)
+run             10000

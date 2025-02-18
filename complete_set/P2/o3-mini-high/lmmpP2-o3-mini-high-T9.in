@@ -1,0 +1,61 @@
+# ---------------------------
+# LAMMPS Input Script: Melting Bulk Ni
+# ---------------------------
+# This script builds a Ni FCC lattice by replicating the unit cell 10 times in each direction.
+# Initial velocities are drawn from a Maxwell-Boltzmann distribution at 600 K.
+# The system is then heated continuously from 300 K to 2500 K at 10 K/ps 
+# (i.e. over 220 ps) under isothermal and isobaric (NPT) conditions at 1 atm.
+# The atomic interactions are described by the EAM potential from Mishin et al. (1999)
+# (provided as a cubic Hermite tabulation potential from OpenKIM).
+
+# ----- Initialization -----
+units           metal                # Energy in eV, distance in Angstrom, time in ps, T in K, pressure in GPa
+dimension       3
+boundary        p p p                # Periodic boundaries in all directions
+atom_style      atomic
+
+# ----- Create Simulation Box -----
+# Define an FCC lattice with a lattice constant of 3.52 Angstrom (typical for Ni).
+lattice         fcc 3.52
+# Replicate the unit cell 10 times in each direction.
+region          box block 0 10 0 10 0 10 units lattice
+create_box      1 box
+create_atoms    1 box
+
+# ----- Interatomic Potential -----
+# Use the EAM potential (cubic Hermite tabulation) from Mishin et al. (1999).
+pair_style      eam/cubic
+pair_coeff      * * Ni_Mishin_1999.eam.alloy Ni
+
+# ----- Neighbor Settings -----
+neighbor        2.0 bin
+neigh_modify    delay 10
+
+# ----- Initial Velocities -----
+# Assign initial velocities from a Maxwell-Boltzmann distribution at 600 K.
+velocity        all create 600.0 12345 mom yes rot no dist gaussian
+
+# ----- Simulation Settings -----
+# Set a time step of 0.001 ps (typical for metallic systems).
+timestep        0.001
+
+# Define thermodynamic output.
+thermo          1000
+thermo_style    custom step temp pe ke etotal press
+
+# Optionally, output trajectory data every 5000 steps.
+dump            dump_all all custom 5000 dump.melting.lammpstrj id type x y z
+
+# ----- Equilibration and Heating -----
+# We use fix npt to control both temperature and pressure.
+# Note: In "units metal", pressure is in GPa. 1 atm = 101325 Pa = 0.000101325 GPa.
+# The fix ramps the temperature linearly from 300 K to 2500 K.
+fix             1 all npt temp 300.0 2500.0 0.1 iso 0.000101325 0.000101325 1.0
+
+# The temperature ramp of 2200 K at a rate of 10 K/ps requires 220 ps, i.e. 220000 steps.
+run             220000
+
+# ----- (Optional) Save Restart -----
+write_restart  restart.melting.restart
+
+# End of script

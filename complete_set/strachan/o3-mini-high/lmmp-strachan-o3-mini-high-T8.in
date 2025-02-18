@@ -1,0 +1,99 @@
+# LAMMPS Input Script for 2D Lennard-Jones Drop Simulation
+# ----------------------------------------------------------
+# This script simulates a two-dimensional drop of 100 LJ particles.
+# The particles interact via the shifted Lennard-Jones potential:
+#   V(r) = 4ε [ (σ/r)^12 - (σ/r)^6 - (σ/rc)^12 + (σ/rc)^6 ] for r < rc,
+# and V(r)=0 for r>=rc, with rc = 3σ.
+#
+# The units are chosen as "lj" (σ = 1, ε = 1, mass = 1).
+# The integration time step is set to dt = 0.0025*t0, where
+#   t0 = sqrt( mσ^2/(48ε) ) = sqrt(1/48) ≈ 0.14434.
+#
+# The initial drop is “cut” from a thermalized system.
+# Here we create 100 atoms inside a circular region of radius R_drop,
+# chosen so that the overall density of the periodic system would be:
+#
+#   ρ = N / (π R_drop^2).
+#
+# To simulate the four cases, change the variable "rho" (and adjust the
+# initial velocity “temperature” T to roughly target the desired total energy E).
+#
+# Note: The analysis of concentric rings (e.g., computing the mean radial velocity
+# and temperature in each ring) is intended to be done as post-processing.
+# ----------------------------------------------------------
+
+# ----- Setup simulation basics -----
+dimension       2
+units           lj
+atom_style      atomic
+boundary        m m m      # "m" means nonperiodic (free) in x,y (z is trivial in 2D)
+
+# ----- Define simulation parameters -----
+variable N       equal 100
+
+# Set the density of the original thermalized periodic system.
+# Change "rho" to 0.75 or 0.8 (in 1/σ^2) for the different runs.
+variable rho     equal 0.75
+
+# Define mathematical constant pi
+variable pi      equal 3.14159
+
+# Compute the area of the drop if the periodic system had density "rho"
+variable drop_area   equal ${N}/${rho}
+# The drop is a circle: Area = π R_drop^2, so R_drop = sqrt( drop_area/π )
+variable drop_rad    equal sqrt(${drop_area}/${pi})
+
+# Define a simulation box that fully contains the drop (with extra margin)
+variable margin  equal 5.0
+variable Lbox    equal ${drop_rad} + ${margin}
+region simbox    block -${Lbox} ${Lbox} -${Lbox} ${Lbox} -0.1 0.1 units box
+create_box 1 simbox
+
+# ----- Create the drop -----
+# Create 100 atoms randomly inside a circular region centered at (0,0)
+region drop      circle 0.0 0.0 ${drop_rad} units box
+create_atoms 1 random ${N} 12345 drop
+
+# ----- Define the interatomic potential -----
+# Lennard-Jones potential with cutoff rc = 3.0 (in LJ units)
+variable sigma   equal 1.0
+variable epsilon equal 1.0
+variable rc      equal 3.0
+
+pair_style      lj/cut ${rc}
+pair_modify     shift yes        # shift so that V(r=rc) = 0
+pair_coeff      1 1 ${epsilon} ${sigma} ${rc}
+
+# ----- Set the integration time step -----
+# Compute t0 = sqrt(mσ^2/(48ε)); here m = 1, σ = 1, ε = 1.
+variable t0      equal sqrt(1.0/48.0)
+# Set time step: dt = 0.0025 * t0
+variable dt      equal 0.0025*${t0}
+timestep         ${dt}
+
+# ----- Initialize velocities -----
+# Set the initial velocity distribution.
+# For microcanonical (NVE) evolution, the initial kinetic energy (temperature)
+# is chosen so that the total energy E (kinetic + potential) is near the target.
+# Adjust variable T for each simulation set:
+#   e.g., for (ρ = 0.75, E = -1.1), (ρ = 0.75, E = -0.55), (ρ = 0.75, E = 0.8),
+#         (ρ = 0.8, E = -0.3)
+variable T equal 0.5   # <--- Adjust this value as needed.
+velocity all create ${T} 98765 dist gaussian
+
+# Optionally, one can superimpose a radial velocity field to mimic expansion.
+# This would require additional processing (for example, using the "velocity" command
+# with per-atom variables computed from the distance from the center).
+
+# ----- Set up fixes and output -----
+fix 1 all nve
+
+# Output thermodynamic information every 100 steps.
+thermo 100
+thermo_style custom step temp pe ke etotal
+
+# Dump atom positions and velocities every 100 steps (for post-processing analysis).
+dump 1 all custom 100 dump.lammpstrj id type x y vx vy
+
+# ----- Run the simulation -----
+run 10000

@@ -1,0 +1,114 @@
+# ----------------------------------------------------------
+# LAMMPS input script for 2D Lennard-Jones "drop" simulation
+# ----------------------------------------------------------
+
+# ----- SECTION 1: Basic Settings -----
+
+units           lj            # Lennard-Jones reduced units
+dimension       2             # 2D simulation
+boundary        p p f         # Periodic in x,y; fixed in z
+
+atom_style      atomic
+
+# ----- SECTION 2: Input Parameters -----
+# We can set these from the command line via '-var name value'
+# or use 'index' or 'equal' as needed.
+
+variable rho index 0.75       # default: 0.75 sigma^-2
+variable E   index -1.1       # default: -1.1 epsilon
+variable N   equal 100        # target final number of atoms in the drop
+variable sigma equal 1.0
+variable eps   equal 1.0
+variable mass  equal 1.0
+variable rc    equal 3.0
+
+# Timestep in LJ units that corresponds to 0.0025*t0 (with t0 = sqrt(m*sigma^2/(48*eps))).
+# => dt ~ 0.0025 / sqrt(48) ~ 0.00036 in LJ units
+variable dt    equal 0.00036
+
+# Number of atoms in the initial "large" system from which we cut the drop:
+variable Nbig  equal 500      # can increase if needed
+# The area to accommodate Nbig at density 'rho':
+variable areaBig equal ${Nbig}/${rho}
+variable Lbox    equal sqrt(${areaBig})
+
+# ----- SECTION 3: Create a Large Periodic Box -----
+
+# Create a 2D simulation box of side Lbox, -0.1 < z < 0.1 to keep dimension=2 consistent
+region bigbox block 0.0 ${Lbox} 0.0 ${Lbox} -0.1 0.1 units box
+create_box 1 bigbox
+
+# Create Nbig random atoms in this region
+create_atoms 1 random ${Nbig} 12345 bigbox
+
+mass 1 ${mass}
+
+# ----- SECTION 4: Interatomic Potential -----
+pair_style lj/cut ${rc}
+pair_coeff 1 1 ${eps} ${sigma} ${rc}
+
+neighbor       0.3 bin
+neigh_modify   delay 0 every 1
+
+# ----- SECTION 5: Equilibrate Large System (Periodic in x,y) -----
+# We’ll do a short NVT run to get a “thermalized” state, from which we'll cut out the drop.
+
+velocity all create 1.0 12345
+fix eq all nvt temp 1.0 1.0 0.5
+timestep ${dt}
+thermo 1000
+thermo_style custom step time temp etotal
+
+run 10000    # run some steps to equilibrate
+
+# ----- SECTION 6: Cut Out Circular Drop of N=100 Atoms -----
+# Compute the area for the final drop (assuming the same 2D density).
+# We want exactly N=100, so area_drop = N / rho.
+variable areaDrop equal ${N}/${rho}
+variable radius   equal sqrt(${areaDrop}/3.14159)
+
+# Define a circular region about the center of the large box
+# This example picks the center at (Lbox/2, Lbox/2) in x,y.
+variable cx equal ${Lbox}/2.0
+variable cy equal ${Lbox}/2.0
+region drop circle ${cx} ${cy} ${radius} units box
+
+# Group atoms inside the circle, remove others
+group insideDrop region drop
+group outsideDrop subtract all insideDrop
+delete_atoms group outsideDrop
+
+# Now we (hopefully) have ~100 atoms in a circular region ("drop").
+# Remove the thermostat fix so we can set total energy precisely.
+unfix eq
+
+# ----- SECTION 7: Adjust the Kinetic Energy to Match Desired E -----
+# We want the total energy per atom to be 'E' (in units of epsilon):
+# E_total_desired = N * E  (units of epsilon)
+# measured potential energy = pe
+# so we need kinetic energy = E_total_desired - pe
+# Kinetic energy in 2D for N atoms is (dim/2)*N*k_B*T, but in LJ units k_B=1, mass=1, so
+# KE = (dim/2)*(N)*T = (2/2)*N*T = N*T. => T = KE / N
+
+# measure the potential first
+variable potNow equal pe
+variable eTotDes equal ${N}*${E}
+
+# desired KE = total E desired - potential
+variable keDes   equal v_eTotDes - v_potNow
+
+# desired "temperature" in LJ units:
+# T_des = KE_des / (N)
+variable T_des   equal v_keDes/${N}
+
+# Only rescale if T_des is positive
+if "${T_des} > 0.0" then "velocity insideDrop scale ${T_des}" 
+
+# ----- SECTION 8: Switch to NVE and Run -----
+fix evolve insideDrop nve
+thermo 500
+thermo_style custom step time etotal pe ke temp
+
+run 30000
+
+# ----- END OF SCRIPT -----

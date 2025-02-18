@@ -1,0 +1,73 @@
+# Ni Melting Simulation
+# ----------------------
+# This script simulates the melting of bulk Ni using MD.
+# The Ni unit cell (FCC, a=3.524 Å) is replicated 10x10x10.
+# Initial velocities are assigned from a Maxwell–Boltzmann distribution at 600 K.
+# The system is then heated continuously from 300 K to 2500 K at a rate of 10 K/ps,
+# under isothermal–isobaric (NPT) conditions at 1 atm (≈0.000101325 GPa).
+
+# ----------------------
+# Initialization
+# ----------------------
+units           metal
+atom_style      atomic
+boundary        p p p
+
+# ----------------------
+# Create Simulation Box
+# ----------------------
+lattice         fcc 3.524
+region          simbox block 0 10 0 10 0 10 units lattice
+create_box      1 simbox
+create_atoms    1 region simbox
+
+# Set mass for Ni (atomic weight ≈58.6934 amu)
+mass            1 58.6934
+
+# ----------------------
+# Interatomic Potential
+# ----------------------
+# Use the Mishin EAM potential for Ni (cubic hermite tabulation, v005).
+# Replace "Ni_Mishin_eam.v005" with the correct potential file path/name.
+pair_style      eam/cubic
+pair_coeff      * * Ni_Mishin_eam.v005 Ni
+
+# ----------------------
+# Initial Velocities
+# ----------------------
+# Draw velocities from a Maxwell-Boltzmann distribution at 600 K.
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# (Optional) Energy minimization to remove any bad contacts.
+minimize        1.0e-10 1.0e-10 1000 10000
+
+# ----------------------
+# Simulation Settings
+# ----------------------
+# Set timestep (ps). For metals, 0.001 ps is common.
+timestep        0.001
+
+# Thermodynamic output settings.
+thermo          1000
+thermo_style    custom step temp pe ke etotal press
+
+# ----------------------
+# NPT Integration with Heating Ramp
+# ----------------------
+# The target temperature is ramped from 300 K to 2500 K.
+# At a rate of 10 K/ps, heating by 2200 K requires 220 ps (i.e. 220000 steps).
+# Pressure is maintained at 1 atm, which is ~0.000101325 GPa in metal units.
+fix             1 all npt temp 300.0 2500.0 0.1 iso 0.000101325 0.000101325 1.0
+
+# ----------------------
+# Output Files
+# ----------------------
+# Dump atomic positions every 10000 steps for visualization.
+dump            1 all atom 10000 dump.ni_melting.lammpstrj
+
+# ----------------------
+# Run Simulation
+# ----------------------
+run             220000
+
+# End of Script

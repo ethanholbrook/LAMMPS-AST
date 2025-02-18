@@ -1,0 +1,95 @@
+# ------------------------------
+# LAMMPS input script for high-velocity impact simulation of Nb single crystals
+# Based on: Fellinger et al. EAM potential and method description for spall failure
+# ------------------------------
+
+# ---------- Initialization ------------
+units           metal
+dimension       3
+boundary        p p f           # Periodic in x and y; free in z (impact direction)
+atom_style      atomic
+
+# ---------- Define lattice and box dimensions ----------
+# Lattice constant for Nb (BCC) [Å]
+variable a        equal 3.3
+
+# Number of replicated unit cells
+variable nx       equal 20      # x direction (for both projectile and target)
+variable ny       equal 20      # y direction (for both projectile and target)
+variable nz_proj  equal 20      # projectile: 20 cells in z
+variable nz_targ  equal 40      # target: 40 cells in z
+
+# Gap between projectile and target [Å]
+variable gap      equal 15.0
+
+# Compute simulation box dimensions (in Å)
+variable Lx       equal ${nx}*${a}
+variable Ly       equal ${ny}*${a}
+variable Lz       equal ${nz_proj}*${a} + ${gap} + ${nz_targ}*${a}
+
+# Create the overall simulation box (units: box → Angstrom)
+region whole block 0 ${Lx} 0 ${Ly} 0 ${Lz} units box
+create_box 1 whole
+
+# ---------- Create atomic regions ----------
+# Set the lattice (Nb BCC) for atom creation
+lattice bcc ${a}
+
+# Projectile region: from z=0 to z = (nz_proj * a)
+region proj block 0 ${Lx} 0 ${Ly} 0 ${nz_proj}*${a} units box
+create_atoms 1 region proj
+
+# Target region: starting above the projectile, with a gap of "gap" [Å]
+variable zmin_targ equal ${nz_proj}*${a} + ${gap}
+region targ block 0 ${Lx} 0 ${Ly} ${zmin_targ} ${Lz} units box
+create_atoms 1 region targ
+
+# Define groups for later operations
+group projectile region proj
+group target region targ
+group mobile union projectile target
+
+# ---------- Define masses and interatomic potential ----------
+mass 1 92.90638
+
+# Use the EAM potential developed by Fellinger et al.
+pair_style eam/fs
+pair_coeff * * Nb.eam.fs Nb
+
+# ---------- Neighbor settings ----------
+neighbor 2.0 bin
+neigh_modify delay 10
+
+# ---------- Simulation settings ----------
+timestep 0.001   # time step in picoseconds
+
+# ---------- Equilibration (NVT at 300 K for 100 ps) ----------
+reset_timestep 0
+fix equil all nvt temp 300 300 0.1
+
+# Print thermo info every 1000 steps
+thermo 1000
+thermo_style custom step temp pe ke etotal
+
+# Equilibrate for 100 ps (i.e. 100,000 timesteps)
+run 100000
+
+# Remove the NVT fix before impact loading
+unfix equil
+
+# ---------- Add impact velocity ----------
+# The projectile atoms receive an extra velocity of 2 km/s.
+# In metal units, 1 Å/ps ≈ 100 m/s so 2 km/s = 2000 m/s ≈ 20 Å/ps.
+velocity projectile add 0.0 0.0 20.0
+
+# ---------- Impact simulation (NVE: adiabatic MD) ----------
+fix impact all nve
+
+# Optionally, dump atom positions every 500 steps for later visualization
+dump 1 all atom 500 dump.impact.lammpstrj
+
+# Run the impact simulation.
+# (Here we run for 50 ps (50,000 timesteps); adjust as needed.)
+run 50000
+
+# ---------- End of simulation ----------

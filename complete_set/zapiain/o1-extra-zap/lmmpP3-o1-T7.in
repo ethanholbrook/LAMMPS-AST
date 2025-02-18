@@ -1,0 +1,55 @@
+# LAMMPS Input File
+# Example: 16-atom bcc W, NVE at 3000K, 7.5 ps total, ~ 1000 time samples
+
+# ---------- INITIALIZATION ----------
+# Metal units are common for metals (energy in eV, distance in Å, time in fs)
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# (Optional) Declare packages - depends on your LAMMPS build and usage
+# package       python
+# package       ml-snap
+
+# ---------- CREATE ATOMS & BOX ----------
+# bcc tungsten lattice parameter (approx. 3.165 Å at RT); for high T you can adjust as needed
+variable        alat equal 3.165
+lattice         bcc ${alat}
+
+# Create a region sized so 2x2x2 conventional bcc repeats => 16 atoms
+region          box block 0 2 0 2 0 2
+create_box      1 box
+create_atoms    1 box
+
+# ---------- DEFINE INTERACTIONS ----------
+# Example using an ML-IAP potential. Replace 'ML_W.json' with your ML potential file/path
+pair_style      ml_iap
+pair_coeff      * * ML_W.json W
+
+# ---------- SETTINGS FOR RUN ----------
+# Choose a 1 fs timestep. 7.5 ps total => 7500 timesteps.
+timestep        0.001
+
+# If you want exactly 1000 data samples over 7500 timesteps, that is a stride of ~7.5
+# which must be rounded. Below we choose every 8 steps for ~938 samples; adapt as needed.
+variable        tstride equal 8
+
+# ---------- INITIAL VELOCITIES & RUN ----------
+# First, assign velocities at 3000 K from a Maxwell-Boltzmann distribution
+velocity        all create 3000.0 12345 mom yes dist gaussian
+
+# Fix NVE (no thermostat, just microcanonical ensemble)
+fix             nve_all all nve
+
+# Equilibrate and run for the total of 7.5 ps
+# Optionally you could run a short initial equilibration with a thermostat,
+# then switch to NVE. Here we run NVE directly for the entire 7.5 ps.
+thermo_style    custom step time temp pe ke etotal
+thermo          ${tstride}
+
+# Dump atomic positions and velocities every tstride steps
+dump            1 all custom ${tstride} tungsten_nve_*.dump id type x y z vx vy vz
+
+# Now run for 7500 steps
+run             7500

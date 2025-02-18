@@ -1,0 +1,59 @@
+# LAMMPS Input Script for 16-atom W BCC, T=3000 K, 7.5 ps NVE run
+
+# -------------------------
+# Initialization
+# -------------------------
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# -------------------------
+# Create BCC W lattice
+# -------------------------
+variable        a equal 3.165  # Approx. W lattice constant (Å)
+lattice         bcc ${a}
+region          box block 0 2 0 2 0 2
+create_box      1 box
+create_atoms    1 box
+
+# Mass of tungsten
+mass            1 183.84
+
+# -------------------------
+# Interatomic Potential
+# (Replace with your ML-IAP pair_style/pair_coeff as needed)
+# For example:
+# pair_style      mlip <other_settings> 
+# pair_coeff      * * <path_to_your_ML_model>
+# 
+# Placeholder example (using an EAM potential file "W.eam.fs"):
+# -------------------------
+pair_style      eam/fs
+pair_coeff      * * W.eam.fs W
+
+# -------------------------
+# Equilibration (NVT at 3000 K)
+# -------------------------
+velocity        all create 3000.0 12345 mom yes rot yes dist gaussian
+fix             EQ all nvt temp 3000.0 3000.0 0.1
+
+# Run a short NVT equilibration (e.g., 5 ps)
+timestep        0.001         # 1 fs
+thermo          100
+run             5000          # 5000 steps = 5 ps
+
+# -------------------------
+# Switch to NVE
+# -------------------------
+unfix           EQ
+fix             INT all nve
+
+# Use a total of 7.5 ps in NVE:
+# 7.5 ps / (1 fs per step) = 7500 steps
+thermo          7              # Print thermo info ~1000 times over 7500 steps
+dump            1 all custom 7 traj.lammpstrj id type x y z vx vy vz
+
+run             7500
+
+# End of script

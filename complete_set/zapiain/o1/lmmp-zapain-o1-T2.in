@@ -1,0 +1,52 @@
+# LAMMPS Input Script for 16-atom W Simulation at ~3000 K under NVE
+# Using units "metal" at time steps of 1 fs, then total NVE run of ~7.5 ps.
+# This script requires the ML-IAP, PYTHON, and ML-SNAP packages as compiled.
+
+# 0) Initialization
+clear
+units          metal             # Time in ps, distance in Angstroms, energy in eV
+atom_style     atomic
+boundary       p p p            # Periodic in all directions
+
+# 1) Create geometry: 16 atoms in BCC tungsten (2×2×2 repeats)
+variable       alat equal 3.1652   # Approx. W lattice constant in Angstroms
+lattice        bcc ${alat}
+region         box block 0 2 0 2 0 2 units lattice
+create_box     1 box
+create_atoms   1 box
+
+# 2) Define mass (tungsten)
+mass           1 183.84
+
+# 3) Specify (ML) Potential
+#   Below is a placeholder. Replace with the actual ML potential style and file:
+#   e.g., "pair_style      mlp model.pb" or "pair_style      pydi <args>" etc.
+#   The following line is only illustrative:
+# pair_style     mlp model.in
+# pair_coeff     * * W
+
+# 4) Initial velocities at 3000 K
+velocity       all create 3000.0 12345 mom yes rot yes dist gaussian
+
+# 5) Short NVT equilibration to 3000 K
+fix            NVT all nvt temp 3000.0 3000.0 0.1
+timestep       0.001   # 1 fs
+thermo         100
+thermo_style   custom step temp etotal press
+run            2000    # 2 ps of NVT equilibration (modify as desired)
+
+unfix          NVT
+
+# 6) Switch to NVE for production (7.5 ps)
+fix            NVE all nve
+reset_timestep 0
+
+# To get 7.5 ps at 1 fs → 7500 steps
+# We want ~1000 snapshots. Dumping every 7 or 8 steps gives ~1070 or ~938 frames.
+# Adjust as you see fit. Below dumps every 8 steps (~938 frames).
+dump           MDdump all custom 8 dump_W.lammpstrj id type x y z vx vy vz
+dump_modify    MDdump sort id
+
+run            7500
+
+# End of script

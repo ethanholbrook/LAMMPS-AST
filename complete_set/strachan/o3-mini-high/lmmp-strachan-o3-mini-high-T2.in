@@ -1,0 +1,137 @@
+# ---------------------------
+# LAMMPS Input Script for 2D LJ Drop Simulation
+# Based on the following method:
+# - 100 Lennard-Jones particles in 2D interacting via
+#   V(r) = 4*ε*[ (σ/r)^12 - (σ/r)^6 - (σ/r_c)^12 + (σ/r_c)^6 ]
+#   with cutoff r_c = 3σ (i.e. potential is shifted so that V(r_c)=0).
+#
+# - The simulation time unit is defined as: 
+#      t0 = sqrt(σ²*m/(48*ε))
+#   and the integration timestep is t_int = 0.0025*t0.
+#
+# - Initial configurations are “drops” obtained by cutting a circle from
+#   a thermalized 2D periodic system at a prescribed density ρ and total energy E.
+#
+# - In the production run the system is evolved in the microcanonical (NVE) ensemble.
+#
+# - (Post-)analysis: the drop will be divided into 10 concentric circular regions
+#   (centered at the drop’s center-of-mass) so that the mean radial velocity and 
+#   the local “temperature” (i.e. fluctuations about the mean radial velocity) can be calculated.
+#
+# Set the variables below to choose one of the parameter sets.
+# For example, for the first set:   ρ=0.75, E=-1.1, adjust T_desired as needed.
+# ---------------------------
+
+# Use LJ units (ε, σ, and m are 1 by default) and work in 2D.
+units           lj
+dimension       2
+boundary        f f f     # non-periodic (free) boundaries in x and y
+
+atom_style      atomic
+
+# ---------------------------
+# ----- Define simulation parameters -----
+# ---------------------------
+variable N         equal 100
+variable rho       equal 0.75       # density in 1/σ² (change to 0.8 for the last set)
+variable E_total   equal -1.1       # total energy [in ε] (set to -1.1, -0.55, 0.8, or -0.3)
+# Note: Exactly setting the total energy would require adjusting both positions and velocities.
+# Here we will roughly target the kinetic portion via an appropriate initial temperature.
+# Adjust the temperature below as needed.
+variable T_desired equal 0.2
+
+# ---------------------------
+# ----- Define the drop geometry -----
+# ---------------------------
+# The drop is assumed to come from a periodic system of density ρ.
+# Its area is A = N/ρ. For a circular drop, A = π*R², so:
+#   R = sqrt(N/(π*ρ))
+variable drop_radius equal sqrt(${N}/(pi*${rho}))
+
+# We choose a simulation box that comfortably contains the drop.
+# Here, we set the half-length L (in each x and y) to be larger than drop_radius.
+variable L equal ${drop_radius}*1.8
+
+region box block -${L} ${L} -${L} ${L} -0.1 0.1 units box
+create_box 1 box
+
+# Define a circular region (centered at 0,0) with the computed drop radius.
+region drop circle 0.0 0.0 ${drop_radius} units box
+
+# Create N atoms randomly within the drop region.
+create_atoms 1 random ${N} 12345 drop
+
+# Remove any net linear momentum.
+velocity all zero linear
+
+# ---------------------------
+# ----- Interatomic potential -----
+# ---------------------------
+# Use the Lennard-Jones potential with a cutoff of 3σ.
+# Note: The standard LJ form is V(r)=4ε[(σ/r)^12-(σ/r)^6].
+# We want to use the shifted form: subtract V(r_c) so that V(r_c)=0.
+pair_style lj/cut 3.0
+pair_modify shift yes
+pair_coeff 1 1 1.0 1.0 3.0
+
+mass 1 1.0
+
+# ---------------------------
+# ----- Timestep setup -----
+# ---------------------------
+# The time unit is t0 = sqrt(σ²*m/(48*ε)) = sqrt(1/48) in LJ units.
+variable t0 equal sqrt(1.0/48.0)
+# Integration timestep: t_int = 0.0025*t0.
+variable dt equal 0.0025*${t0}
+timestep ${dt}
+
+# ---------------------------
+# ----- Initial velocity assignment -----
+# ---------------------------
+# To approximately achieve the desired total energy (E_total),
+# we assign initial velocities from a Gaussian distribution corresponding to T_desired.
+# (Note: Because the drop’s potential energy is fixed by the positions,
+#  you may need to fine-tune T_desired to match your desired E_total.)
+velocity all create ${T_desired} 54321 mom yes rot yes
+
+# ---------------------------
+# ----- Neighbor settings -----
+# ---------------------------
+neighbor        0.3 bin
+neigh_modify    delay 0 every 1 check yes
+
+# ---------------------------
+# ----- Output and (optional) analysis computes -----
+# ---------------------------
+# Dump atom id, type, x, y, and velocities every 100 steps.
+dump 1 all custom 100 dump.lammpstrj id type x y vx vy
+
+# (Optional) Compute the center-of-mass so you can later post-process and
+# bin atoms into 10 concentric circular shells (about the c.m.) to calculate
+# the mean radial velocity and local temperature.
+compute myCOM all com
+# You can output the center-of-mass coordinates via thermo_style if desired.
+variable xcm equal c_myCOM[1]
+variable ycm equal c_myCOM[2]
+thermo 100
+thermo_style custom step temp pe ke etotal v_xcm v_ycm
+
+# ---------------------------
+# ----- Equilibration run -----
+# ---------------------------
+# Run a short equilibration to “thermalize” the drop.
+run 5000
+
+# ---------------------------
+# ----- Production run (NVE) -----
+# ---------------------------
+# Switch to microcanonical ensemble.
+unfix 1     # (if you had any previous fix that is not NVE; here we simply start NVE)
+fix 1 all nve
+
+# Run the simulation for production (adjust the number of steps as needed).
+run 20000
+
+# ---------------------------
+# End of simulation script.
+# ---------------------------

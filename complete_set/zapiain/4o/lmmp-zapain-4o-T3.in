@@ -1,0 +1,35 @@
+# LAMMPS input script for NVE simulation of tungsten
+
+units           metal
+atom_style      atomic
+boundary        p p p
+
+# Create a BCC tungsten lattice
+lattice         bcc 3.165 # Assuming lattice constant for Tungsten in Angstroms
+region          box block 0 2 0 2 0 2
+create_box      1 box
+create_atoms    1 box
+
+# Define potential (Assuming EAM potential for tungsten, modify as needed)
+pair_style      eam/alloy
+pair_coeff      * * W_eam.alloy W
+
+# Temperature and Run parameters
+velocity        all create 3000 123456 mom yes rot yes
+fix             1 all nve
+
+# Output settings
+thermo          10
+thermo_style    custom step time temp pe ke etotal press vol
+
+# Equilibration run
+timestep        0.001
+run             7500    # 7.5 ps total with 1 fs timesteps
+
+# Save final configuration (optional)
+write_data      tungsten_final.data
+
+# Ensure you have the ML-IAP and ML-SNAP packages installed and compiled
+# Ensure you load any Python scripts or ML-IAP models if you need them
+
+# Note: Modify the potential or additional settings based on the specific ML-IAP needs

@@ -1,0 +1,33 @@
+# LAMMPS script for simulating the melting of bulk Ni
+
+units metal
+boundary p p p
+atom_style atomic
+
+# Create FCC Ni lattice and replicate
+lattice fcc 3.52  # Approximate lattice constant for Ni
+region box block 0 10 0 10 0 10
+create_box 1 box
+create_atoms 1 box
+
+# Define interatomic potential
+pair_style eam
+pair_coeff * * Ni_Mishin1999.eam.alloy Ni  # Ensure this file is in the working directory
+
+# Define simulation settings
+mass 1 58.69  # Atomic mass of Ni
+velocity all create 600.0 12345 mom yes rot yes dist gaussian
+
+timestep 0.001  # 1 fs timestep
+
+# NPT ensemble for heating at 1 atm
+fix 1 all npt temp 300.0 2500.0 100.0 iso 1.0 1.0 1000.0
+
+thermo 100
+thermo_style custom step temp press etotal pe ke vol
+
+dump 1 all atom 1000 dump.melt
+run 220000  # Heating rate 10 K/ps -> (2500K - 300K) / (10 K/ps) = 220 ps = 220000 steps
+
+unfix 1
+dump_modify 1 sort id

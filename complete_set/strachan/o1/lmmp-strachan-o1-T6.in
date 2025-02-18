@@ -1,0 +1,110 @@
+# --------------------------
+# 2D Lennard-Jones simulation
+# --------------------------
+
+# ---------- Initialization ----------
+units       lj               # Use Lennard-Jones reduced units
+dimension   2                # 2D simulation
+boundary    p p f            # Periodic in x,y; free (fixed) in z
+atom_style  atomic
+
+# ---------- Variables (Adjust as needed) ----------
+
+# Number of particles
+variable    N        index 100
+
+# We will run four separate cases for example by manually specifying
+# or calling LAMMPS with command-line arguments, e.g.:
+#   lmp -in this_script.in -var rho 0.75 -var Etarget -1.1
+# etc.
+variable    rho      index 0.75   # Target 2D density = N / (box_area)
+variable    Etarget  index -1.1   # Desired total energy (approx)
+
+# Time-step consistent with Delta t = 0.0025 * t0 = 0.0025 / sqrt(48) ~ 3.6e-4
+variable    dt       equal 0.00036
+
+# Number of MD steps (increase or decrease as needed)
+variable    nsteps   index 500000
+
+# ---------- Create Simulation Box & Atoms ----------
+# 1. Create a 10x10 square lattice (100 sites) with spacing = 1.0
+# 2. Then "stretch" the box to achieve the desired area so that the
+#    final 2D density is rho = N / L^2.
+
+# Step A: minimal 10x10 box
+region      box block 0 10 0 10 -0.5 0.5  # "f" boundary means z-dimension is just a small fixed range
+create_box  1 box
+
+lattice     sq 1.0
+create_atoms 1 box
+
+# Step B: scale the box so that area matches N / rho
+# L = sqrt(N / rho)
+variable    boxL equal sqrt(${N}/${rho})
+print "Creating a box sized ${boxL} x ${boxL} to get 2D density rho = ${rho}"
+
+fix         deformbox all deform 1 x final 0 ${boxL} y final 0 ${boxL} units box
+run         0
+unfix       deformbox
+
+# ---------- LJ Interactions ----------
+mass        1 1.0                         # particle mass in LJ units
+pair_style  lj/cut 3.0                    # cutoff = 3 sigma
+pair_modify shift yes                     # shift potential to 0 at cutoff
+pair_coeff  1 1 1.0 1.0 3.0               # (epsilon=1, sigma=1, cutoff=3.0)
+
+# ---------- Optional: Convert to circular droplet ----------
+# If you really want to "cut out" a circle (droplet) of radius R
+# in the center of the box and remove everything else, you can do:
+#   variable R equal 0.5*${boxL}    # for example, half the box length
+#   region   droplet cylinder z 0.5*${boxL} 0.5*${boxL} ${R} 0 0 side in units box
+#   delete_atoms region droplet invert
+#   Now you have an approximate circle of atoms. 
+#   (Or invert the logic if you want to *keep* only the circle.)
+
+# ---------- Initial Velocities ----------
+# For demonstration, we simply create velocities at a guessed temperature
+# that you might iterate to get the desired total energy. 
+velocity    all create 1.0 12345 mom yes dist gaussian  # "1.0" is an example
+# You may have to do short runs, measure total energy, and re-create velocities
+# with a different T to converge on E = ${Etarget}.
+
+# ---------- Settings for Integration ----------
+neighbor    0.3 bin
+neigh_modify every 1 delay 0 check yes
+
+# We do pure NVE to conserve total energy
+fix         integrator all nve
+
+timestep    ${dt}
+thermo      1000
+thermo_style custom step time temp pe ke etotal lx ly
+
+# ---------- Data Collection (optional) ----------
+# Example: Dump atomic coordinates
+dump        myDump all atom 5000 LJ2D_${rho}_${Etarget}.lammpstrj
+dump_modify myDump sort id
+
+# ---------- Optional: Measure radial bins (velocity, temperature) ----------
+# For advanced analysis, you can define "chunks" in concentric bins around 
+# the center of mass and measure radial velocity or local T. For example:
+#
+# compute       com all com
+# variable      cx equal c_com[1]
+# variable      cy equal c_com[2]
+#
+# # Make 10 radial bins from r=0 up to half the box (or a droplet radius)
+# compute       myChunks all chunk/atom bin/sphere ${cx} ${cy} 0 0.5*${boxL} 10
+#
+# # Average velocity in each bin (including radial velocity components)
+# fix           radvel all ave/chunk 10 100 1000 myChunks vx vy vx ave one file radial_velocity.txt
+# 
+# # Similarly, local temperature in each bin (subtracting the chunk's average velocity)
+# # LAMMPS docs: compute temp/chunk ...
+# compute       tchunk all temp/chunk myChunks temp com yes
+# fix           avetemp all ave/time 10 100 1000 c_tchunk file radial_temp.txt
+
+# ---------- Run Simulation ----------
+run         ${nsteps}
+
+# ---------- End of Script ----------

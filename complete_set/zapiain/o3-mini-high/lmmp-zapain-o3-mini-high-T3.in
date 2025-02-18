@@ -1,0 +1,48 @@
+# LAMMPS input script for NVE simulation of tungsten in a BCC lattice at 3000 K
+
+# -------------------------- Initialization --------------------------
+units           metal
+dimension       3
+boundary        p p p
+
+# -------------------------- Atom Definition --------------------------
+# Create a BCC lattice with lattice parameter 3.16 Å.
+# A single BCC cell in LAMMPS has 2 atoms so a 2x2x2 replication gives 16 atoms.
+lattice         bcc 3.16
+region          simbox block 0 2 0 2 0 2
+create_box      1 simbox
+create_atoms    1 box
+
+# Define mass for tungsten (in atomic mass units)
+mass            1 183.84
+
+# -------------------------- Potential Definition --------------------------
+# Set the ML-IAP potential.
+# Replace "your_model_file" with the appropriate ML-IAP model file for tungsten.
+pair_style      ml-iap model_file=your_model_file
+pair_coeff      * * tungsten
+
+# -------------------------- Initial Velocities --------------------------
+# Initialize velocities corresponding to 3000 K.
+velocity        all create 3000.0 12345 mom yes rot yes dist gaussian
+
+# -------------------------- Integration Settings --------------------------
+# Set timestep to 0.001 ps (1 fs)
+timestep        0.001
+
+# Use NVE integration
+fix             1 all nve
+
+# -------------------------- Output Settings --------------------------
+# Print thermo info every 100 steps
+thermo          100
+thermo_style    custom step temp pe ke etotal
+
+# Dump atomic positions every 7 steps (≈1000 samples over 7500 steps)
+dump            1 all custom 7 dump.wte.lammpstrj id type x y z
+
+# -------------------------- Run Simulation --------------------------
+# Run for 7500 steps corresponding to 7.5 ps total simulation time
+run             7500
+
+# End of script

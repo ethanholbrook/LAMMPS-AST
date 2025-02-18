@@ -1,0 +1,40 @@
+# LAMMPS script to characterize melting of bulk Ni
+
+units metal
+boundary p p p
+atom_style atomic
+
+# Define lattice and create simulation box
+lattice fcc 3.52
+region box block 0 10 0 10 0 10
+create_box 1 box
+create_atoms 1 box
+
+# Set interatomic potential (EAM potential by Mishin et al. 1999)
+pair_style eam
+pair_coeff * * Ni_Mishin1999.eam.alloy Ni
+
+# Set initial velocities at 600 K from Maxwell-Boltzmann distribution
+velocity all create 600.0 12345 mom yes rot yes dist gaussian
+
+# Define fixes for NPT ensemble
+fix 1 all npt temp 300.0 2500.0 10.0 iso 1.0 1.0 1.0
+
+# Set timestep
+timestep 0.001  # 1 fs
+
+# Run simulation for enough time to achieve desired heating rate
+# Heating rate: 10 K per ps = 0.01 K per fs
+variable total_time equal (2500-300)/10.0  # Time required in ps
+variable steps equal v_total_time*1000  # Convert to steps (1 fs timestep)
+
+thermo 100  # Print thermodynamic info every 100 steps
+thermo_style custom step temp press pe ke etotal
+
+# Dump atomic positions to monitor melting
+dump 1 all custom 1000 melt_ni.lammpstrj id type x y z
+
+# Run the simulation
+run ${steps}
+
+# End of script

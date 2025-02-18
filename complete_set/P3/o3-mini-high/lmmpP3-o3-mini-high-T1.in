@@ -1,0 +1,122 @@
+# LAMMPS Input Script: High-Velocity Impact Simulation of Nb Single Crystals
+# Simulation of spall failure using a projectile impacting a target at 2 km/s
+# 
+# The projectile is built by replicating the Nb BCC unit cell 20 times in [100], [010], and [001].
+# The target is built by replicating 20×20×40 unit cells.
+# A 1.5 nm (15 Å) gap separates the two.
+# Periodic boundaries are used in x and y (directions normal to the impact) and free in z.
+# Equilibration is done in an isothermal, isochoric (NVT) ensemble for 100 ps at 300 K,
+# then 2 km/s (20 Å/ps) is added to the projectile along z, and the simulation is run adiabatically (NVE).
+
+#############################
+# 1. Initialization
+#############################
+
+units           metal
+dimension       3
+boundary        p p f             # p in x and y; free (non-periodic) in z
+atom_style      atomic
+
+#############################
+# 2. Define Lattice and Simulation Box
+#############################
+
+# Lattice constant for Nb (in Å)
+variable a       equal 3.3
+
+# Replication factors for projectile and target
+variable nproj   equal 20          # number of unit cells along each direction for projectile
+variable ntarget_z equal 40         # number of unit cells along z for target
+
+# Gap between projectile and target (in Å); 1.5 nm = 15 Å
+variable gap     equal 15.0
+
+# Lateral dimensions (projectile and target are both 20 unit cells in x and y)
+variable Lx      equal ${nproj}*${a}
+variable Ly      equal ${nproj}*${a}
+
+# z-dimension: projectile (20 cells) + gap + target (40 cells)
+variable Lz      equal ${nproj}*${a} + ${gap} + ${ntarget_z}*${a}
+
+# Create the simulation box
+region          simbox block 0 ${Lx} 0 ${Ly} 0 ${Lz} units box
+create_box      1 simbox
+
+#############################
+# 3. Create Regions for Projectile and Target
+#############################
+
+# Projectile region: occupies the bottom part in z (20 unit cells = 20*a)
+region          projectile block 0 ${Lx} 0 ${Ly} 0 ${nproj}*${a} units box
+
+# Define the lower bound of the target region (projectile thickness + gap)
+variable        zlow_target equal ${nproj}*${a} + ${gap}
+
+# Target region: placed at the top (40 unit cells in z)
+region          target block 0 ${Lx} 0 ${Ly} ${zlow_target} ${Lz} units box
+
+# Create atoms in each region using the Nb BCC lattice
+lattice         bcc ${a}
+create_atoms    1 region projectile
+create_atoms    1 region target
+
+#############################
+# 4. Define Groups and Interatomic Potential
+#############################
+
+# Define groups for projectile and target based on their regions
+group           projectile_region region projectile
+group           target_region region target
+group           all type 1
+
+# Set the interatomic potential (EAM potential from Fellinger et al.)
+# (Replace "Nb_Fellinger.eam.alloy" with the actual filename from openKIM.)
+pair_style      eam/fs
+pair_coeff      * * Nb_Fellinger.eam.alloy Nb
+
+# Set up neighbor settings
+neighbor        2.0 bin
+neigh_modify    delay 10
+
+#############################
+# 5. Equilibration (NVT at 300 K for 100 ps)
+#############################
+
+# Initialize velocities at 300 K (using a random seed, here 12345)
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+
+# Set the timestep (metal units: time in ps; 0.001 ps ≈ 1 fs)
+timestep        0.001
+
+# Equilibrate using an NVT ensemble (temperature damping constant 0.1 ps)
+fix             1 all nvt temp 300.0 300.0 0.1
+thermo          1000
+run             100000        # 100000 steps × 0.001 ps = 100 ps
+
+# Remove thermostat (NVT) fix after equilibration
+unfix           1
+
+#############################
+# 6. Add Impact Velocity to Projectile
+#############################
+
+# Add a net velocity of 20 Å/ps (≈2 km/s) along +z to the projectile atoms,
+# so that their velocity becomes (thermal + 20 Å/ps)
+velocity        projectile_region set 0.0 0.0 20.0 sum yes
+
+#############################
+# 7. Impact Simulation (Adiabatic, NVE)
+#############################
+
+# Switch to NVE (microcanonical) integration for the impact simulation
+fix             2 all nve
+
+# (Optional) Set up a dump to record atom positions every 1000 steps
+dump            1 all custom 1000 dump.impact.lammpstrj id type x y z
+
+# Run the simulation for an additional 50 ps (50000 steps)
+run             50000
+
+#############################
+# End of Script
+#############################

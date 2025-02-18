@@ -1,0 +1,74 @@
+# ------------------------------------------------------------------------------
+# LAMMPS script to model the melting of bulk Ni using 
+# the Mishin et al. (1999) EAM potential from OpenKIM.
+#
+# Reference for the EAM potential:
+# Mishin et al. (1999), also available in OpenKIM:
+#    https://openkim.org/id/EAM_Mishin_Ni_Al__MO_141186801389_005
+# or the tabulated version:
+#    "EAM potential (LAMMPS cubic hermite tabulation) for Ni developed 
+#     by Mishin et al. (1999) v005. OpenKIM; 2018. doi:10.25950/a88dfc37.
+# ------------------------------------------------------------------------------
+  
+# ---------- Initialize Simulation ---------------------
+units          metal
+atom_style     atomic
+boundary       p p p
+
+# ---------- Create Geometry ---------------------------
+# Lattice constant for Ni (approx. 3.52 Å); adjust as needed
+variable       a equal 3.52
+
+# Define an FCC lattice and a region that is 10x10x10 unit cells
+lattice        fcc ${a}
+region         box block 0 10 0 10 0 10 units lattice
+create_box     1 box
+create_atoms   1 box
+
+# ---------- Masses and Potential ----------------------
+mass           1 58.6934  # Mass of Ni in g/mol
+
+# Use the Mishin et al. EAM potential from OpenKIM
+# If you have a local file, it might be something like Ni_Mishin1999.eam.alloy
+# or if compiled with KIM, you might use "pair_style kim" syntax. 
+# Below is a generic usage example assuming you have a local EAM file.
+pair_style     eam
+pair_coeff     * * Ni_Mishin1999.eam  # Replace with your actual filename
+
+# ---------- Define Settings ---------------------------
+# The script states:
+#   1) Initial velocities at 600 K
+#   2) Heat from 300 K to 2500 K at 10 K/ps
+#   3) NPT ensemble at 1 atm
+
+# Time-step in metal units (1 fs = 0.001 ps)
+timestep       0.001
+
+# Assign initial velocities at 600 K with a random seed = 12345
+velocity       all create 600.0 12345 dist gaussian
+
+# Total temperature ramp:
+#   Start T = 300 K
+#   End T   = 2500 K
+#   Rate    = 10 K/ps
+# => Temperature increase = 2500 - 300 = 2200 K
+# => Time needed = 2200 K / (10 K/ps) = 220 ps
+# => Number of timesteps = 220 ps / (0.001 ps/timestep) = 220,000 timesteps
+
+# Use fix npt to perform the simultaneous ramp in T and regulate P ~ 1 atm
+# In "units metal", 1 atm ≈ 1.01325 bar, but 1.0 bar is often used as approximation.
+fix            1 all npt temp 300.0 2500.0 100.0 iso 1.0 1.0 100.0
+
+# Output thermodynamic info every 100 timesteps
+thermo         100
+
+# Write atom positions (dump) every 1000 timesteps
+dump           1 all custom 1000 dump_Ni_melting.lammpstrj id type x y z
+
+# ---------- Run the Simulation ------------------------
+run            220000
+
+# ------------------------------------------------------------------------------
+# End of LAMMPS script
+# ------------------------------------------------------------------------------
+

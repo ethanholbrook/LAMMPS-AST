@@ -1,0 +1,59 @@
+# LAMMPS input script for NVE simulations of 16 tungsten atoms in a BCC lattice
+# (Compiled with ML-IAP, PYTHON, and ML-SNAP. MLIAP_ENABLE_PYTHON and
+#  BUILD_SHARED_LIBS must be set accordingly.)
+
+# ---------- INITIALIZATION ----------
+
+units           metal
+atom_style      atomic
+boundary        p p p
+
+# ---------- ATOM DEFINITION ----------
+
+variable        a equal 3.1652   # Approx. lattice constant (Å) for W in BCC
+lattice         bcc ${a}
+region          box block 0 2 0 2 0 2 units lattice
+create_box      1 box
+create_atoms    1 box
+
+mass            1 183.84        # Tungsten atomic mass
+
+# ---------- FORCE FIELD (EXAMPLE) ----------
+# If using ML or SNAP potentials, replace the lines below with your ML-specific pair_style/pair_coeff.
+
+pair_style      eam/fs
+pair_coeff      * * W.eam.fs W
+
+# ---------- EQUILIBRATION at 3000 K ----------
+
+# Assign initial velocities from a Maxwell-Boltzmann distribution at 3000 K
+velocity        all create 3000.0 12345 mom yes rot yes dist gaussian
+
+# Optionally, you can equilibrate briefly with an NVT thermostat, then switch to NVE.
+# Here, we show a short NVT equilibration for demonstration:
+
+fix             eq all nvt temp 3000.0 3000.0 0.1
+timestep        0.001           # 0.001 ps = 1 fs in 'metal' units
+thermo          100
+thermo_style    custom step temp etotal press
+run             2000            # short equilibration run (2 ps if dt=1 fs)
+
+unfix           eq
+
+# ---------- PRODUCTION RUN (NVE) ----------
+
+fix             int all nve
+
+# Total time: 7.5 ps → 7500 steps at dt=0.001 ps
+variable        nSteps equal 7500
+
+# (Optional) Dump atomic coordinates. For example, dump every 7 steps ~ 1071 frames
+# or every 8 steps ~ 938 frames. Adjust as needed to get ~ 1000 snapshots.
+dump            myDump all custom 8 dump.W_NVE id type x y z vx vy vz
+dump_modify     myDump sort id
+
+thermo          100
+thermo_style    custom step temp etotal press
+run             ${nSteps}
+
+# ---------- END OF SCRIPT -------------------------------------------------------

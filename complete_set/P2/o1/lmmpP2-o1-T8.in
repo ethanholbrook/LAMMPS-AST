@@ -1,0 +1,67 @@
+# ------------------------------------------------------------------
+# LAMMPS script for melting a bulk Ni sample using the
+# Mishin et al. (1999) EAM potential from OpenKIM
+# ------------------------------------------------------------------
+
+# ---------- Initialize simulation ----------
+units          metal
+atom_style     atomic
+boundary       p p p
+
+# ---------- Create geometry ----------
+# Lattice constant for fcc Ni (approx. 3.52 Å at 0 K)
+variable       alat equal 3.52
+
+# Define an FCC lattice. The lattice parameter is the conventional cell size.
+lattice        fcc ${alat}
+
+# Create a region that spans 10 unit cells in each direction
+region         box block 0 10 0 10 0 10
+create_box     1 box
+create_atoms   1 box
+
+# ---------- Potential parameters ----------
+# If you have the OpenKIM potential file, use the pair_style kim approach:
+# pair_style     kim         <model_name>  # e.g., "pair_style kim Ni_Mishin1999.v005"
+# pair_coeff     * * Ni
+
+# Alternatively, if you have the EAM/Alloy file directly, do:
+pair_style     eam/alloy
+pair_coeff     * * Ni_Mishin1999.eam.alloy Ni
+
+# Set mass of Ni (atomic weight ~58.6934 g/mol)
+mass           1 58.6934
+
+# ---------- Simulation parameters ----------
+timestep       0.001    # 1 fs time step (in metal units)
+thermo         1000     # Print thermo info every 1000 steps
+thermo_style   custom step time temp pe ke etotal press vol
+
+# ---------- Define run parameters ----------
+# We want to ramp from 300 K to 2500 K at 10 K/ps
+# The total temperature change is 2200 K.
+# Rate = 10 K/ps => total time = 220 ps.
+# With a 1 fs timestep, 1 ps = 1000 timesteps => 220 ps = 220,000 timesteps
+variable       t_start  equal 300
+variable       t_stop   equal 2500
+variable       nsteps   equal 220000
+
+# ---------- Initial velocities ----------
+# Method describes initial velocities from a 600 K distribution
+velocity       all create 600.0 12345 mom yes rot yes dist gaussian
+
+# ---------- Fixes ----------
+# NPT fix to ramp the temperature from 300 K to 2500 K over nsteps
+# Keeping pressure at 1 atm (in metal units ~ 0.000101325 Mbar).
+# Tdamp and Pdamp are chosen somewhat large to allow smooth equilibration.
+fix            1 all npt temp ${t_start} ${t_stop} 100 iso 1.0 1.0 1000
+
+# ---------- Data output ----------
+dump           1 all atom 5000 nickel_melt.lammpstrj
+dump_modify    1 sort id
+
+# ---------- Run  ----------
+run            ${nsteps}
+
+# Optionally write out final configuration
+write_data     nickel_melt_final.data

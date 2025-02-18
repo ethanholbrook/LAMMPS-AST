@@ -1,0 +1,128 @@
+# LAMMPS script for 2D Lennard-Jones drop simulation
+# -----------------------------------------------------
+# This script simulates a 2D drop of N = 100 LJ particles.
+# The particles interact via the potential:
+#    V(r) = 4*ε [ (1/r)^12 - (1/r)^6 - (1/(r_c))^12 + (1/(r_c))^6 ]
+# for r < r_c, with r_c = 3.0; V(r) = 0 for r >= r_c.
+#
+# The simulation uses LJ units (σ = 1, ε = 1, m = 1) and the 2D option.
+# The integration time step is dt = 0.0025*t₀, where t₀ = 1/√48.
+#
+# Four parameter sets can be simulated by choosing the desired values:
+#    (i)   ρ = 0.75 and Etarget = -1.1
+#    (ii)  ρ = 0.75 and Etarget = -0.55
+#    (iii) ρ = 0.75 and Etarget =  0.8
+#    (iv)  ρ = 0.8  and Etarget = -0.3
+#
+# To run a different case, change the values of variables "rho" and "Etarget".
+# -----------------------------------------------------
+
+clear
+dimension 2
+units lj
+atom_style atomic
+boundary m m m      # shrink-wrapped boundaries in x and y (z is trivial in 2d)
+
+# --------------------------
+# Set simulation parameters:
+# --------------------------
+variable N equal 100
+variable rho equal 0.75         # density (in 1/σ^2); change to 0.8 for case (iv)
+variable Etarget equal -1.1     # desired total energy for the drop; adjust as needed
+
+# Compute drop area A = N/ρ and drop radius R_drop = sqrt(A/π)
+variable A equal ${N}/${rho}
+variable Rdrop equal sqrt(${A}/pi)
+
+# Define a simulation box that comfortably contains the drop.
+variable margin equal 2.0
+variable Lbox equal 2*(${Rdrop}+${margin})
+region simbox block -${Lbox}/2 ${Lbox}/2 -${Lbox}/2 ${Lbox}/2 -0.5 0.5 units box
+create_box 1 simbox
+
+# Create a circular region from which the drop is “cut”
+region drop circle 0.0 0.0 ${Rdrop} units box
+
+# Create N atoms randomly within the drop region
+create_atoms 1 random ${N} 12345 drop
+
+# -----------------------------------------
+# Define the Lennard-Jones interactions:
+# -----------------------------------------
+pair_style lj/cut 3.0
+pair_coeff 1 1 1.0 1.0 3.0
+pair_modify shift yes            # shift potential so that V(r_c)=0
+
+# Set particle mass
+mass 1 1.0
+
+# Neighbor list settings
+neighbor 0.3 bin
+neigh_modify every 1 delay 0 check yes
+
+# --------------------------------------------------
+# Set initial velocities (a starting T = 1.0 is arbitrary)
+# --------------------------------------------------
+velocity all create 1.0 54321 mom yes rot yes dist gaussian
+
+# Optionally, zero the net (linear) momentum
+velocity all zero linear
+
+# -----------------------------------------
+# (Optional) Adjust velocities to set the total energy
+# -----------------------------------------
+# Here you would compute the instantaneous potential energy (PE)
+# and then scale the velocities so that the kinetic energy (KE)
+# satisfies: KE = (Etarget - PE).
+#
+# For example:
+#    compute ke all ke
+#    variable U equal pe
+#    variable KE equal c_ke
+#    variable totE equal c_ke + pe
+#    print "Initial total energy: ${totE}"
+#    # If totE != ${Etarget}, then scale velocities:
+#    variable scaleFactor equal sqrt( (${Etarget} - U) / KE )
+#    velocity all scale ${scaleFactor}
+#
+# Note: Implementing this “on-the-fly” may require running a short equilibration,
+#       measuring the energy, and then adjusting velocities before switching to NVE.
+# -----------------------------------------
+
+# ---------------------------------------------------------
+# Set time step: dt = 0.0025*t0, with t0 = 1/√48 ≈ 0.144337
+# ---------------------------------------------------------
+variable t0 equal 1.0/sqrt(48.0)
+variable dt equal 0.0025*${t0}
+timestep ${dt}
+
+# -----------------------------------------
+# Integration: NVE dynamics (microcanonical)
+# -----------------------------------------
+fix 1 all nve
+
+# Thermodynamic output
+thermo 1000
+thermo_style custom step temp pe ke etotal
+
+# Dump atom positions and velocities for post-processing
+dump 1 all custom 1000 dump.lammpstrj id type x y vx vy
+
+# -------------------------
+# Run the simulation
+# -------------------------
+run 10000
+
+# ---------------------------------------------------------
+# Post-processing (not done within LAMMPS):
+# To analyze the drop’s multifragmentation, you should:
+#  - Divide the drop (centered at its instantaneous center-of-mass)
+#    into 10 concentric circular regions.
+#  - For each ring, compute the mean radial velocity and the local temperature
+#    (defined from the fluctuations about the mean radial motion).
+#
+# Such spatial binning is not implemented here but can be done by processing
+# the dump file (e.g. using Python) or by employing custom compute/chunk commands.
+# ---------------------------------------------------------
+
+# End of input script.

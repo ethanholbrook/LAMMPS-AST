@@ -1,0 +1,76 @@
+# LAMMPS Input Script for 16-atom W in BCC at 3000 K under NVE
+# Compatible with ML-IAP, PYTHON, and ML-SNAP packages.
+# Make sure "MLIAP_ENABLE_PYTHON" and "BUILD_SHARED_LIBS" are enabled
+# in your LAMMPS build configuration if you use pair_style mliap or similar.
+
+# ---------- INITIALIZATION ----------
+
+units           metal
+atom_style      atomic
+boundary        p p p
+dimension       3
+
+# ---------- ATOM DEFINITION ----------
+
+# Lattice constant for tungsten (approx. 3.1652 Å).
+# 2x2x2 BCC cells => 16 atoms total
+lattice         bcc 3.1652
+region          box block 0 2 0 2 0 2
+create_box      1 box
+create_atoms    1 box
+
+# Set atomic mass of W
+mass            1 183.84
+
+# ---------- FORCE FIELD (ML or Otherwise) ----------
+
+# Example with machine-learned potential (modify to your model file):
+# If you have a specific model file, replace "tungsten_model.mliap"
+# with the appropriate file name, and adjust accordingly.
+
+# pair_style mliap
+# pair_coeff * * tungsten_model.mliap W
+
+# -- OR -- Use a standard EAM potential as a placeholder:
+# pair_style eam/alloy
+# pair_coeff * * W_EAM.alloy W
+
+# ---------- NEIGHBOR & THERMO SETTINGS ----------
+
+neighbor        2.0 bin
+neigh_modify    delay 5 every 1
+
+timestep        0.001         # 1 fs
+thermo_style    custom step temp pe ke etotal press vol
+thermo          100
+
+# ---------- EQUILIBRATION ----------
+
+# Create initial velocities at 3000 K
+velocity        all create 3000.0 12345 mom yes dist gaussian
+
+# Short NVT run to relax to 3000 K
+fix             1 all nvt temp 3000.0 3000.0 0.1
+run             2000          # e.g., 2 ps of equilibration
+
+unfix           1
+
+# ---------- PRODUCTION (NVE) ----------
+
+fix             2 all nve
+
+# 7.5 ps at 3000 K in NVE ensemble
+# 7.5 ps / 1 fs = 7500 steps
+run             7500
+
+unfix           2
+
+# ---------- DATA OUTPUT ----------
+
+# Dump atomic positions and velocities periodically.
+# Adjust dump frequency so that you end up with ~1000 time samples,
+# or use “fix ave/time” for post-processing as needed.
+dump            myDump all custom 10 dump.lammpstrj id type x y z vx vy vz
+dump_modify     myDump sort id
+
+# End of script

@@ -1,0 +1,49 @@
+# File: in.W_NVE.lmp
+# LAMMPS script for a 16-atom tungsten BCC system at 3000 K in NVE ensemble
+# Requires LAMMPS compiled with ML-IAP, PYTHON, ML-SNAP, etc.
+
+# ---------- INITIALIZATION ----------
+units           metal
+atom_style      atomic
+boundary        p p p
+
+# ---------- CREATE ATOMS ----------
+variable        a equal 3.1652         # Approx. lattice constant for W (Å)
+lattice         bcc ${a}
+region          box block 0 2 0 2 0 2
+create_box      1 box
+create_atoms    1 box
+
+mass            1 183.84              # Atomic mass of tungsten (amu)
+
+# ---------- ML-IAP (or SNAP) POTENTIAL ----------
+# Modify these lines to use your actual ML potential
+pair_style      mlp model tungsten_mliap.json
+pair_coeff      * * tungsten
+
+# ---------- NEIGHBOR LIST ----------
+neighbor        2.0 bin
+neigh_modify    delay 5 every 1
+
+# ---------- EQUILIBRATION AT 3000 K ----------
+velocity        all create 3000.0 12345 mom yes rot yes dist gaussian
+fix             eq all nvt temp 3000.0 3000.0 0.1
+
+timestep        0.001                  # 1 fs
+run             2000                   # ~2 ps of NVT to equilibrate
+
+unfix           eq
+
+# ---------- NVE PRODUCTION RUN ----------
+fix             myNVE all nve
+
+# We want a total of 7.5 ps -> 7500 steps at 1 fs
+# To get approximately 1000 outputs, dump every ~7 or 8 steps.
+# Here, we do every 8 steps for ~938 snapshots.
+dump            traj all custom 8 dump.W.lammpstrj id type x y z vx vy vz
+dump_modify     traj sort id
+
+thermo          100
+run             7500
+
+# ---------- END OF SCRIPT ----------

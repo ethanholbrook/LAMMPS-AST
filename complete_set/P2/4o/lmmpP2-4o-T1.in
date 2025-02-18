@@ -1,0 +1,32 @@
+units metal
+boundary p p p
+atom_style atomic
+
+# Create Ni lattice and replicate
+lattice fcc 3.52  # Lattice parameter for Ni
+region box block 0 10 0 10 0 10
+create_box 1 box
+create_atoms 1 box
+
+# Define potential
+pair_style eam
+pair_coeff * * Ni99.eam.alloy Ni  # Use the Mishin et al. (1999) potential from OpenKIM
+
+# Set masses
+mass 1 58.6934  # Ni atomic mass
+
+# Initial velocities
+velocity all create 600.0 12345 mom yes rot yes
+
+# Define thermodynamic output
+thermo 100
+thermo_style custom step temp press etotal
+
+# Set up NPT ensemble for heating
+fix 1 all npt temp 300.0 2500.0 10.0 iso 1.0 1.0 1.0
+
+timestep 0.001  # 1 fs time step
+run 220000  # To achieve a 10 K/ps heating rate from 300K to 2500K
+
+# Unfix NPT and end simulation
+unfix 1

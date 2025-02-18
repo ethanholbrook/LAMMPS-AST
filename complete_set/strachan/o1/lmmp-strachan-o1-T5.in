@@ -1,0 +1,83 @@
+# --------------------------
+#  LAMMPS 2D Lennard-Jones
+#  N = 100 atoms
+#  Truncated/shifted LJ at rc = 3*sigma
+#  Timestep = 3.6e-4 (approx)
+# --------------------------
+
+# 1) Basic settings
+units           lj
+atom_style      atomic
+dimension       2
+boundary        p p p           # Periodic in x,y for convenience; z is ignored in dimension 2
+
+# 2) Define variables for parameter scans 
+#    (You can run multiple times with different values)
+variable        myRho index 0.75     # e.g., 0.75 / sigma^2
+variable        myEnergy index -1.1  # e.g., -1.1 * epsilon
+variable        N index 100
+
+# 3) Create simulation box
+#    For a 2D system of N=100 atoms at areal density rho = 0.75, total area needed = N / rho = ~133.3
+#    A simple approach is to create a roughly square box of side ~ sqrt(133.3) ~ 11.55
+#    Make sure it is large enough for a "drop"
+#    (In a real study you might read from a data file that has the drop cut out, or do more steps.)
+variable        boxLx equal sqrt(${N}/${myRho})
+variable        boxLy equal ${boxLx}
+
+region          box block 0 ${boxLx} 0 ${boxLy} -0.1 0.1 units box
+create_box      1 box
+
+# 4) Create atoms
+#    (Option A) Random placement of N=100 atoms, then thermalize:
+#    (Option B) Lattice-based initialization (for demonstration):
+#    Below: place exactly N random atoms inside the box:
+create_atoms    1 random ${N} 12345 box
+
+# 5) Define LJ potential with cutoff = 3 sigma
+mass            1 1.0
+pair_style      lj/cut 3.0
+pair_coeff      1 1 1.0 1.0 3.0
+
+# 6) Timestep (in LJ units) matching dt = 0.0025 * t0
+#    where t0 = sqrt(sigma^2 m / (48 epsilon)) => dt ~ 3.6e-4 in LJ units
+timestep        3.6e-4
+
+# 7) Initialize velocities
+#    We assume you want total energy E = -1.1 eps/particle (just as an example).
+#    The procedure for exactly hitting E may require:
+#    - guessing a T
+#    - velocity create
+#    - short NVT or velocity rescale
+#    - measuring final total energy
+#    - adjusting T
+#    For demonstration, we'll just set a temperature of ~ 1.0 and then let the system relax.
+velocity        all create 1.0 12345 dist gaussian
+
+# 8) Equilibrate/thermalize for some steps under NVT (optional):
+fix             eq all nvt temp 1.0 1.0 1.0
+run             5000
+
+# 9) Switch to NVE for microcanonical evolution:
+unfix           eq
+fix             1 all nve
+
+# If you want to remove any net angular momentum or net linear momentum:
+# fix             2 all momentum 1 angular yes
+
+# 10) Run production
+thermo_style    custom step time temp pe ke etotal
+thermo          100
+run             100000
+
+# 11) Output: radial binning to get local radial velocity & temperature
+#     We use compute chunk/atom with bin/2d radial. 
+#     Example: 10 bins from r=0 to r= half of box diagonal. 
+#     (Choose bin size so that the outermost bin encloses your entire drop.)
+compute         ringChunks all chunk/atom bin/2d radial 0.0 0.5 10 0.0 0.0 units box
+
+# average vx, vy, and local "temperature" in each chunk
+fix             ringAve all ave/chunk 50 1 50 ringChunks vx vy temp file radial_profile.txt
+
+# That's it. You will get "radial_profile.txt" with the average radial velocities
+# (vx, vy) and local temperature in each concentric radial bin every 50 timesteps.

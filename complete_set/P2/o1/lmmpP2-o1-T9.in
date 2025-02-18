@@ -1,0 +1,60 @@
+# LAMMPS Input Script: Ni Melting via Continuous Heating
+
+# ---------- INITIALIZATION ----------
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# ---------- ATOM DEFINITION ----------
+# Lattice parameter for fcc Ni. You can adjust if needed based on the potential.
+variable        a equal 3.52
+lattice         fcc ${a}
+region          box block 0 10 0 10 0 10
+create_box      1 box
+create_atoms    1 box
+
+# Set the mass of Ni (atomic number 28)
+mass            1 58.6934
+
+# ---------- INTERATOMIC POTENTIAL ----------
+# If using the Mishin et al. (1999) EAM potential file from OpenKIM locally:
+#   Download/rename file as Ni_Mishin_1999.eam or similar in your run directory.
+#   Alternatively, if you compiled LAMMPS with the KIM API, you can use 'pair_style kim' syntax.
+pair_style      eam
+pair_coeff      * * Ni_Mishin_1999.eam Ni
+
+# ---------- NEIGHBOR SETTINGS ----------
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+# ---------- VELOCITY INITIALIZATION ----------
+# Create initial velocities from a Maxwell-Boltzmann distribution at 600 K
+# The 'seed' (12345) can be changed for different random initial velocities.
+velocity        all create 600.0 12345 mom yes dist gaussian
+
+# ---------- EQUILIBRATION / RAMPED HEATING ----------
+# In metal units, 1 'timestep' = 1 fs if 'timestep' is set to 0.001.
+timestep        0.001  # 1 fs
+
+# We want to heat from 300 K to 2500 K at 10 K/ps. 
+# Temperature difference: (2500 - 300) = 2200 K 
+# Rate = 10 K/ps => total time = 220 ps. At 1 fs per step => 1 ps = 1000 steps => 220 ps = 220,000 steps.
+
+# NPT ensemble at 1 atm, ramping T from 300 K to 2500 K over 220 ps.
+# Typical damping constants for metal: ~0.1 ps for T, ~1 ps for P. 
+# (Since 1 ps = 1000 steps at 1 fs each, we use 100 steps & 1000 steps for Tdamp & Pdamp, respectively.)
+fix             1 all npt temp 300.0 2500.0 0.1 iso 1.0 1.0 1.0
+
+# ---------- OUTPUT SETTINGS ----------
+thermo_style    custom step time temp press pe ke etotal vol
+thermo          1000
+
+# Dump atomic coordinates (and velocities) every 1000 steps
+dump            1 all custom 1000 dump.melting id type x y z vx vy vz
+
+# Optional: write restart files periodically
+restart         50000 restart.melting.*
+
+# ---------- RUN ----------
+run             220000

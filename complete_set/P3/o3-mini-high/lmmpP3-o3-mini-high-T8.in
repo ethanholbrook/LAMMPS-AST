@@ -1,0 +1,100 @@
+# ----------------------- LAMMPS Script for Nb Spall Failure -----------------------
+# This script simulates high-velocity impact between a Nb projectile and target.
+# The projectile is built by replicating the Nb BCC unit cell 20×20×20,
+# and the target by replicating it 20×20×40.
+# A gap of 1.5 nm (15 Å) separates the two.
+# The system is first equilibrated at 300 K (NVT) for 100 ps.
+# Then a velocity of 2 km/s (20 Å/ps) is added to the projectile (along –z)
+# and the simulation is continued adiabatically (NVE).
+
+# ------------------------------- Initialization -------------------------------
+units           metal
+dimension       3
+boundary        p p f        # Periodic in x and y, free in z
+atom_style      atomic
+
+# ------------------------ Define Box and Regions ------------------------------
+# Lattice parameter for Nb (in Å)
+variable latConst equal 3.3
+
+# Set box dimensions:
+#  • x and y: 20 unit cells → 20*3.3 = 66.0 Å
+#  • Target thickness (z): 40 unit cells → 40*3.3 = 132.0 Å
+#  • Gap: 15.0 Å (1.5 nm)
+#  • Projectile thickness (z): 20 unit cells → 20*3.3 = 66.0 Å
+variable Lx       equal 20*${latConst}    # 66 Å
+variable Ly       equal 20*${latConst}    # 66 Å
+variable target_z equal 40*${latConst}    # 132 Å
+variable gap      equal 15.0              # 15 Å gap
+variable proj_z   equal 20*${latConst}    # 66 Å
+variable Lz       equal ${target_z} + ${gap} + ${proj_z}  # Total = 132 + 15 + 66 = 213 Å
+
+# Create overall simulation box
+region box block 0 ${Lx} 0 ${Ly} 0 ${Lz} units box
+create_box 1 box
+
+# Define region for the target (placed at the bottom)
+region target block 0 ${Lx} 0 ${Ly} 0 ${target_z} units box
+
+# Define a “template” region for the projectile.
+# (We create the projectile “in-place” and then later displace it upward.)
+region proj_template block 0 ${Lx} 0 ${Ly} 0 ${proj_z} units box
+
+# ------------------------ Create Atoms in Each Region -------------------------
+# Set up the BCC lattice with the desired orientation (x=[100], y=[010], z=[001])
+lattice         bcc ${latConst} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+
+# Create atoms in the target region (40×20×20 unit cells)
+create_atoms    1 region target
+
+# Create atoms in the projectile template region (20×20×20 unit cells)
+create_atoms    1 region proj_template
+
+# Group the projectile atoms (they are those created in proj_template)
+group           projectile region proj_template
+
+# Displace projectile atoms in the z direction so that they lie above the target.
+# (The target occupies 0–132 Å; add the 15 Å gap → displacement = 132 + 15 = 147 Å.)
+displace_atoms  projectile move 0 0 147.0 units box
+
+# Also, define a group for target atoms (for clarity)
+group           target region target
+
+# ------------------------- Set Mass and Potential -----------------------------
+# Set the mass of Nb (in atomic mass units)
+mass            1 92.91
+
+# Use the EAM potential from Fellinger et al.
+# (Ensure that the potential file "Nb_fm_eam.alloy" is in your working directory or give its full path.)
+pair_style      eam
+pair_coeff      * * Nb_fm_eam.alloy Nb
+
+# Set up the neighbor list
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+# --------------------------- Equilibration (NVT) ------------------------------
+# Initialize velocities corresponding to 300 K (Gaussian distribution, zero net momentum)
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+
+# Define thermo and dump settings
+thermo          1000
+thermo_style    custom step temp pe ke etotal
+dump            1 all atom 1000 dump.spall.lammpstrj
+
+# Equilibrate the entire system at 300 K for 100 ps.
+fix             1 all nvt temp 300.0 300.0 0.1
+timestep        0.001            # 1 fs timestep (0.001 ps)
+run             100000           # 100,000 steps = 100 ps
+unfix           1
+
+# ----------------------- Apply Impact Velocity & NVE --------------------------
+# Add an extra velocity of 2 km/s (20 Å/ps) to the projectile atoms.
+# (Since the projectile is above the target, we add a velocity in the –z direction.)
+velocity        projectile set 0 0 -20.0 sum yes
+
+# Switch to adiabatic dynamics (NVE) to simulate impact and subsequent expansion.
+fix             2 all nve
+run             50000            # Continue simulation for 50 ps (adjust as needed)
+
+# ------------------------------ End Simulation -------------------------------

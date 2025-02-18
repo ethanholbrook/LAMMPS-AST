@@ -1,0 +1,108 @@
+# ------------------------------------------------------------------
+# LAMMPS input script for high-velocity impact (2 km/s) of Nb projectile
+# against an Nb target, replicating the setup described:
+#
+#  - Nb is BCC with lattice parameter ~3.30 Å
+#  - Projectile: 20×20×20 unit cells
+#  - Target: 20×20×40 unit cells
+#  - Impact direction is [001], with periodic boundaries in [100] and [010],
+#    and free boundaries (non-periodic) along [001].
+#  - A 1.5 nm gap separates the projectile and target.
+#  - System equilibrated at 300 K for 100 ps (NVT), then adiabatic (NVE) for impact.
+#  - Uses an EAM potential from Fellinger et al. (Phys. Rev. B 81, 144119) via openKIM.
+#
+#  References:
+#    [1] Fellinger MR, Park H, Wilkins JW. force-matched EAM potential for niobium.
+#        Phys. Rev. B 81, 144119 (2010). doi:10.1103/PhysRevB.81.144119
+#    [2] https://doi.org/10.25950/befb2eea
+# ------------------------------------------------------------------
+
+# ---------- 1) Initialization ----------
+
+units           metal
+dimension       3
+boundary        p p s          # periodic in x, y; free (non-periodic) in z
+atom_style      atomic
+timestep        0.001          # 0.001 ps = 1 fs
+
+# ---------- 2) Define lattice and simulation regions ----------
+
+# Lattice parameter for BCC Nb (approx.)
+variable        a0 equal 3.30  
+
+# Use a bcc lattice oriented such that:
+#   x -> [100], y -> [010], z -> [001]
+lattice         bcc ${a0} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+
+# In lattice units, the projectile is 20 cells thick in z, the gap is ~1.5 nm,
+# and the target is 40 cells thick in z. Each cell has size a0 ~ 3.3 Å in z.
+#   Projectile thickness in z: 20 × a0  ~ 66 Å
+#   Gap:                       1.5 nm   = 15 Å  ~ 15 / a0 = 4.55 lattice units
+#   Target thickness in z:     40 × a0  ~132 Å
+# Total z range ~ 66 + 15 + 132 = 213 Å  ~ 64.5 lattice units
+# We'll place them from z=0 to z=~64.5 for convenience.
+
+# Define a global simulation box
+region          full block 0 20  0 20  0 65 units lattice
+create_box      1 full
+
+# Define the projectile region: z from 0 to 20 lattice units
+region          projectile block  0 20  0 20  0 20 units lattice
+create_atoms    1 region projectile
+
+# Define the target region: start at z=20 + gap
+# gap in lattice units = ~15 Å / 3.30 Å = ~4.55
+variable        zgap equal 20+4.55
+region          target block  0 20  0 20  ${zgap} 60 units lattice
+create_atoms    1 region target
+
+# ---------- 3) Define masses and potentials ----------
+
+# Nb atomic mass ~92.906
+mass            1 92.906
+
+# Example of using the KIM pair style for Fellinger et al. Nb EAM potential.
+# (Requires LAMMPS compiled with KIM support and appropriate KIM model installed.)
+# Adjust the model name below to match your local openKIM ID for Nb.
+pair_style      kim Model_SEMI_empirical_EAM_Fellinger_Nb  metal
+pair_coeff      * * Nb
+
+# If you prefer a file-based EAM potential (instead of openKIM), do for example:
+# pair_style     eam/alloy
+# pair_coeff     * * Nb_Fellinger_eam.alloy Nb
+
+# ---------- 4) Group definitions ----------
+group           gProjectile region projectile
+group           gTarget     region target
+
+# ---------- 5) Equilibration at 300 K (NVT) ----------
+
+# Initialize velocities at 300 K
+velocity        all create 300.0 12345 mom yes
+
+# NVT simulation for 100 ps
+fix             NVT all nvt temp 300.0 300.0 0.1
+# 100 ps / (0.001 ps per step) = 100,000 steps
+run             100000
+
+unfix           NVT
+
+# ---------- 6) Impart the impact velocity to the projectile ----------
+
+# 2 km/s = 2000 m/s. In metal units: 1 Å/ps = 100 m/s, so 2 km/s = 20 Å/ps.
+velocity        gProjectile set 0.0 0.0 20.0 sum yes
+
+# ---------- 7) Adiabatic (NVE) MD for the shock process ----------
+fix             NVE all nve
+
+# Run for however long is desired to capture spall and expansion
+# e.g., 100 ps = 100,000 steps at 1 fs per step
+run             100000
+
+# ---------- 8) End of script ----------
+
+# Notes:
+#  - Adjust the total run steps as needed to capture the full spall process.
+#  - Consider adding computes/dumps (stress, atom positions, etc.) for analysis.
+#  - Check the exact openKIM model name for the Fellinger Nb EAM potential
+#    and modify the pair_style kim line accordingly.

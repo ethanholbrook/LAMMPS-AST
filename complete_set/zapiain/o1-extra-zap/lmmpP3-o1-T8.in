@@ -1,0 +1,48 @@
+# LAMMPS Script for 16-atom BCC Tungsten NVE at 3000 K
+
+# ---------- INITIAL SETUP ----------
+units          metal
+atom_style     atomic
+boundary       p p p
+
+# ---------- CREATE ATOMS ----------
+# BCC tungsten lattice parameter (approx. 3.165 Å)
+lattice        bcc 3.165
+region         mybox block 0 2 0 2 0 2 units lattice
+create_box     1 mybox
+create_atoms   1 box
+
+# Give tungsten its mass in atomic mass units (amu)
+mass           1 183.84
+
+# ---------- CHOOSE INTERATOMIC POTENTIAL ----------
+# Example (placeholder) using an EAM potential:
+# For an ML-IAP potential, replace pair_style and pair_coeff lines appropriately.
+pair_style     eam
+pair_coeff     * * W_eam_example_file.eam
+
+# ---------- INITIAL VELOCITIES ----------
+# Set initial temperature near melting (~3000 K)
+velocity       all create 3000.0 12345 mom yes dist gaussian
+
+# ---------- ENSEMBLE DEFINITION ----------
+# Use NVE fix to conserve total energy
+fix            1 all nve
+
+# ---------- OUTPUT / THERMO SETTINGS ----------
+# Time step in picoseconds (1 fs = 0.001 ps)
+timestep       0.001
+
+# Print thermo data periodically
+thermo_style   custom step temp etotal
+thermo         100
+
+# Dump atomic positions/velocities for post-processing (optional)
+dump           1 all custom 750 dump.lammpstrj id type x y z vx vy vz
+dump_modify    1 sort id
+
+# ---------- RUN SIMULATION ----------
+# 7.5 ps / (0.001 ps/step) = 7500 steps
+run            7500
+
+# ---------- END OF SCRIPT ----------

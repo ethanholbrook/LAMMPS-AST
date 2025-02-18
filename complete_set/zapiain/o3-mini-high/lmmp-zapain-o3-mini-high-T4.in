@@ -1,0 +1,63 @@
+# LAMMPS Input Script: NVE Simulation of Tungsten Using ML-IAP Potential
+# -----------------------------------------------------------------------
+# Description:
+#  - 16 tungsten atoms arranged in a BCC lattice (2x2x2 unit cells)
+#  - Periodic boundary conditions in all directions
+#  - Initial temperature: 3000 K (using a Gaussian distribution)
+#  - Total simulation time: 7.5 ps (15000 steps at 0.0005 ps/step)
+#  - Output: 1000 time samples (dump every 15 steps)
+#
+# LAMMPS version: November 2021 with ML-IAP, PYTHON, and ML-SNAP packages
+# -----------------------------------------------------------------------
+
+# ---------- Initialization ----------
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+
+# ---------- Create BCC Lattice for Tungsten ----------
+# Tungsten adopts a BCC structure. The lattice command here sets the lattice
+# constant (in Angstroms). Adjust '3.16' if necessary.
+lattice bcc 3.16
+# Create a simulation box that contains a 2x2x2 repetition of the BCC unit cell.
+region box block 0 2 0 2 0 2 units lattice
+create_box 1 box
+create_atoms 1 box
+
+# ---------- Define ML-IAP Potential ----------
+# The ML-IAP potential (e.g., developed using ML-SNAP) is invoked via the ml_iap pair style.
+# Replace "tungsten.ml" with the path to your ML potential file.
+pair_style ml_iap
+pair_coeff * * tungsten.ml tungsten
+
+# ---------- Simulation Settings ----------
+# Set a time step of 0.0005 ps (0.5 fs)
+timestep 0.0005
+
+# Initialize velocities at 3000 K with a random seed of 12345
+velocity all create 3000.0 12345 mom yes rot yes dist gaussian
+
+# Setup neighbor list settings
+neighbor 2.0 bin
+neigh_modify delay 5 every 1 check yes
+
+# ---------- Equations of Motion ----------
+# Use the NVE integrator for constant energy dynamics.
+fix 1 all nve
+
+# ---------- Output Settings ----------
+# Set thermo output every 15 steps (to roughly match the dump frequency)
+thermo 15
+thermo_style custom step temp pe ke etotal
+
+# Dump atom coordinates and velocities every 15 steps.
+# Over 15000 steps, this will produce 1000 snapshots.
+dump 1 all custom 15 dump.wt id type x y z vx vy vz
+
+# ---------- Run the Simulation ----------
+# 7.5 ps / 0.0005 ps per step = 15000 steps
+run 15000
+
+# Optionally, write a restart file
+write_restart tungsten_nve.restart

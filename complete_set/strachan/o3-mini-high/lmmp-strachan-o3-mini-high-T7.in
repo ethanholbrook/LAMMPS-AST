@@ -1,0 +1,106 @@
+# LAMMPS Input Script for 2D Lennard-Jones Drop (Multifragmentation Study)
+# -------------------------------------------------------
+# This script simulates a 2D system of N=100 LJ particles interacting via:
+#   V(r) = 4ε[(σ/r)^12 - (σ/r)^6 - (σ/rc)^12 + (σ/rc)^6]  for r < rc, zero otherwise,
+# with rc = 3σ, and uses an integration timestep
+#   dt = 0.0025*t0,   t0 = sqrt(σ^2*m/(48*ε)).
+#
+# The drop is obtained by “cutting” a circular region from a thermalized periodic system
+# characterized by density ρ and total energy E. We then divide the drop into 10 concentric
+# circular regions (using a cylinder binning compute) to analyze the mean radial velocity
+# and local temperature (via velocity fluctuations).
+
+# ----- Initialize Simulation -----
+units           lj
+dimension       2
+boundary        m m      # non-periodic (free) boundaries in 2d
+atom_style      atomic
+
+# ----- Simulation Parameters -----
+# Number of atoms (approximately 100 atoms will be created in the drop region)
+variable N equal 100
+
+# Density of the original periodic system (units: 1/σ^2)
+# --- Choose one of the following:
+# variable rho equal 0.75   # for sets 1, 2, 3
+# variable rho equal 0.8    # for set 4
+variable rho equal 0.75
+
+# Target total energy (in units of ε)
+# --- Choose one of the following:
+# variable E_target equal -1.1   # set 1
+# variable E_target equal -0.55  # set 2
+# variable E_target equal 0.8    # set 3
+# variable E_target equal -0.3   # set 4
+variable E_target equal -1.1
+
+variable sigma   equal 1.0
+variable epsilon equal 1.0
+variable rcut    equal 3.0      # cutoff radius: r_c = 3σ
+variable m       equal 1.0
+
+# Time scale: t0 = sqrt(σ^2*m/(48*ε)); integration timestep dt = 0.0025*t0.
+variable t0 equal sqrt(${sigma}*${sigma}*${m}/(48.0*${epsilon}))
+variable dt equal 0.0025*${t0}
+
+# Estimate drop radius from density: for a periodic system, area = N/ρ, so
+# R = sqrt[N/(πρ)].
+variable dropR equal sqrt(${N}/(3.14159265*${rho}))
+
+# ----- Create Simulation Box and Atoms -----
+# Define a box large enough to accommodate the drop and its later expansion.
+region simbox block -20 20 -20 20 -0.1 0.1 units box
+create_box 1 simbox
+
+# Create a circular region ("drop") centered at (0,0) with radius dropR.
+region drop circle 0.0 0.0 ${dropR} units box
+create_atoms 1 region drop
+
+# Set atom mass.
+mass 1 ${m}
+
+# ----- Define the Interatomic Potential -----
+pair_style lj/cut ${rcut}
+pair_coeff 1 1 ${epsilon} ${sigma} ${rcut}
+pair_modify shift yes
+
+# ----- Assign Initial Velocities -----
+# (Here we assign a low temperature; in practice, one would generate the drop from a
+# thermalized periodic system and then adjust the velocities to yield the desired E_target.)
+velocity all create 0.1 12345 mom yes rot no dist gaussian
+
+# --- Optional Energy Rescaling ---
+# To target a specific total energy E_target (total energy = potential + kinetic),
+# one can (after a run 0 to measure energy) scale velocities.
+run 0
+# [At this point one might compute the current KE and PE and rescale velocities accordingly.]
+# For simplicity, this script proceeds with the assigned velocities.
+
+# ----- Integration -----
+fix 1 all nve
+timestep ${dt}
+
+# ----- Setup Computes for Radial Analysis -----
+# Define a per-atom variable for the radial velocity:
+#   vr = (vx*x + vy*y) / sqrt(x^2+y^2)  [with a tiny constant to avoid division by zero].
+variable vr atom "(vx*x + vy*y)/sqrt(x*x + y*y + 1.0e-12)"
+
+# Bin atoms into 10 concentric rings using a cylinder (axis along z).
+# Syntax: bin/cylinder  x_center y_center z_center  vx vy vz  r_inner r_outer Nbins
+compute chunks all chunk/atom bin/cylinder 0.0 0.0 0.0  0.0 0.0 1.0  0.0 ${dropR} 10 units box
+
+# Compute the local temperature (from velocity fluctuations) in each chunk.
+compute Tchunk all temp/chunk chunks
+
+# Average the radial velocity (variable vr) per chunk and output it every 1000 steps.
+fix avrg all ave/chunk 100 10 1000 chunks v_vr file radial_velocity.dat ave running
+
+# ----- Output Settings -----
+thermo 1000
+thermo_style custom step temp pe ke etotal
+
+# Dump atom positions and velocities (for visualization in, e.g., OVITO).
+dump 1 all custom 1000 dump.lammpstrj id type x y vx vy
+
+# ----- Run Simulation -----
+run 100000

@@ -1,0 +1,60 @@
+# LAMMPS Input Script for NVE simulation of tungsten in a BCC lattice
+# Total simulation time: 7.5 ps with 1000 timesteps (dt = 0.0075 ps)
+# 16 tungsten atoms arranged in a BCC lattice (2x2x2 supercell)
+# Temperature initialized at 3000 K
+# Using ML-IAP potential (replace "tungsten.ml" with your actual potential file)
+
+# --------------------------
+# Initialization
+# --------------------------
+units           metal
+atom_style      atomic
+boundary        p p p
+
+# Define a BCC lattice for tungsten with lattice constant ~3.16 Å
+lattice         bcc 3.16
+# Create a region that is 2x2x2 unit cells (2x2x2 BCC => 16 atoms)
+region          simbox block 0 2 0 2 0 2
+create_box      1 simbox
+create_atoms    1 box
+
+# Set tungsten atomic mass (amu)
+mass            1 183.84
+
+# --------------------------
+# Potential Setup
+# --------------------------
+# Use the ML-IAP potential.
+# Make sure that tungsten.ml is in your working directory or specify the correct path.
+pair_style      ml-iap file tungsten.ml
+pair_coeff      * * tungsten.ml
+
+# --------------------------
+# Equilibration & Dynamics
+# --------------------------
+# Initialize velocities at 3000 K (seed = 12345 for reproducibility)
+velocity        all create 3000.0 12345 mom yes rot yes
+
+# Set timestep (0.0075 ps = 7.5 fs); total simulation time = 1000*0.0075 ps = 7.5 ps
+timestep        0.0075
+
+# Use NVE integration (constant energy)
+fix             1 all nve
+
+# --------------------------
+# Output Settings
+# --------------------------
+# Print thermo output every timestep (i.e. 1000 samples over the simulation)
+thermo          1
+thermo_style    custom step temp etotal
+
+# Dump atom positions every timestep to a trajectory file
+dump            1 all custom 1 dump.tungsten.lammpstrj id type x y z
+
+# --------------------------
+# Run Simulation
+# --------------------------
+run             1000
+
+# Optionally, write a restart file
+# write_restart tungsten_restart.lmp

@@ -1,0 +1,90 @@
+# ---------------- Initialization ----------------
+units       lj
+dimension   2
+boundary    p p p
+atom_style  atomic
+
+# ---------------- Variables (edit these for each run) ----------------
+variable    density   equal 0.75   # (sigma^-2)
+variable    E_target  equal -1.10  # (in units of epsilon)
+variable    dt        equal 3.6e-4 # time step ~ 0.0025 t0
+
+# Number of particles
+variable    N equal 100
+
+# ---------------- Create Simulation Box & Atoms ----------------
+# Box area needed for N=100 at the given density: A = N / rho
+# We'll create a square of side L = sqrt(A).
+variable    area equal ${N}/${density}
+variable    Lx   equal sqrt(${area})
+
+# Define a box in x,y from 0 -> Lx (z-min,z-max are small but nonzero in 2D)
+region      boxreg block 0 ${Lx} 0 ${Lx} -0.1 0.1 units box
+create_box  1 boxreg
+
+# Create atoms inside a circular region to approximate a "drop"
+# If you want to "cut out" a circle of radius R from the box, define R:
+variable    R  equal 0.45*${Lx}  # e.g. a circle that fits comfortably inside
+region      dropreg circle ${Lx}/2.0 ${Lx}/2.0 ${R} side in units box
+create_atoms 1 region dropreg  # place all 100 atoms inside this circle
+
+mass        1 1.0  # in LJ units, mass=1
+
+# ---------------- Define Interatomic Potential ----------------
+pair_style      lj/cut 3.0
+pair_modify     shift yes
+pair_coeff      1 1 1.0 1.0 3.0  # epsilon=1, sigma=1, cutoff=3.0*sigma
+
+# ---------------- Neighbor Settings ----------------
+neighbor    0.3 bin
+neigh_modify    every 1 delay 0 check yes
+
+# ---------------- Time Stepping ----------------
+timestep    ${dt}
+
+# ---------------- Zero-step run to measure potential energy ----------------
+# This helps us set velocities so that total E = E_target
+compute     perAtomPE all pe/atom
+compute     potSum all reduce sum c_perAtomPE
+
+run 0  # no actual steps, just calculates energy
+
+variable    PE_now equal c_potSum
+print "Initial potential energy (PE_now) = ${PE_now}"
+
+# Total E desired = E_target, so K_target = E_target - PE_now
+variable    K_target equal ${E_target} - ${PE_now}
+print "Desired Kinetic Energy (K_target) = ${K_target}"
+
+# For N=100 in 2D, degrees of freedom DOF = 2*N
+# But you may subtract 2 or 3 if you remove COM motion or rotation.
+# We'll keep it simple: T_target = 2*K_target / (DOF)
+variable    DOF equal 2*${N}
+variable    T_target equal 2.0*${K_target}/${DOF}
+print "Setting velocity with T_target = ${T_target}"
+
+# If T_target <= 0 (i.e. E_target < PE_now), you cannot set a real temperature.
+# For negative K_target, you may need a different strategy (e.g. compressing the system or a more constrained approach).
+# Here we just do a check:
+if "${T_target} < 0.0" then "print 'WARNING: T_target is negative. Adjust E_target or initial configuration.'"
+
+# Initialize velocities from Maxwell-Boltzmann distribution at T_target
+velocity    all create ${T_target} 12345 mom yes rot yes dist gaussian
+
+# Optionally remove any net angular momentum or net linear momentum
+# velocity    all zero angular
+# velocity    all zero momentum
+
+# ---------------- Integration ----------------
+fix         1 all nve
+
+# Output Thermo
+thermo      100
+thermo_style custom step temp pe ke etotal press
+
+# Run for some time
+run         200000  # adjust as needed
+
+# You can then dump atom positions, velocities, etc.
+# dump        1 all custom 1000 dump_drop.lammpstrj id type x y vx vy
+# dump_modify 1 sort id

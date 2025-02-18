@@ -1,0 +1,67 @@
+# tungsten_bcc_nve.in
+# -------------------------------------------
+# LAMMPS input script for tungsten NVE simulation
+#
+# Simulation details:
+# - 16 tungsten atoms arranged in a BCC lattice (2x2x2 unit cells)
+# - Periodic boundary conditions in all directions
+# - Equilibration temperature: 3000 K
+# - Total simulation time: 7.5 ps (1000 timesteps, dt = 0.0075 ps)
+# - ML-IAP potential is used (ensure you provide the correct potential file)
+# -------------------------------------------
+
+clear
+units metal                   # metal units: length in Å, time in ps, energy in eV, etc.
+dimension 3
+boundary p p p                # periodic boundary conditions in all directions
+atom_style atomic
+
+# Define the BCC lattice for tungsten.
+# Tungsten has a BCC structure; the lattice constant is taken as ~3.16 Å.
+lattice bcc 3.16             
+
+# Create a simulation box that is 2x2x2 unit cells in size.
+# A BCC unit cell contains 2 atoms so 2^3*2 = 16 atoms total.
+region simbox block 0 2 0 2 0 2 units lattice
+create_box 1 simbox
+create_atoms 1 region simbox
+
+# Set the mass for tungsten (in g/mol)
+mass 1 183.84
+
+# -------------------------------------------
+# Potential Setup using ML-IAP
+# -------------------------------------------
+# Use the ML-IAP potential. Replace the file path below with the actual path
+# to your tungsten ML-IAP potential file.
+pair_style ml-iap
+pair_coeff * * path/to/tungsten_ml_iap.json W
+
+# -------------------------------------------
+# Initialize Velocities and Integration Settings
+# -------------------------------------------
+# Initialize velocities corresponding to 3000 K.
+velocity all create 3000.0 12345 mom yes rot yes dist gaussian
+
+# Set the integration to NVE (microcanonical ensemble).
+fix 1 all nve
+
+# -------------------------------------------
+# Timestep, Output, and Run Parameters
+# -------------------------------------------
+# Set timestep: total time = 7.5 ps / 1000 = 0.0075 ps per step.
+timestep 0.0075
+
+# Print thermo info every 100 steps.
+thermo 100
+thermo_style custom step temp etotal
+
+# Dump full atomic info (id, type, positions, and velocities) every step.
+# This will produce 1000 snapshots corresponding to 1000 time samples.
+dump 1 all custom 1 dump.tungsten.lammpstrj id type x y z vx vy vz
+
+# Run the simulation for 1000 timesteps (total 7.5 ps)
+run 1000
+
+# (Optional) Write a restart file at the end.
+# write_restart tungsten.restart

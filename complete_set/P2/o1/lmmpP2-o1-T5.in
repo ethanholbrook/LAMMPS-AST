@@ -1,0 +1,75 @@
+# ---------------------------
+# LAMMPS Script for Melting Bulk Ni
+# Using EAM (Mishin 1999) Potential from OpenKIM
+# ---------------------------
+
+# ---------- INITIAL SETUP ----------
+clear
+units           metal            # time in ps, distance in Å, energy in eV, pressure in bar
+dimension       3
+boundary        p p p            # periodic boundaries in all directions
+atom_style      atomic
+
+# ---------- CREATE ATOMS ----------
+# Lattice for Ni (FCC). The lattice constant below (3.52 Å) is a typical value 
+# for many EAM Ni potentials; you may want to adjust it according to the 
+# recommended lattice constant for the specific Mishin Ni potential.
+
+lattice         fcc 3.52
+region          box block 0 1 0 1 0 1
+create_box      1 box
+create_atoms    1 box
+replicate       10 10 10        # replicate the conventional cell 10x in each dimension
+
+# ---------- DEFINE INTERACTIONS ----------
+# If you're using the KIM potential directly via LAMMPS's 'pair_style kim', 
+# you'll need the exact model name. Below is an example placeholder. 
+# Ensure you have compiled LAMMPS with KIM support and have the model installed.
+
+# --- Option A: Using pair_style kim ---
+# pair_style      kim EAM_Mishin_Ni_1999_v005
+# pair_coeff      * * Ni
+
+# --- Option B: Using an EAM file from OpenKIM (downloaded locally) ---
+# pair_style      eam
+# pair_coeff      * * Ni_Mishin_1999.eam  # Example EAM file name
+
+# For clarity, we'll show a kim-based setup (you will need to modify 
+# the pair_style/pair_coeff lines to match your local environment).
+pair_style      kim EAM_Mishin_Ni_1999_v005
+pair_coeff      * * Ni
+
+# ---------- MASS ----------
+# Just in case the EAM file doesn't override it, define the mass of Ni:
+mass            1 58.69
+
+# ---------- VELOCITIES ----------
+# The method states initial velocities at 600 K. 
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# ---------- EQUILIBRATION / THERMOSTAT-PRESSURE SETUP ----------
+# We want to run in NPT ensemble at 1 atm (1.01325 bar).
+# We will ramp the temperature continuously from 300 K to 2500 K.
+# The method calls for a 10 K/ps ramp. 
+
+# Total ΔT = 2500 K - 300 K = 2200 K
+# At 10 K/ps, that requires 220 ps of simulation time.
+# In 'units metal': 1 timestep = 1 fs = 0.001 ps. So, 220 ps = 220,000 timesteps.
+
+fix             1 all npt temp 300.0 2500.0 0.1 iso 1.01325 1.01325 1.0
+# Explanation:
+# - temp 300.0 2500.0 0.1 : start at 300 K, end at 2500 K, with a thermostat damping parameter of 0.1 ps
+# - iso 1.01325 1.01325 1.0 : hold pressure at 1 atm (1.01325 bar) with a barostat damping of 1.0 ps
+
+# ---------- RUN PARAMETERS AND OUTPUT ----------
+timestep        0.001          # 1 fs
+thermo          100            # print thermodynamic info every 100 timesteps
+thermo_style    custom step temp press etotal ke pe density
+
+# If desired, dump atomic coordinates:
+dump            myDump all custom 1000 dump.ni id type x y z vx vy vz
+
+# ---------- RUN ----------
+run             220000         # 220 ps total, ramping from 300K to 2500K at ~10 K/ps
+
+# ---------- END OF SCRIPT ----------

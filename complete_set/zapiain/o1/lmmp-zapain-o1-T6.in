@@ -1,0 +1,65 @@
+# LAMMPS Input Script for 16-atom W (BCC) at 3000 K, NVE for 7.5 ps
+# Requires LAMMPS (Nov 2021 or newer) compiled with:
+#   - ML-IAP, PYTHON, ML-SNAP packages
+#   - MLIAP_ENABLE_PYTHON and BUILD_SHARED_LIBS = ON
+
+# ---------- INITIALIZATION ----------
+clear
+units          metal
+dimension      3
+boundary       p p p
+atom_style     atomic
+
+# ---------- CREATE ATOMS ----------
+# Lattice constant of W at high temperature can be adjusted; approximate ~3.16 Å
+lattice        bcc 3.16
+region         box block 0 2 0 2 0 2
+create_box     1 box
+create_atoms   1 box
+
+# Set atomic mass of tungsten
+mass           1 183.84
+
+# ---------- PAIR POTENTIAL (ML-based or otherwise) ----------
+# Example placeholder for a machine-learning potential; modify as appropriate
+# E.g. LAMMPS ML-IAP might use "pair_style      mlip <options>"
+# Replace "my_w_potential.mliap" with your actual ML potential file/path
+
+pair_style     mlip
+pair_coeff     * * my_w_potential.mliap W
+
+# ---------- NEIGHBOR/SETTINGS ----------
+neighbor       2.0 bin
+neigh_modify   delay 5 every 1
+
+# ---------- EQUILIBRATION (NVT at 3000 K) ----------
+velocity       all create 3000 12345 mom yes dist gaussian
+fix            eq all nvt temp 3000 3000 0.1
+
+timestep       0.001        # 1 fs time step
+run            5000         # e.g. 5 ps of NVT to equilibrate
+unfix          eq
+
+# ---------- NVE RUN ----------
+fix            int all nve
+
+# We want ~7.5 ps total. With 0.001 ps (1 fs) per step, 7500 steps => 7.5 ps
+# We also want ~1000 time samples, so we choose thermo and dump every 7-8 steps.
+# This yields ~937–1071 samples; here we pick every 8 steps (937 samples).
+
+thermo         8
+thermo_style   custom step time temp etotal press
+
+dump           dumpall all custom 8 dump_w_nve.lammpstrj id type x y z
+dump_modify    dumpall sort id
+
+run            7500         # 7.5 ps in NVE
+
+# ---------- END ----------
+
+# Notes:
+#  - Adjust the NVT equilibration length, target temperature, or time step as needed.
+#  - Check that your ML potential file matches the pair_style and pair_coeff syntax.
+#  - The above settings produce 16 atoms (2×2×2 BCC unit cells). 
+#  - With “thermo 8” and 7500 total steps, you will have ~937 log samples. 
+#  - The dump frequency matches the thermo frequency for convenience.

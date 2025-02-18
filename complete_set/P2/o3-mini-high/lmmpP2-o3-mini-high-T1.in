@@ -1,0 +1,63 @@
+# LAMMPS Input Script: Melting simulation of bulk Ni
+
+# -----------------------------
+# Basic simulation settings
+# -----------------------------
+units           metal
+atom_style      atomic
+dimension       3
+boundary        p p p
+
+# -----------------------------
+# Create simulation box:
+# Replicate the FCC Ni unit cell 10x10x10 times.
+# -----------------------------
+lattice         fcc 3.52            # lattice constant in Angstroms
+region          box block 0 10 0 10 0 10
+create_box      1 box
+create_atoms    1 box
+
+# Set the atomic mass for Ni (in atomic mass units)
+mass            1 58.6934
+
+# -----------------------------
+# Initialize velocities
+# -----------------------------
+# Note: Initial velocities are drawn from a Maxwell–Boltzmann distribution at 600 K.
+# However, the simulation thermostat will begin at 300 K.
+velocity        all create 600.0 12345 mom yes dist gaussian
+
+# -----------------------------
+# Define interatomic potential
+# -----------------------------
+# Use the EAM potential (cubic hermite tabulation) for Ni from OpenKIM,
+# Mishin et al. (1999) v005. Make sure the potential file (e.g., 'Ni_Mishin_Ni_u3.eam')
+# is available in your working directory.
+pair_style      eam/cubic
+pair_coeff      * * Ni_Mishin_Ni_u3.eam Ni
+
+# -----------------------------
+# Simulation parameters
+# -----------------------------
+timestep        0.001            # time step in picoseconds
+
+# Set up NPT integration:
+# - Temperature ramp: 300 K -> 2500 K over the run (heating rate = 10 K/ps)
+#   (2200 K over 220 ps gives 10 K/ps).
+# - Pressure: 1 atm = 0.000101325 GPa (in metal units)
+fix             1 all npt temp 300.0 2500.0 0.1 iso 0.000101325 0.000101325 1.0
+
+# -----------------------------
+# Output settings
+# -----------------------------
+thermo          1000
+thermo_style    custom step temp pe ke etotal press
+
+# Dump atomic positions every 10000 steps
+dump            1 all custom 10000 dump.melting.lammpstrj id type x y z
+
+# -----------------------------
+# Run the simulation
+# -----------------------------
+# Total simulation time: 220 ps (220000 steps at 0.001 ps/step)
+run             220000

@@ -1,0 +1,56 @@
+# ----------------------------
+# LAMMPS Input Script for Bulk Ni Melting
+# ----------------------------
+
+# 1) INITIALIZATION
+units           metal            # Use metal units (time in ps, distance in Angstroms, energy in eV)
+dimension       3
+boundary        p p p           # Periodic boundary conditions in x, y, z
+atom_style      atomic
+
+# 2) ATOM DEFINITION
+#   Lattice constant for Ni (~3.52 Å) - adjust if needed for your potential
+lattice         fcc 3.52
+region          box block 0 10 0 10 0 10  # 10 unit cells in each direction
+create_box      1 box
+create_atoms    1 box
+
+# 3) FORCE FIELD
+#   Make sure you have the correct potential file. 
+#   For example, "Ni_Mishin1999.eam" from OpenKIM could be referenced as:
+#       pair_style eam
+#       pair_coeff * * Ni_Mishin1999.eam Ni
+#   In practice, you might rename or place the file in your working directory.
+pair_style      eam
+pair_coeff      * * Ni_Mishin1999.eam Ni
+
+# 4) MASS (if needed; EAM files often set atomic mass internally, but this is okay to include)
+mass            1 58.6934
+
+# 5) VELOCITIES
+#   Initialize velocities from a Maxwell-Boltzmann distribution at 600 K
+#   (Matches the method statement's initial-velocity specification)
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# 6) EQUILIBRATION / RAMP
+#   We will heat from 300 K to 2500 K at a rate of 10 K per ps under NPT at 1 atm.
+#   The total temperature increase is 2200 K (from 300 to 2500).
+#   At 10 K/ps, we need 220 ps total. With a 1 fs timestep (0.001 ps), 
+#   that requires 220,000 timesteps.
+
+timestep        0.001           # 1 fs
+reset_timestep  0
+
+# Fix for NPT at 1 atm. 
+# 'temp 300 2500 0.1' -> initial temp = 300 K, final temp = 2500 K, 
+#                       thermostat damping ~0.1 ps
+# 'iso 1.0 1.0 1.0'  -> maintain pressure isotropically at 1 bar (close to 1 atm)
+fix             1 all npt temp 300.0 2500.0 0.1 iso 1.0 1.0 1.0
+
+# 7) OUTPUT
+thermo          1000
+thermo_style    custom step temp press etotal
+dump            1 all atom 1000 dump_melting.lammpstrj
+
+# 8) RUN SIMULATION
+run             220000

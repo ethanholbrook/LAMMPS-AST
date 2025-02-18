@@ -1,0 +1,54 @@
+# LAMMPS Input Script for Tungsten NVE Simulation
+
+# 1. Basic setup
+units          metal
+atom_style     atomic
+boundary       p p p
+
+# 2. Define lattice & create simulation box
+variable       latparam equal 3.1652     # Approx. lattice constant for W (Å)
+lattice        bcc ${latparam}
+region         box block 0 2 0 2 0 2
+create_box     1 box
+create_atoms   1 box
+
+# 3. Set masses
+mass           1 183.84                  # Tungsten atomic mass
+
+# 4. Choose and set interatomic potential
+#    (Below is a placeholder EAM potential for W. 
+#     If you have a machine-learning potential, 
+#     uncomment and adjust the pair_style lines for ML-IAP.)
+
+pair_style     eam/alloy
+pair_coeff     * * W_eam.alloy W
+
+#  -- Example for ML potential (commented out) --
+#  pair_style    mlip model.mlp
+#  pair_coeff    * *                # The ML potential file must specify W parameters
+
+# 5. Initialize velocities at ~3000 K
+velocity       all create 3000.0 12345 mom yes rot yes dist gaussian
+
+# 6. Equilibration (NVT) at 3000 K, if desired
+fix            nvt_equil all nvt temp 3000.0 3000.0 0.1
+timestep       0.001                  # 1 fs in 'metal' units
+run            1000                   # 1 ps of NVT equilibration
+unfix          nvt_equil
+
+# 7. Switch to NVE for production run
+fix            nve_run all nve
+
+# 8. Output settings
+thermo         100                    # Print thermo data every 100 steps
+thermo_style   custom step temp etotal press
+
+# Dump atoms periodically so you can post-process ~1000 samples
+# 7.5 ps / 0.001 ps per step = 7500 steps total
+# Adjust "dump" frequency to get desired sampling count n=1000
+dump           myDump all custom 8 dump.w atoms id type x y z vx vy vz
+
+# 9. NVE production run (7.5 ps)
+run            7500
+
+# End of script

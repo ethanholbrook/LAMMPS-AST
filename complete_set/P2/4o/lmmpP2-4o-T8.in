@@ -1,0 +1,35 @@
+# LAMMPS Script for Ni Melting Simulation
+
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# Create FCC Ni lattice and replicate
+lattice         fcc 3.52
+region          box block 0 10 0 10 0 10
+create_box      1 box
+create_atoms    1 box
+
+# Define interatomic potential (Mishin et al. 1999, OpenKIM)
+kim_init        EAM_Dynamo_Mishin_Ni__MO_123629422045_005 metal
+kim_interactions Ni
+
+# Define thermodynamic parameters
+mass            1 58.693  # Ni atomic mass
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# Define the thermostat/barostat (NPT ensemble)
+fix             1 all npt temp 300.0 2500.0 100.0 iso 1.0 1.0 1000.0
+
+# Output settings
+thermo          1000
+thermo_style    custom step temp press pe ke etotal
+
+# Dump atomic positions for visualization
+dump            1 all atom 5000 dump.melting
+dump_modify     1 sort id
+
+# Run simulation
+timestep        0.001  # 1 fs
+run             220000  # 220 ps, heating rate 10 K/ps (2200 K increase from 300 K)
