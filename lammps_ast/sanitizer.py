@@ -6,6 +6,11 @@ def remove_comments(script):
     """Removes inline comments while preserving meaningful lines."""
     return '\n'.join(line.split('#', 1)[0].rstrip() for line in script.splitlines() if line.split('#', 1)[0].strip())
 
+def remove_prints(script):
+    """Removes lines that start with 'print'."""
+    return '\n'.join(line for line in script.splitlines() if not line.lstrip().startswith('print'))
+
+
 def merge_ampersand_lines(script):
     """Merges lines ending with '&' into a single line while preserving spacing."""
     merged_lines, buffer = [], None
@@ -154,6 +159,7 @@ def expand_loops(script):
 def sanitize(script):
     """Runs all sanitization steps in order, ensuring proper variable resolution and trailing newline."""
     script = remove_comments(script)
+    script = remove_prints(script)
     script = merge_ampersand_lines(script)
     script = expand_loops(script)
     script = process_and_evaluate_variables(script)
