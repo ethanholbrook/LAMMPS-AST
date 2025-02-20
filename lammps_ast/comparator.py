@@ -1,7 +1,6 @@
 from zss import simple_distance, Node
 from lark.lexer import Token
 from collections import defaultdict
-from .parser import parse_to_AST
 
 def lark_tree_to_zss(ttree):
     """Convert a Lark Tree to a zss-compatible tree (Node object)."""
