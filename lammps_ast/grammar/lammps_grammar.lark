@@ -61,7 +61,9 @@
            | clear_statement
            | delete_atoms_statement
            | change_box_statement
-           | basic_statement  // fallback
+           | restart_statement
+           | package_statement
+           | pair_modify_statement
 
 // ======================
 //  1. units
@@ -258,7 +260,6 @@ velocity_body: "create" TEMPERATURE RANDOM_SEED
              | "scale" TEMPERATURE
              | "ramp" (VELOCITY_COMPONENT VELOCITY_VALUE VELOCITY_VALUE AXIS COORDINATE_VALUE COORDINATE_VALUE)+
              | "zero" ("linear" | "angular")
-             | UNSUPPORTED_KEYWORD UNSUPPORTED_ARGS*
              
 velocity_keyword_pair: "dist" ("uniform" | "gaussian")
                      | "sum"  BOOL
@@ -392,6 +393,8 @@ compute_body: "temp"
             | "pressure"
             | "ke"
             | "pe"
+            | "temp/chunk"
+            | "chunk/atom"
             | "stress/atom"
             | "msd"
             | "com" 
@@ -415,6 +418,7 @@ fix_body: "nve"                        -> fix_style_nve
         | "langevin" fix_langevin_args -> fix_style_langevin
         | "setforce" fix_setforce_args -> fix_style_setforce
         | "addforce" fix_addforce_args -> fix_style_addforce
+        | "deform" fix_deform_args     -> fix_style_deform
 
 fix_nvt_args: "temp" TEMPERATURE TEMPERATURE DAMPING_PARAMETER
 fix_npt_args: "temp" TEMPERATURE TEMPERATURE DAMPING_PARAMETER
@@ -422,7 +426,21 @@ fix_npt_args: "temp" TEMPERATURE TEMPERATURE DAMPING_PARAMETER
 fix_langevin_args: TEMPERATURE TEMPERATURE DAMPING_PARAMETER RANDOM_SEED
 fix_setforce_args: FORCE_COMPONENT FORCE_COMPONENT FORCE_COMPONENT ("region" REGION_ID)?
 fix_addforce_args: FORCE_COMPONENT FORCE_COMPONENT FORCE_COMPONENT ("region" REGION_ID)?
+fix_deform_args: STEPS (deform_style)+ fix_deform_options*
 
+deform_style: AXIS "final" DISTANCE DISTANCE
+            | AXIS "delta" DISTANCE DISTANCE
+            | AXIS "scale" NUMBER
+            | AXIS "vel"   NUMBER
+            | AXIS "erate" NUMBER
+            | AXIS "trate" NUMBER
+            | AXIS "wiggle" DISTANCE NUMBER
+            | AXIS "variable" VAR_NAME VAR_NAME
+            | AXIS "volume"
+
+fix_deform_options: "remap" ("x" | "v" | "none")
+                 | "flip" BOOL
+                 | "units" ("lattice" | "box")
 
 // ======================
 //  43. if
@@ -486,9 +504,6 @@ write_data_statement: "write_data" ARGUMENT+ _NEWLINE
 //  48. lattice
 // ======================
 lattice_statement: "lattice" LATTICE_STYLE LATTICE_VALUE lattice_options* _NEWLINE
-
-LATTICE_STYLE: "sc" | "bcc" | "fcc" | "hcp" | "diamond" | "sq" | "hex" | "none" | "custom"
-LATTICE_VALUE: FLOAT
 
 lattice_options: lattice_origin
                | lattice_spacing
@@ -561,7 +576,7 @@ change_box_tilt: ("final" | "delta") DISTANCE
 
 
 // ======================
-// 52. dump
+//  52. dump
 // ======================
 dump_statement: "dump" DUMP_ID GROUP_ID dump_style _NEWLINE
 
@@ -581,13 +596,75 @@ dump_custom_args: "id"
 
 dump_local_args: INT VAR_EXPR+ 
 
+// ======================
+//  53. restart
+// ======================
+
+restart_statement: "restart" STEPS (FILE_NAME+)? ("fileper" STEPS)? ("nfile" INT)? _NEWLINE
+
+// ======================
+//  54. package
+// ======================
+
+package_statement: "package" package_body _NEWLINE
+
+package_body: "gpu"    INT gpu_args*    -> package_gpu
+            | "intel"  INT intel_args*  -> package_intel
+            | "kokkos" kokkos_args*     -> package_kokkos
+            | "omp"    INT omp_args*    -> package_omp
+
+gpu_args: "neigh"      BOOL
+        | "newton"     ("on" | "off")
+        | "pair/only"  ("on" | "off")
+        | "binsize"    FLOAT
+        | "split"      FLOAT
+        | "gpuID"      INT
+        | "tpa"        INT
+        | "platform"   ARGUMENT
+
+intel_args: "mode"     ("single" | "mixed" | "double")
+          | "neigh"    ("half" | "full")
+          | "newton"   ("on" | "off")
+          | "tpc"      INT
+          | "tptask"   INT
+          | "balance"  FLOAT
+          | "pppm"     ("cpu" | "gpu")
+          | "lrt"      BOOL
+          | "omp"      INT
+
+kokkos_args: "neigh"         ("half" | "full")
+           | "neigh/qeq"     ("half" | "full")
+           | "binsize"       FLOAT
+           | "gpu"           ("on" | "off")
+           | "omp"           INT
+           | "cuda/aware"    ("on" | "off")
+           | "suffix"        ("on" | "off")
+           | "newton"        ("on" | "off")
+           | "sort"          ("on" | "off")
+           | "gpu/aware"     ("on" | "off")
+           | "pair/only"     ("on" | "off")
+
+omp_args: "neigh"   BOOL
+
+// ======================
+//  55. pair_modify
+// ======================
+
+pair_modify_statement: "pair_modify" pair_modify_args+ _NEWLINE
+
+pair_modify_args: "mix" ("geometric" | "arithmetic" | "sixthpower")
+                | "shift" BOOL
+                | "table" INT
+                | "table/disp" INT
+                | "tabinner" FLOAT
+                | "tabinner/disp" FLOAT
+                | "tail" BOOL
+                | "compute" BOOL
+                | "compute/tally" BOOL
+                | "neigh/trim" BOOL
+
+
 // ----------------------------------
-
-// ======================
-//   FALLBACKS
-// ======================
-
-basic_statement: (COMMAND) (ARGUMENT)* _NEWLINE
 
 // ======================
 //   TERMINALS / TOKENS
@@ -610,6 +687,8 @@ DIHEDRAL_STYLE: "harmonic" | "multi/harmonic" | "class2" | "helix" | "hybrid"
 IMPROPER_STYLE: "cvff" | "harmonic" | "hybrid"
 NEIGHBOR_STYLE: "bin" | "nsq" | "multi"
 
+LATTICE_STYLE: "sc" | "bcc" | "fcc" | "hcp" | "diamond" | "sq" | "hex" | "none" | "custom"
+
 THERMO_KEYWORDS: "step" | "elapsed"  | "elaplong" | "dt"       | "time"     | "cpu"      | "tpcpu"    | "spcpu"    | "cpuremain"| "part"     | "atoms"    | "temp"     | "press"    | "pe"       | "ke"       | "etotal"   | "enthalpy" | "evdwl"    | "ecoul"    | "epair"    | "ebond"    | "eangle"   | "edihed"   | "eimp"     | "emol"     | "elong"    | "etail"    | "vol"      | "density"  | "lx"       | "ly"       | "lz"       | "xy"       | "xz"       | "yz"       | "pxx"      | "pyy"      | "pzz"      | "pxy"      | "pxz"      | "pyz"      | "fmax"     | "fnorm"    | "cella"    | "cellb"    | "cellc"    | "cellalpha"| "cellbeta" | "cellgamma"| "ecouple"  | "econserve"
 
 
@@ -623,6 +702,7 @@ PAIR_STYLE_CUTOFF: FLOAT
 DISTANCE_CUTOFF: FLOAT
 ENERGY_TOLERANCE: FLOAT
 FORCE_TOLERANCE: FLOAT
+LATTICE_VALUE: FLOAT
 STEPS: INT
 MAX_ITERATIONS: INT
 MAX_EVALUATIONS: INT
@@ -664,7 +744,7 @@ FIX_ID: GENERIC_ID
 TEMPLATE_ID: GENERIC_ID
 
 
-COMMAND: /(units|atom_style|atom_modify|pair_style|pair_coeff|bond_style|bond_coeff| angle_style|angle_coeff|dihedral_style|dihedral_coeff|improper_style|improper_coeff| velocity|thermo_style|thermo_modify|fix|group|variable|region|if|run|label|jump|next| read_data|write_data|include|lattice|fix_modify|minimize|displace_atoms| compute|replicate|write_restart|dump_modify|reset_timestep|delete_atoms|change_box| create_box|boundary|dimension|mass|timestep|dump|undump|unfix|create_atoms| neighbor|neigh_modify|clear)\b/
+COMMAND: /(units|pair_modify|package|atom_style|atom_modify|pair_style|pair_coeff|bond_style|bond_coeff| angle_style|angle_coeff|dihedral_style|dihedral_coeff|improper_style|improper_coeff| velocity|thermo_style|thermo_modify|fix|group|variable|region|if|run|label|jump|next| read_data|write_data|include|lattice|fix_modify|minimize|displace_atoms| compute|replicate|write_restart|dump_modify|reset_timestep|delete_atoms|change_box| create_box|boundary|dimension|mass|timestep|dump|undump|unfix|create_atoms| neighbor|neigh_modify|clear|restart)\b/
 
 BOOL: "yes" | "no"
 NUMBER:  FLOAT | VAR_EXPR
@@ -675,8 +755,6 @@ VAR_NAME: GENERIC_ID
 VAR_EXPR: /(v_|c_)[a-zA-Z_][a-zA-Z0-9_]* (\\[\\d+\\])?/
 
 ARGUMENT: /[^\s#]+/
-UNSUPPORTED_KEYWORD: ARGUMENT
-UNSUPPORTED_ARGS: ARGUMENT
 
 ESCAPED_STRING: /"(?:[^"\\]|\\.)*"/
 QUOTED_COMMANDS: ESCAPED_STRING
