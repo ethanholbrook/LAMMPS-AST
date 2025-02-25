@@ -30,25 +30,30 @@ def merge_ampersand_lines(script):
 
 def parse_variable_line(line):
     """Extracts variable name and expression from a LAMMPS variable definition line."""
-    tokens = line.split(maxsplit=4)
+    tokens = line.split(maxsplit=3)  # Adjusted to ensure proper parsing
 
-    if len(tokens) < 4 or tokens[0] != "variable":
+    if len(tokens) < 3 or tokens[0] != "variable":
         return None, None
 
-    if tokens[2] == "equal":
-        return tokens[1], tokens[3] if len(tokens) == 4 else tokens[3] + ' ' + tokens[4]
-    
-    if len(tokens) >= 5 and tokens[3] == "equal":
-        return f"{tokens[1]}_{tokens[2]}", tokens[4]
+    var_name = tokens[1]
+    var_type = tokens[2]
+
+    # Handle "index" type variables correctly
+    if var_type == "index":
+        return var_name, tokens[3] if len(tokens) == 4 else None
+
+    # Handle "equal" type variables
+    if var_type == "equal":
+        return var_name, tokens[3] if len(tokens) == 4 else None
 
     return None, None
 
 def process_and_evaluate_variables(script):
-    """Replaces variables (`${var}` and `v_var`) while ensuring dependencies are handled."""
+    """Replaces variables (`${var}` and `v_var`) while ensuring dependencies are handled iteratively."""
     script_lines = script.splitlines()
     var_dict, variable_definitions, processed_lines = {}, {}, []
 
-    # **Step 1: Extract variable definitions**
+    # Extract variable definitions
     for line in script_lines:
         if line.startswith('variable'):
             var_name, expr = parse_variable_line(line)
@@ -57,32 +62,38 @@ def process_and_evaluate_variables(script):
         else:
             processed_lines.append(line)
 
-    # **Step 2: Resolve variable expressions iteratively**
-    def replace_var(match):
-        var_name = match.group(1) or match.group(2)  # Handles both v_var and ${var}
-        return str(var_dict.get(var_name, f'v_{var_name}'))  # Keep unresolved as-is
+    # Extract dependencies between variables
+    dependency_graph = {}
+    for var, expr in variable_definitions.items():
+        dependencies = set(re.findall(r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}', expr))
+        dependency_graph[var] = {v[0] or v[1] for v in dependencies if (v[0] or v[1]) in variable_definitions}
 
-    resolved = True
-    while resolved and variable_definitions:
-        resolved = False
+    # Resolve variables in topological order
+    resolved_vars = set()
+    while variable_definitions:
+        progress_made = False
         for var_name, expr in list(variable_definitions.items()):
-            # Replace known variables inside the expression
-            expr = re.sub(r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}', replace_var, expr)
+            # Only evaluate if all dependencies are resolved
+            if dependency_graph[var_name].issubset(resolved_vars):
+                expr = re.sub(r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}', lambda m: str(var_dict.get(m.group(1) or m.group(2), f'v_{m.group(1) or m.group(2)}')), expr)
+                expr = expr.replace('^', '**').replace('sqrt(', 'math.sqrt(')
 
-            # Convert LAMMPS operators to Python-compatible
-            expr = expr.replace('^', '**').replace('sqrt(', 'math.sqrt(')
+                try:
+                    # Add math.pi to the safe evaluation environment
+                    var_dict[var_name] = str(eval(expr, {"__builtins__": None}, {"math": math, "pi": math.pi}))
+                    resolved_vars.add(var_name)
+                    del variable_definitions[var_name]
+                    progress_made = True
+                except (NameError, SyntaxError, TypeError) as e:
+                    continue  # Skip if an undefined variable is encountered
 
-            try:
-                var_dict[var_name] = str(eval(expr, {"__builtins__": None}, {"math": math}))
-                del variable_definitions[var_name]
-                resolved = True  # Continue resolving
-            except:
-                continue  # Skip variables that cannot be resolved yet
+        if not progress_made:
+            break  # Prevent infinite loops
 
-    # **Step 3: Replace variables in the script**
+    # Replace variables in the script
     new_lines = []
     for line in processed_lines:
-        line = re.sub(r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}', replace_var, line)
+        line = re.sub(r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}', lambda m: str(var_dict.get(m.group(1) or m.group(2), f'v_{m.group(1) or m.group(2)}')), line)
         new_lines.append(line)
 
     return '\n'.join(new_lines)
