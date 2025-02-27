@@ -1,0 +1,59 @@
+# LAMMPS script for simulating a 2D system of Lennard-Jones particles
+
+units lj
+dimension 2
+atom_style atomic
+boundary p p p
+
+# Define variables for convenience
+variable sigma equal 1.0
+variable epsilon equal 1.0
+variable rc equal 3.0*${sigma}
+variable t0 equal sqrt(${sigma}^2 * 1.0 / (48.0 * ${epsilon}))
+variable tint equal 0.0025 * ${t0}
+
+# Create a 2D simulation box
+region box block 0 10 0 10 -0.1 0.1
+create_box 1 box
+
+# Define initial conditions for the four sets of parameters
+variable config equal 1  # Change from 1 to 4 to run each configuration
+
+if "${config} == 1" then "variable rho equal 0.75 / (${sigma}*${sigma})"
+if "${config} == 2" then "variable rho equal 0.75 / (${sigma}*${sigma})"
+if "${config} == 3" then "variable rho equal 0.75 / (${sigma}*${sigma})"
+if "${config} == 4" then "variable rho equal 0.8 / (${sigma}*${sigma})"
+
+# Assume cut circular drop; initial setup will be loaded or generated externally
+# Assuming initial positions and velocities are stored in a file, e.g., "init_config.dat"
+read_data init_config.dat
+
+# Mass of particles
+mass 1 1.0
+
+# Setup Lennard-Jones potential with modifications
+pair_style lj/cut 3.0
+pair_coeff * * ${epsilon} ${sigma} ${rc}
+
+# Integration
+timestep ${tint}
+
+# Run simulation
+# Setting up the simulation parameters
+variable e equal -1.1  # Change as per each parameter set
+if "${config} == 2" then "variable e equal -0.55"
+if "${config} == 3" then "variable e equal 0.8"
+if "${config} == 4" then "variable e equal -0.3"
+
+# Initialize velocities to simulate different energy states
+velocity all create ${e} 12345
+
+# Output settings
+thermo 100
+thermo_style custom step temp pe ke etotal
+
+# Main run for each configuration
+run 10000  # Number of timesteps
+
+# Output radial velocities and temperature analysis
+compute myTemp all temp/rdf 10 # Assuming a post-processing computation for radial velocity

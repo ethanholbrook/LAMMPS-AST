@@ -1,0 +1,80 @@
+# LAMMPS Simulation Script for 2D Lennard-Jones System
+
+# Initialization
+clear
+units lj
+dimension 2
+boundary p p p
+atom_style atomic
+
+# Create atoms
+lattice hex 0.75 # Density = 0.75/sigma^2
+region simbox block 0 10 0 10 -0.1 0.1 units box
+create_box 1 simbox
+create_atoms 1 box
+
+# Define LJ potential with specified cutoff
+pair_style lj/cut 3.0
+pair_coeff 1 1 1.0 1.0 3.0
+
+# Set mass
+mass 1 1.0
+
+# Define integrator and timestep
+variable t0 equal sqrt(1.0^2 * 1.0 / (48.0 * 1.0))
+variable dt equal 0.0025 * ${t0}
+timestep ${dt}
+
+# Grouping particles for future reference
+group all type 1
+
+# Specify simulations for different energies and densities
+variable rho equal 0.75
+variable e_set1 equal -1.1
+variable e_set2 equal -0.55
+variable e_set3 equal 0.8
+variable e_set4 equal -0.3
+
+# Velocity and temperature initialization for each energy level
+# Set initial velocities based on energy requirement
+
+# Simulation 1
+label loop1
+velocity all create ${e_set1} 12345
+fix 1 all nve
+thermo 100
+run 10000
+unfix 1
+next loop1
+
+# Simulation 2
+label loop2
+velocity all create ${e_set2} 12345
+fix 1 all nve
+thermo 100
+run 10000
+unfix 1
+next loop2
+
+# Simulation 3
+label loop3
+velocity all create ${e_set3} 12345
+fix 1 all nve
+thermo 100
+run 10000
+unfix 1
+next loop3
+
+# Simulation 4
+label loop4
+variable rho equal 0.8
+velocity all create ${e_set4} 12345
+fix 1 all nve
+thermo 100
+run 10000
+unfix 1
+next loop4
+
+# Analysis steps here (e.g., computing mean radial velocity, temperature, etc.)
+
+# End of script

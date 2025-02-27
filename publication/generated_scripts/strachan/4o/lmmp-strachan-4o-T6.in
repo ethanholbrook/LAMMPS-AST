@@ -1,0 +1,73 @@
+# LAMMPS script for 2D Lennard-Jones system
+
+units lj
+dimension 2
+atom_style atomic
+boundary p p p  # periodic boundary conditions
+
+# Define simulation parameters
+variable sigma equal 1.0
+variable epsilon equal 1.0
+variable m equal 1.0
+variable rc equal 3.0*${sigma}  # cutoff radius
+
+variable t0 equal sqrt(${sigma}^2*${m}/(48.0*${epsilon}))
+variable dt equal 0.0025*${t0}  # time step
+
+# LJ potential parameters
+pair_style lj/cut ${rc}
+pair_coeff * * ${epsilon} ${sigma} ${rc}
+
+# Initialize atoms
+region box block 0 10 0 10 -0.5 0.5 units box
+create_box 1 box
+
+# Define different systems and parameters
+variable rho1 equal 0.75/(1.0*${sigma}^2)
+variable rho2 equal 0.8/(1.0*${sigma}^2)
+variable E1 equal -1.1*${epsilon}
+variable E2 equal -0.55*${epsilon}
+variable E3 equal 0.8*${epsilon}
+variable E4 equal -0.3*${epsilon}
+
+# Function to create initial configuration
+define macro init_system rho_value energy_value {
+    variable density equal ${rho_value}
+    variable energy equal ${energy_value}
+    variable box_side equal sqrt(100/${density})
+    
+    # Resize the simulation box
+    change_box all x final 0 ${box_side} y final 0 ${box_side}
+    
+    # Delete existing atoms and create new initial configuration
+    delete_atoms group all
+    create_atoms 1 random 100 12345 box
+    
+    # Assign initial velocities based on desired energy
+    velocity all create ${energy} 12345 dist gaussian
+    run 0
+}
+
+# Iterate over each set of parameters (rho, E)
+label loop_start
+
+# Example initialization for particular parameters
+init_system ${rho1} ${E1}
+run 10000  # Run the simulation for some time to equilibrate the system
+
+init_system ${rho1} ${E2}
+run 10000
+
+init_system ${rho1} ${E3}
+run 10000
+
+init_system ${rho2} ${E4}
+run 10000
+
+label loop_end
+
+# Output settings
+thermo 100          # Print output every 100 steps
+thermo_style custom step temp pe ke etotal press
+
+# End of the script

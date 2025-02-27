@@ -1,0 +1,70 @@
+# LAMMPS script for simulating 2D Lennard-Jones particles
+# Inspired by method description provided
+
+units   lj
+dimension 2
+atom_style atomic
+
+# Create a 2D simulation box and initialize atoms
+lattice hex 0.75
+region box block 0 10 0 10 -0.1 0.1
+create_box 1 box
+create_atoms 1 box
+
+mass 1 1.0
+
+# Define Lennard-Jones potential with shifted forces
+variable sigma equal 1.0
+variable epsilon equal 1.0
+variable rc equal 3.0*${sigma}
+pair_style lj/cut ${rc}
+pair_coeff 1 1 ${epsilon} ${sigma} ${rc}
+
+# Time integration settings
+variable m equal 1.0
+variable t0 equal sqrt(${sigma}^2*${m}/(48*${epsilon}))
+variable tint equal 0.0025*${t0}
+
+timestep ${tint}
+
+# Group all particles
+group all type 1
+
+# Simulation parameters
+variable N equal 100  # Number of particles
+variable rho equal 0.75*(1/${sigma}^2)  # Density
+variable E equal -1.1*${epsilon}  # Initial energy
+
+# Set initial velocities to correspond with given energy
+velocity all create 1.0 12345
+# Customize velocities here to achieve specific energies if needed
+
+# Run simulation for various energies and densities
+variable iter loop 4
+label loop
+if "${iter} == 1" then "set variable E equal -1.1*${epsilon}" &
+                    "set variable rho equal 0.75*(1/${sigma}^2)"
+if "${iter} == 2" then "set variable E equal -0.55*${epsilon}" &
+                    "set variable rho equal 0.75*(1/${sigma}^2)"
+if "${iter} == 3" then "set variable E equal 0.8*${epsilon}" &
+                    "set variable rho equal 0.75*(1/${sigma}^2)"
+if "${iter} == 4" then "set variable E equal -0.3*${epsilon}" &
+                    "set variable rho equal 0.8*(1/${sigma}^2)"
+
+# Equilibrate system
+thermo 1000
+thermo_style custom step temp pe ke etotal
+minimize 1.0e-4 1.0e-6 100 1000
+run 10000
+
+# Main run for analysis
+run 20000
+
+next iter
+jump SELF loop
+
+# Compute properties of interest
+compute radial_velocity all temp/region box
+compute temp_per_region all temp/region box
+
+variable ke_sum equal c_radial_velocity+c_temp_per_region

@@ -1,0 +1,49 @@
+# LAMMPS Script for 2D Lennard-Jones Particle System
+
+units           lj
+dimension       2
+boundary        p p f
+atom_style      atomic
+
+# Create a 2D system with 100 particles
+lattice         hex 0.75
+region          mybox block 0 10 0 10 -0.1 0.1
+create_box      1 mybox
+create_atoms    1 box
+
+# Lennard-Jones potential parameters
+variable        epsilon equal 1.0
+variable        sigma   equal 1.0
+variable        rc      equal 3.0*${sigma}
+pair_style      lj/cut 3.0
+# Custom Lennard-Jones potential using hybrid overlay to subtract unwanted parts
+pair_coeff      * * ${epsilon} ${sigma} ${rc}
+
+# Adjust mass and set timestep
+mass            1 1.0
+variable        t0 equal sqrt(${sigma}^2*1.0/(48.0*${epsilon}))  # t0 = sqrt(sigma^2 * m / (48 * epsilon))
+variable        tint equal 0.0025*${t0}
+timestep        ${tint}
+
+# Define neighbor list
+neighbor        0.3 bin
+neigh_modify    every 1 delay 0 check yes
+
+# Velocity initialization. 
+# Set to zero for now; needs adjusting based on desired initial energy (e.g., using velocity scaling).
+velocity        all create 0.0 12345
+
+# Fixes: using NVE to integrate equations of motion
+fix             1 all nve
+
+# Run settings
+run_style       verlet
+
+# Define output settings
+thermo          100
+thermo_style    custom step temp epair etotal
+
+# Run for the desired duration
+run             100000  # Adjust the number of steps according to the desired duration
+
+# You need to adjust temperature and velocity distributions manually based on initial energy condition
