@@ -10,57 +10,57 @@
 //  STATEMENTS
 // ======================
 ?statement:  units_statement
-           | atom_style_statement
-           | atom_modify_statement
-           | pair_style_statement
-           | pair_coeff_statement
-           | create_box_statement
            | boundary_statement
            | dimension_statement
-           | mass_statement
-           | timestep_statement
-           | velocity_statement
-           | dump_statement
+           | thermo_statement
+           | include_statement
+           | minimize_statement
+           | clear_statement       
+           | write_restart_statement
            | undump_statement
            | unfix_statement
-           | create_atoms_statement
-           | neighbor_statement
-           | neigh_modify_statement
-           | bond_style_statement
-           | bond_coeff_statement
-           | angle_style_statement
-           | angle_coeff_statement
-           | dihedral_style_statement
-           | dihedral_coeff_statement
-           | improper_style_statement
-           | improper_coeff_statement
-           | thermo_statement
-           | thermo_style_statement
-           | thermo_modify_statement
-           | fix_statement
-           | group_statement
-           | variable_statement
-           | region_statement
-           | if_statement
-           | run_statement
+           | create_box_statement
+           | timestep_statement
            | label_statement
            | jump_statement
            | next_statement
+           | replicate_statement
+           | neighbor_statement
+           | reset_timestep_statement
+           | bond_style_statement
+           | angle_style_statement
+           | dihedral_style_statement
+           | improper_style_statement
+           | atom_style_statement
+           | atom_modify_statement
+           | variable_statement
+           | mass_statement
+           | create_atoms_statement
+           | pair_style_statement
+           | pair_coeff_statement
+           | velocity_statement
+           | neigh_modify_statement
+           | bond_coeff_statement
+           | angle_coeff_statement
+           | dihedral_coeff_statement
+           | improper_coeff_statement
+           | group_statement
+           | thermo_style_statement
+           | thermo_modify_statement
+           | run_statement
+           | fix_modify_statement
+           | compute_statement
+           | fix_statement
+           | if_statement
+           | displace_atoms_statement
+           | region_statement
            | read_data_statement
            | write_data_statement
-           | include_statement
            | lattice_statement           
-           | fix_modify_statement
-           | minimize_statement
-           | displace_atoms_statement
-           | compute_statement
-           | replicate_statement
            | dump_modify_statement
-           | write_restart_statement
-           | reset_timestep_statement
-           | clear_statement
            | delete_atoms_statement
            | change_box_statement
+           | dump_statement
            | restart_statement
            | package_statement
            | pair_modify_statement
@@ -233,15 +233,15 @@ create_atoms_args: "mol" TEMPLATE_ID RANDOM_SEED
 // ======================
 pair_style_statement: "pair_style" pair_style_body _NEWLINE
 
-pair_style_body: "lj/cut" PAIR_STYLE_CUTOFF
+pair_style_body: LJ_CUT PAIR_STYLE_CUTOFF
                | "eam"
-               | "eam/alloy"
-               | "eam/fs"
+               | EAM_ALLOY
+               | EAM_FS
                | "gauss"
                | "meam"
                | "snap"
                | "kim" POTENTIAL_NAME          
-               | "coul/cut" PAIR_STYLE_CUTOFF
+               | COUL_CUT PAIR_STYLE_CUTOFF
                | "morse" PAIR_STYLE_CUTOFF
                | "hybrid" (ARGUMENT (ARGUMENT)*)+
 
@@ -291,8 +291,8 @@ neigh_modify_option: "delay" STEPS
                    | "binsize" BIN_SIZE
 
 exclude_option: "group" GROUP_ID GROUP_ID
-              | "molecule/intra" GROUP_ID
-              | "molecule/inter" GROUP_ID
+              | MOLECULE_INTRA GROUP_ID
+              | MOLECULE_INTER GROUP_ID
 
 
 
@@ -352,7 +352,7 @@ thermo_styles_options: "one" | "multi" | "yaml" | "custom" THERMO_KEYWORDS+
 thermo_modify_statement: "thermo_modify" thermo_modify_arg+ _NEWLINE
 
 thermo_modify_arg: "lost" ERROR_ACTION_TYPE
-                 | "lost/bond" ERROR_ACTION_TYPE
+                 | LOST_BOND ERROR_ACTION_TYPE
                  | "warn" WARNING_ACTION_TYPE
                  | "norm" BOOL
                  | "flush" BOOL
@@ -380,7 +380,7 @@ fix_modify_statement: "fix_modify" FIX_ID fix_modify_option+ _NEWLINE
 fix_modify_option: "energy" BOOL
                  | "temp" GROUP_ID
                  | "press" GROUP_ID
-                 | "dynamic/dof" BOOL
+                 | DYNAMIC_DOF BOOL
                  | "body" BOOL
                  | "virial" BOOL
                  | "thermo" BOOL
@@ -396,18 +396,18 @@ compute_body: "temp"
             | "pressure"
             | "ke"
             | "pe"
-            | "temp/chunk"
-            | "chunk/atom"
-            | "stress/atom"
+            | TEMP_CHUNK
+            | CHUNK_ATOM
+            | STRESS_ATOM
             | "msd"
             | "com" 
-            | "displace/atom"
+            | DISPLACE_ATOM
             | "gyration" 
             | "rdf" NUMBER_OF_BINS INT* ("cutoff" CUTOFF_RADIUS)?
             | "reduce" REDUCE_OPERATIONS (POSITION_COMPONENT | VELOCITY_COMPONENT | FORCE_COMPONENT | VAR_EXPR | VAR_NAME)
-            | "bond/local" BOND_ATTRIBUTES+ ("set dist" VAR_NAME)?                    
-            | "property/atom" ATOM_ATTRIBUTES+
-            | "pair/local" ("dist" | DISTANCE_COMPONENT | FORCE_COMPONENT | "eng" | "force")* ("cutoff" ("type" | "radius"))?
+            | BOND_LOCAL BOND_ATTRIBUTES+ ("set dist" VAR_NAME)?                    
+            | PROPERTY_ATOM ATOM_ATTRIBUTES+
+            | PAIR_LOCAL ("dist" | DISTANCE_COMPONENT | FORCE_COMPONENT | "eng" | "force")* ("cutoff" ("type" | "radius"))?
 
 
 // ======================
@@ -618,7 +618,7 @@ package_body: "gpu"    INT gpu_args*    -> package_gpu
 
 gpu_args: "neigh"      BOOL
         | "newton"     ("on" | "off")
-        | "pair/only"  ("on" | "off")
+        | PAIR_ONLY    ("on" | "off")
         | "binsize"    FLOAT
         | "split"      FLOAT
         | "gpuID"      INT
@@ -636,16 +636,16 @@ intel_args: "mode"     ("single" | "mixed" | "double")
           | "omp"      INT
 
 kokkos_args: "neigh"         ("half" | "full")
-           | "neigh/qeq"     ("half" | "full")
+           | NEIGH_QEQ       ("half" | "full")
            | "binsize"       FLOAT
            | "gpu"           ("on" | "off")
            | "omp"           INT
-           | "cuda/aware"    ("on" | "off")
+           | CUDA_AWARE      ("on" | "off")
            | "suffix"        ("on" | "off")
            | "newton"        ("on" | "off")
            | "sort"          ("on" | "off")
-           | "gpu/aware"     ("on" | "off")
-           | "pair/only"     ("on" | "off")
+           | GPU_AWARE       ("on" | "off")
+           | PAIR_ONLY     ("on" | "off")
 
 omp_args: "neigh"   BOOL
 
@@ -658,13 +658,13 @@ pair_modify_statement: "pair_modify" pair_modify_args+ _NEWLINE
 pair_modify_args: "mix" ("geometric" | "arithmetic" | "sixthpower")
                 | "shift" BOOL
                 | "table" INT
-                | "table/disp" INT
+                | TABLE_DISP INT
                 | "tabinner" FLOAT
-                | "tabinner/disp" FLOAT
+                | TABBINER_DISP FLOAT
                 | "tail" BOOL
                 | "compute" BOOL
-                | "compute/tally" BOOL
-                | "neigh/trim" BOOL
+                | COMPUTE_TALLY BOOL
+                | NEIGH_TRIM BOOL
 
 
 // ======================
@@ -703,6 +703,39 @@ set_body: "atom"  RANGE       -> set_atom
 //   TERMINALS / TOKENS
 // ======================
 
+// COMPOUND TOKENS
+
+LJ_CUT: "lj/cut"
+EAM_ALLOY: "eam/alloy"
+EAM_FS: "eam/fs"
+COUL_CUT: "coul/cut"
+MULTI_HARMONIC: "multi/harmonic"
+VERLET_SPLIT: "verlet/split"
+
+TEMP_CHUNK: "temp/chunk" 
+LOST_BOND: "lost/bond" 
+TABLE_DISP: "table/disp"
+TABBINER_DISP: "tabinner/disp"
+DYNAMIC_DOF: "dynamic/dof"
+
+PAIR_ONLY: "pair/only"
+PAIR_LOCAL: "pair/local"
+BOND_LOCAL: "bond/local"
+BOND_PERIODIC: "bond/periodic"
+CHUNK_ATOM: "chunk/atom"
+STRESS_ATOM: "stress/atom"
+DISPLACE_ATOM: "displace/atom"
+PROPERTY_ATOM: "property/atom"
+NEIGH_QEQ: "neigh/qeq"
+NEIGH_TRIM: "neigh/trim"
+MOLECULE_INTRA: "molecule/intra"
+MOLECULE_INTER: "molecule/inter"
+COMPUTE_TALLY: "compute/tally"
+CUDA_AWARE: "cuda/aware"
+GPU_AWARE: "gpu/aware"
+
+
+
 COMPARISON_OPERATOR: "==" | "!=" | ">" | "<" | ">=" | "<="
 LOGICAL_OPERATOR: "&&" | "||"
 AXIS: "x" | "y" | "z" 
@@ -716,10 +749,10 @@ BOUNDARY_STYLE: "p" | "f" | "s" | "m"
 ATOM_STYLES: "atomic" | "charge" | "full" | "molecular" | "granular" | "bond" | "dielectric" | "dipole" 
 BOND_STYLE: "harmonic" | "morse" | "class2" | "hybrid"
 ANGLE_STYLE: "harmonic" | "class2" | "hybrid"
-DIHEDRAL_STYLE: "harmonic" | "multi/harmonic" | "class2" | "helix" | "hybrid"
+DIHEDRAL_STYLE: "harmonic" | MULTI_HARMONIC | "class2" | "helix" | "hybrid"
 IMPROPER_STYLE: "cvff" | "harmonic" | "hybrid"
 NEIGHBOR_STYLE: "bin" | "nsq" | "multi"
-RUN_STYLES: "verlet" | "verlet/split"
+RUN_STYLES: "verlet" | VERLET_SPLIT
 
 LATTICE_STYLE: "sc" | "bcc" | "fcc" | "hcp" | "diamond" | "sq" | "hex" | "none" | "custom"
 
@@ -751,7 +784,7 @@ ERROR_ACTION_TYPE: "error" | "warn" | "ignore"
 OUTPUT_FORMAT: "one" | "multi" | "yaml"
 MAP_TYPE: "yes" | "array" | "hash"
 DIMENSION: "2" | "3"
-REPLICATE_KEYWORDS: "bbox"| "bond/periodic"
+REPLICATE_KEYWORDS: "bbox"| BOND_PERIODIC
 POTENTIAL_NAME: ARGUMENT
 FILE_NAME: ARGUMENT
 MODEL_NAME: ARGUMENT
@@ -781,11 +814,10 @@ FIX_ID: GENERIC_ID
 TEMPLATE_ID: GENERIC_ID
 
 
-COMMAND: /(units|kim|set|run_style|pair_modify|package|atom_style|atom_modify|pair_style|pair_coeff|bond_style|bond_coeff| angle_style|angle_coeff|dihedral_style|dihedral_coeff|improper_style|improper_coeff| velocity|thermo_style|thermo_modify|fix|group|variable|region|if|run|label|jump|next| read_data|write_data|include|lattice|fix_modify|minimize|displace_atoms| compute|replicate|write_restart|dump_modify|reset_timestep|delete_atoms|change_box| create_box|boundary|dimension|mass|timestep|dump|undump|unfix|create_atoms| neighbor|neigh_modify|clear|restart)\b/
+COMMAND: /(units|boundary|dimension|thermo|include|minimize|clear|write_restart|undump|unfix|create_box|timestep|label|jump|next|replicate|neighbor|reset_timestep|bond_style|angle_style|dihedral_style|improper_style|atom_style|atom_modify|variable|mass|create_atoms|pair_style|pair_coeff|velocity|neigh_modify|bond_coeff|angle_coeff|dihedral_coeff|improper_coeff|group|thermo_style|thermo_modify|run|fix_modify|compute|fix|if|displace_atoms|region|read_data|write_data|lattice|dump_modify|delete_atoms|change_box|dump|restart|package|pair_modify|kim|run_style|set)\b/
 
 BOOL: "yes" | "no"
 NUMBER:  FLOAT | VAR_EXPR
-MISSING_ARGUMENT: "__ERROR__"
 GENERIC_ID: INT | ARGUMENT
 
 VAR_NAME: GENERIC_ID
