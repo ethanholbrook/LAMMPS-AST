@@ -65,6 +65,8 @@
            | package_statement
            | pair_modify_statement
            | kim_statement
+           | run_style_statement
+           | set_statement
 
 // ======================
 //  1. units
@@ -674,6 +676,26 @@ kim_statement: "kim" kim_body _NEWLINE
 kim_body: "init" MODEL_NAME UNITS_STYLE? ("unit_conversion_mode")?
         | "interactions" ARGUMENT+
 
+// ======================
+//  57. run_style
+// ======================
+
+run_style_statement: "run_style" RUN_STYLES _NEWLINE
+
+
+// ======================
+//  58. set
+// ======================
+
+set_statement: "set" set_body ARGUMENT+ _NEWLINE
+
+set_body: "atom"  RANGE       -> set_atom
+         | "type" RANGE       -> set_type
+         | "mol"  RANGE       -> set_mol
+         | "group" GROUP_ID   -> set_group
+         | "region" REGION_ID -> set_region
+
+
 
 // ----------------------------------
 
@@ -697,6 +719,7 @@ ANGLE_STYLE: "harmonic" | "class2" | "hybrid"
 DIHEDRAL_STYLE: "harmonic" | "multi/harmonic" | "class2" | "helix" | "hybrid"
 IMPROPER_STYLE: "cvff" | "harmonic" | "hybrid"
 NEIGHBOR_STYLE: "bin" | "nsq" | "multi"
+RUN_STYLES: "verlet" | "verlet/split"
 
 LATTICE_STYLE: "sc" | "bcc" | "fcc" | "hcp" | "diamond" | "sq" | "hex" | "none" | "custom"
 
@@ -745,10 +768,12 @@ PRESSURE: NUMBER
 VELOCITY_VALUE: NUMBER | "NULL"
 DAMPING_PARAMETER: NUMBER
 VALUE_EXPR: NUMBER
+RANGE: INT (":" INT)?
 
 LABEL_ID: GENERIC_ID
 BOX_ID: GENERIC_ID
 REGION_ID: GENERIC_ID
+MOLECULE_ID: GENERIC_ID
 COMPUTE_ID: GENERIC_ID
 DUMP_ID: GENERIC_ID
 GROUP_ID: GENERIC_ID
@@ -756,7 +781,7 @@ FIX_ID: GENERIC_ID
 TEMPLATE_ID: GENERIC_ID
 
 
-COMMAND: /(units|kim|pair_modify|package|atom_style|atom_modify|pair_style|pair_coeff|bond_style|bond_coeff| angle_style|angle_coeff|dihedral_style|dihedral_coeff|improper_style|improper_coeff| velocity|thermo_style|thermo_modify|fix|group|variable|region|if|run|label|jump|next| read_data|write_data|include|lattice|fix_modify|minimize|displace_atoms| compute|replicate|write_restart|dump_modify|reset_timestep|delete_atoms|change_box| create_box|boundary|dimension|mass|timestep|dump|undump|unfix|create_atoms| neighbor|neigh_modify|clear|restart)\b/
+COMMAND: /(units|kim|set|run_style|pair_modify|package|atom_style|atom_modify|pair_style|pair_coeff|bond_style|bond_coeff| angle_style|angle_coeff|dihedral_style|dihedral_coeff|improper_style|improper_coeff| velocity|thermo_style|thermo_modify|fix|group|variable|region|if|run|label|jump|next| read_data|write_data|include|lattice|fix_modify|minimize|displace_atoms| compute|replicate|write_restart|dump_modify|reset_timestep|delete_atoms|change_box| create_box|boundary|dimension|mass|timestep|dump|undump|unfix|create_atoms| neighbor|neigh_modify|clear|restart)\b/
 
 BOOL: "yes" | "no"
 NUMBER:  FLOAT | VAR_EXPR
