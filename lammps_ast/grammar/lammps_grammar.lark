@@ -81,7 +81,7 @@ boundary_statement: "boundary" BOUNDARY_STYLE BOUNDARY_STYLE BOUNDARY_STYLE? _NE
 // ======================
 //  3. dimension
 // ======================
-dimension_statement: "dimension" DIMENSION _NEWLINE
+dimension_statement: "dimension" DIMENSIONS _NEWLINE
 
 // ======================
 //  4. thermo
@@ -783,7 +783,7 @@ WARNING_ACTION_TYPE: "ignore" | "reset" | "default"
 ERROR_ACTION_TYPE: "error" | "warn" | "ignore"
 OUTPUT_FORMAT: "one" | "multi" | "yaml"
 MAP_TYPE: "yes" | "array" | "hash"
-DIMENSION: "2" | "3"
+DIMENSIONS: "2" | "3"
 REPLICATE_KEYWORDS: "bbox"| BOND_PERIODIC
 POTENTIAL_NAME: ARGUMENT
 FILE_NAME: ARGUMENT
