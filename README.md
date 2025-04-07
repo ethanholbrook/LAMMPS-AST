@@ -12,5 +12,9 @@
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/ethanholbrook/LAMMPS-AST.git
-cd LAMMPS-AST
+conda create -n Last_env python=3.11
+
+pip install lammps_ast
+conda install graphviz
+
+
