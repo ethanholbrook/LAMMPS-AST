@@ -39,6 +39,6 @@ def parse_to_AST(sanitized_script):
             Previous token: {e.token_history}""")
 
 
-        return None
+        return None, e
 
-    return parse_tree
+    return parse_tree, None
