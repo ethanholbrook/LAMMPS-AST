@@ -259,7 +259,7 @@ pair_coeff_atom_type_option: INT | "*" INT? | INT "*" INT?
 velocity_statement: "velocity" GROUP_ID velocity_body velocity_keyword_pair* _NEWLINE
 
 velocity_body: "create" TEMPERATURE RANDOM_SEED
-             | "set" VELOCITY_VALUE VELOCITY_VALUE VELOCITY_VALUE
+             | "set" (VELOCITY_VALUE | "NULL") (VELOCITY_VALUE | "NULL") (VELOCITY_VALUE | "NULL")
              | "scale" TEMPERATURE
              | "ramp" (VELOCITY_COMPONENT VELOCITY_VALUE VELOCITY_VALUE AXIS COORDINATE_VALUE COORDINATE_VALUE)+
              | "zero" ("linear" | "angular")
