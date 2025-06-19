@@ -116,6 +116,28 @@ def evaluate_expressions(script):
         for line in script.splitlines()
     )
 
+def evaluate_lammps_arithmetic(script):
+    """
+    Replace LAMMPS-style $( … ) expressions that are *purely numeric*
+    with their evaluated values.
+    """
+    # matches $(   3.14*1e2  )  but *not* $(x+1) or $(v_t+1)
+    expr_pat = re.compile(
+        r"""\$\(\s*([0-9+\-*/^(). eE]+?)\s*\)""",  # capture inner arithmetic
+        flags=re.VERBOSE,
+    )
+    math_safe = {"__builtins__": None, "math": math}
+
+    def repl(match: re.Match) -> str:
+        expr = match.group(1).replace("^", "**")
+        try:
+            return str(eval(expr, math_safe))
+        except Exception:
+            # If evaluation fails (e.g., empty or invalid), leave it unchanged
+            return match.group(0)
+
+    return expr_pat.sub(repl, script)
+
 def expand_loops(script):
     """Expands simple LAMMPS loops by evaluating 'if' conditions and unrolling iterations."""
     lines = script.splitlines()
@@ -175,5 +197,6 @@ def sanitize(script):
     script = expand_loops(script)
     script = process_and_evaluate_variables(script)
     script = evaluate_expressions(script)
+    script = evaluate_lammps_arithmetic(script)
     
     return script.rstrip() + '\n'
