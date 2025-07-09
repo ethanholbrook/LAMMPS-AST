@@ -80,7 +80,10 @@ def process_and_evaluate_variables(script):
 
                 try:
                     # Add math.pi to the safe evaluation environment
-                    var_dict[var_name] = str(eval(expr, {"__builtins__": None}, {"math": math, "pi": math.pi}))
+                    result = eval(expr, {"__builtins__": None}, {"math": math, "pi": math.pi})
+                    if isinstance(result, float) and result.is_integer():
+                        result = int(result)
+                    var_dict[var_name] = str(result)
                     resolved_vars.add(var_name)
                     del variable_definitions[var_name]
                     progress_made = True
@@ -106,7 +109,10 @@ def evaluate_expressions(script):
     def evaluate_token(token):
         if arithmetic_pattern.fullmatch(token):  # Check if the token is a pure expression
             try:
-                return str(eval(token.replace('^', '**'), math_safe))  # Safe evaluation
+                value = eval(token.replace('^', '**'), math_safe)  # Safe evaluation
+                if isinstance(value, float) and value.is_integer():
+                    value = int(value)
+                return str(value)
             except:
                 pass  # Leave token unchanged if evaluation fails
         return token  # Return unchanged if not numeric
@@ -131,7 +137,10 @@ def evaluate_lammps_arithmetic(script):
     def repl(match: re.Match) -> str:
         expr = match.group(1).replace("^", "**")
         try:
-            return str(eval(expr, math_safe))
+            value = eval(expr, math_safe)
+            if isinstance(value, float) and value.is_integer():
+                value = int(value)
+            return str(value)
         except Exception:
             # If evaluation fails (e.g., empty or invalid), leave it unchanged
             return match.group(0)
