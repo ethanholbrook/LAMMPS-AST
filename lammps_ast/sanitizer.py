@@ -1,6 +1,7 @@
 
 import re
 import math
+import simpleeval
 
 def remove_comments(script):
     """Removes inline comments while preserving meaningful lines."""
@@ -79,8 +80,7 @@ def process_and_evaluate_variables(script):
                 expr = expr.replace('^', '**').replace('sqrt(', 'math.sqrt(')
 
                 try:
-                    # Add math.pi to the safe evaluation environment
-                    result = eval(expr, {"__builtins__": None}, {"math": math, "pi": math.pi})
+                    result = simpleeval.simple_eval(expr, names={"pi": math.pi}, functions={"sqrt": math.sqrt})
                     if isinstance(result, float) and result.is_integer():
                         result = int(result)
                     var_dict[var_name] = str(result)
@@ -104,12 +104,11 @@ def process_and_evaluate_variables(script):
 def evaluate_expressions(script):
     """Evaluates only pure numeric expressions in the script."""
     arithmetic_pattern = re.compile(r'^[\d+\-*/().eE]+$')  # Optimized regex
-    math_safe = {"math": math, "__builtins__": None}
 
     def evaluate_token(token):
         if arithmetic_pattern.fullmatch(token):  # Check if the token is a pure expression
             try:
-                value = eval(token.replace('^', '**'), math_safe)  # Safe evaluation
+                value = simpleeval.simple_eval(token.replace('^', '**'), names={"pi": math.pi}, functions={"sqrt": math.sqrt})
                 if isinstance(value, float) and value.is_integer():
                     value = int(value)
                 return str(value)
@@ -132,12 +131,11 @@ def evaluate_lammps_arithmetic(script):
         r"""\$\(\s*([0-9+\-*/^(). eE]+?)\s*\)""",  # capture inner arithmetic
         flags=re.VERBOSE,
     )
-    math_safe = {"__builtins__": None, "math": math}
 
     def repl(match: re.Match) -> str:
         expr = match.group(1).replace("^", "**")
         try:
-            value = eval(expr, math_safe)
+            value = simpleeval.simple_eval(expr, names={"pi": math.pi}, functions={"sqrt": math.sqrt})
             if isinstance(value, float) and value.is_integer():
                 value = int(value)
             return str(value)
@@ -187,7 +185,7 @@ def expand_loops(script):
 
                     if re.fullmatch(r'[\d\s<>=!]+', condition_eval):  # Ensure safe evaluation
                         try:
-                            if eval(condition_eval, {"__builtins__": None}):  # Secure eval
+                            if simpleeval.simple_eval(condition_eval):
                                 expanded_lines.extend(re.findall(r'"([^"]*)"', then_part))
                         except:
                             pass

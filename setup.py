@@ -19,7 +19,8 @@ setup(
         "colorama",
         "graphviz",
         "zss", 
-        "pydot", 
+        "pydot",
+        "simpleeval" 
     ],
     python_requires=">=3.10",
     classifiers=[

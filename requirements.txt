@@ -3,3 +3,4 @@ colorama
 graphviz
 pydot
 zss
+simpleeval
