@@ -15,10 +15,10 @@ repo_root = os.path.abspath(os.path.join(current_dir, ".."))  # Go one level up
 # Ensure the grammar file exists before loading
 try: 
     GRAMMAR_PATH = files("lammps_ast.grammar").joinpath("lammps_grammar.lark")
-    with open(grammar_path, "r") as f:
+    with open(GRAMMAR_PATH, "r") as f:
         LAMMPS_GRAMMAR = f.read()
 except FileNotFoundError:
-    raise FileNotFoundError(f"Critical error: Grammar file not found at {grammar_path}")
+    raise FileNotFoundError(f"Critical error: Grammar file not found at {GRAMMAR_PATH}")
 
 # Initialize the parser using the built-in grammar
 parser = Lark(LAMMPS_GRAMMAR, parser="lalr", keep_all_tokens=True)
