@@ -695,6 +695,13 @@ set_body: "atom"  RANGE       -> set_atom
          | "group" GROUP_ID   -> set_group
          | "region" REGION_ID -> set_region
 
+// ======================
+//  59. newton
+// ======================
+
+newton_statement: "newton" newton_flag+ _NEWLINE
+
+newton_flag: ("on" | "off")
 
 
 // ----------------------------------
