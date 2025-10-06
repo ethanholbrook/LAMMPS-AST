@@ -67,6 +67,7 @@
            | kim_statement
            | run_style_statement
            | set_statement
+           | newton_statement
 
 // ======================
 //  1. units
@@ -425,7 +426,7 @@ fix_body: "nve"                        -> fix_style_nve
 
 fix_nvt_args: "temp" TEMPERATURE TEMPERATURE DAMPING_PARAMETER
 fix_npt_args: "temp" TEMPERATURE TEMPERATURE DAMPING_PARAMETER
-            | ("iso" | AXIS | "xy" | "xz" | "yz") PRESSURE PRESSURE DAMPING_PARAMETER
+            | ("iso" | AXIS | "xy" | "xz" | "yz") PRESSURE PRESSURE DAMPING_PARAMETER ("drag" NUMBER)?
 fix_langevin_args: TEMPERATURE TEMPERATURE DAMPING_PARAMETER RANDOM_SEED
 fix_setforce_args: FORCE_COMPONENT FORCE_COMPONENT FORCE_COMPONENT ("region" REGION_ID)?
 fix_addforce_args: FORCE_COMPONENT FORCE_COMPONENT FORCE_COMPONENT ("region" REGION_ID)?
@@ -699,10 +700,7 @@ set_body: "atom"  RANGE       -> set_atom
 //  59. newton
 // ======================
 
-newton_statement: "newton" newton_flag+ _NEWLINE
-
-newton_flag: ("on" | "off")
-
+newton_statement: "newton" ("on" | "off") ("on" | "off")? _NEWLINE
 
 // ----------------------------------
 
