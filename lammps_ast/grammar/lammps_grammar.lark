@@ -68,6 +68,9 @@
            | run_style_statement
            | set_statement
            | newton_statement
+           | processors_statement
+           | comm_modify_statement
+           | special_bonds_statement
 
 // ======================
 //  1. units
@@ -423,6 +426,8 @@ fix_body: "nve"                        -> fix_style_nve
         | "setforce" fix_setforce_args -> fix_style_setforce
         | "addforce" fix_addforce_args -> fix_style_addforce
         | "deform" fix_deform_args     -> fix_style_deform
+        | "temp/berendsen" fix_temp_berendsen_args -> fix_style_temp_berendsen 
+        | "temp/rescale"  fix_temp_rescale_args   -> fix_style_temp_rescale   
 
 fix_nvt_args: "temp" TEMPERATURE TEMPERATURE DAMPING_PARAMETER
 fix_npt_args: "temp" TEMPERATURE TEMPERATURE DAMPING_PARAMETER
@@ -431,6 +436,8 @@ fix_langevin_args: TEMPERATURE TEMPERATURE DAMPING_PARAMETER RANDOM_SEED
 fix_setforce_args: FORCE_COMPONENT FORCE_COMPONENT FORCE_COMPONENT ("region" REGION_ID)?
 fix_addforce_args: FORCE_COMPONENT FORCE_COMPONENT FORCE_COMPONENT ("region" REGION_ID)?
 fix_deform_args: STEPS (deform_style)+ fix_deform_options*
+fix_temp_berendsen_args: TEMPERATURE TEMPERATURE DAMPING_PARAMETER
+fix_temp_rescale_args: STEPS TEMPERATURE TEMPERATURE NUMBER NUMBER ("region" REGION_ID)?
 
 deform_style: AXIS "final" DISTANCE DISTANCE
             | AXIS "delta" DISTANCE DISTANCE
@@ -702,6 +709,44 @@ set_body: "atom"  RANGE       -> set_atom
 
 newton_statement: "newton" ("on" | "off") ("on" | "off")? _NEWLINE
 
+// ======================
+//  60. processors
+// ======================
+
+processors_statement: "processors" ("*" | NUMBER) ("*" | NUMBER) ("*" | NUMBER) _NEWLINE
+
+// ======================
+//  61. comm_modify
+// ======================
+
+comm_modify_statement: "comm_modify" comm_modify_args+ _NEWLINE
+
+comm_modify_args: "mode" ("single" | "multi")
+                | "cutoff" DISTANCE_CUTOFF
+                | "cutoff/multi" comm_modify_option DISTANCE_CUTOFF   
+                | "reduce/multi"                       
+                | "group" GROUP_ID
+                | "vel" BOOL
+
+comm_modify_option:  INT | "*" INT? | INT "*" INT?
+
+// ======================
+// 62. special_bonds
+// ======================
+
+special_bonds_statement: "special_bonds" special_bonds_args+ _NEWLINE
+
+special_bonds_args: "amber"    -> sb_preset_amber
+                  | "charmm"   -> sb_preset_charmm
+                  | "dreiding" -> sb_preset_dreiding
+                  | "fene"     -> sb_preset_fene
+                  | "lj/coul" NUMBER NUMBER NUMBER
+                  | "lj"      NUMBER NUMBER NUMBER
+                  | "coul"    NUMBER NUMBER NUMBER
+                  | "angle"   BOOL
+                  | "dihedral" BOOL
+                  | "one/five" BOOL
+
 // ----------------------------------
 
 // ======================
@@ -819,7 +864,7 @@ FIX_ID.-1: GENERIC_ID
 TEMPLATE_ID.-1: GENERIC_ID
 
 
-COMMAND: /(units|boundary|dimension|thermo|include|minimize|clear|write_restart|undump|unfix|create_box|timestep|label|jump|next|replicate|neighbor|reset_timestep|bond_style|angle_style|dihedral_style|improper_style|atom_style|atom_modify|variable|mass|create_atoms|pair_style|pair_coeff|velocity|neigh_modify|bond_coeff|angle_coeff|dihedral_coeff|improper_coeff|group|thermo_style|thermo_modify|run|fix_modify|compute|fix|if|displace_atoms|region|read_data|write_data|lattice|dump_modify|delete_atoms|change_box|dump|restart|package|pair_modify|kim|run_style|set|newton)\b/
+COMMAND: /(units|boundary|dimension|thermo|include|minimize|clear|write_restart|undump|unfix|create_box|timestep|label|jump|next|replicate|neighbor|reset_timestep|bond_style|angle_style|dihedral_style|improper_style|atom_style|atom_modify|variable|mass|create_atoms|pair_style|pair_coeff|velocity|neigh_modify|bond_coeff|angle_coeff|dihedral_coeff|improper_coeff|group|thermo_style|thermo_modify|run|fix_modify|compute|fix|if|displace_atoms|region|read_data|write_data|lattice|dump_modify|delete_atoms|change_box|dump|restart|package|pair_modify|kim|run_style|set|newton|processors|comm_modify|special_bonds)\b/
 
 BOOL: "yes" | "no"
 NUMBER:  FLOAT | VAR_EXPR
