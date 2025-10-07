@@ -808,15 +808,15 @@ DAMPING_PARAMETER: NUMBER
 VALUE_EXPR: NUMBER
 RANGE: INT (":" INT)?
 
-LABEL_ID: GENERIC_ID
-BOX_ID: GENERIC_ID
-REGION_ID: GENERIC_ID
-MOLECULE_ID: GENERIC_ID
-COMPUTE_ID: GENERIC_ID
-DUMP_ID: GENERIC_ID
-GROUP_ID: GENERIC_ID
-FIX_ID: GENERIC_ID
-TEMPLATE_ID: GENERIC_ID
+LABEL_ID.-1: GENERIC_ID
+BOX_ID.-1: GENERIC_ID
+REGION_ID.-1: GENERIC_ID
+MOLECULE_ID.-1: GENERIC_ID
+COMPUTE_ID.-1: GENERIC_ID
+DUMP_ID.-1: GENERIC_ID
+GROUP_ID.-1: GENERIC_ID
+FIX_ID.-1: GENERIC_ID
+TEMPLATE_ID.-1: GENERIC_ID
 
 
 COMMAND: /(units|boundary|dimension|thermo|include|minimize|clear|write_restart|undump|unfix|create_box|timestep|label|jump|next|replicate|neighbor|reset_timestep|bond_style|angle_style|dihedral_style|improper_style|atom_style|atom_modify|variable|mass|create_atoms|pair_style|pair_coeff|velocity|neigh_modify|bond_coeff|angle_coeff|dihedral_coeff|improper_coeff|group|thermo_style|thermo_modify|run|fix_modify|compute|fix|if|displace_atoms|region|read_data|write_data|lattice|dump_modify|delete_atoms|change_box|dump|restart|package|pair_modify|kim|run_style|set)\b/

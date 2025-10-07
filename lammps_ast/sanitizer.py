@@ -80,7 +80,7 @@ def process_and_evaluate_variables(script):
                 expr = expr.replace('^', '**').replace('sqrt(', 'math.sqrt(')
 
                 try:
-                    result = simpleeval.simple_eval(expr, names={"pi": math.pi}, functions={"sqrt": math.sqrt})
+                    result = simpleeval.simple_eval(expr, names={"pi": math.pi}, functions={"sqrt": math.sqrt,"ceil": math.ceil,"floor":math.floor,'exp':math.exp})
                     if isinstance(result, float) and result.is_integer():
                         result = int(result)
                     var_dict[var_name] = str(result)
