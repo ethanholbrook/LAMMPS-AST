@@ -23,6 +23,15 @@ except FileNotFoundError:
 # Initialize the parser using the built-in grammar
 parser = Lark(LAMMPS_GRAMMAR, parser="lalr", keep_all_tokens=True)
 
+from dataclasses import dataclass
+
+@dataclass
+class ParseErrorInfo:
+    line: int
+    column: int
+    token: str
+    text: str
+    
 def parse_to_AST(sanitized_script, *, lint=False, max_errors=10, verbose=False):
     """
     If lint=False (default):
