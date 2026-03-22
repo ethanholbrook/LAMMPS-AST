@@ -12,5 +12,8 @@ __pycache__/
 venv/
 .env/
 
+# Stored API Keys
+.env
+
 # Other metadata
 pip-wheel-metadata/
