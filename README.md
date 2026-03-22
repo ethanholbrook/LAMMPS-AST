@@ -28,7 +28,7 @@ conda create -n Last_env python=3.11
 
 pip install lammps_ast
 conda install graphviz
-
+```
 
 ## Citation
 
@@ -41,6 +41,6 @@ If you use `LAMMPS-AST` or the evaluation pipeline in academic work, please cite
   year         = {2026},
   note         = {Manuscript in preparation}
 }
-
+```
 
 
