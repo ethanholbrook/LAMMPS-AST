@@ -1,38 +1,62 @@
 # LAMMPS-AST
 
-**LAMMPS-AST** is a toolset for parsing, analyzing, and processing LAMMPS scripts using an Abstract Syntax Tree (AST) representation. It utilizes [Lark](https://github.com/lark-parser/lark) for parsing LAMMPS input files and provides scripts that leverage Large Language Models (LLMs) for interpreting, modifying, and generating LAMMPS scripts. It is designed to support structural analysis of LAMMPS scripts and to enable downstream workflows such as validation, comparison, transformation, and evaluation of LLM-generated simulation inputs.
+`LAMMPS-AST` is a Python package for sanitizing and parsing LAMMPS input scripts into abstract syntax trees (ASTs). It is built on [Lark](https://github.com/lark-parser/lark) and is intended for structural analysis, validation, comparison, and downstream workflows around LAMMPS input files.
 
-`LAMMPS-AST` is a Python package for sanitizing and parsing LAMMPS input scripts into abstract syntax trees (ASTs). 
+## What It Provides
 
-## Repository Structure
+- script sanitization before parsing
+- parsing of LAMMPS input scripts into ASTs
+- AST transformation and comparison utilities
+- repository examples showing how the parser can be used in notebook and pipeline workflows
 
-- `lammps_ast/`: core parser, sanitizer, grammar, and AST utilities
-- `EvaluationPipelineExample/`: notebook-based example pipeline for script generation, parsing, execution, accuracy checking, and visualization
-- `examples/`: small usage examples
-- `setup.py`: package metadata and installation configuration
+## Install
 
-## Features
-
-- Sanitization of LAMMPS input scripts prior to parsing
-- Parsing of LAMMPS scripts into AST representations using Lark
-- Utilities for AST transformation and comparison
-- Support for evaluating generated LAMMPS scripts in downstream workflows
-- Example notebooks demonstrating an end-to-end LLM evaluation pipeline
-
-## Installation
-
-### Clone the Repository
+Install from PyPI:
 
 ```bash
-conda create -n Last_env python=3.11
-
 pip install lammps_ast
-conda install graphviz
+```
+
+If you need the optional visualization tooling used in some example workflows, you may also want a local Graphviz install.
+
+## Minimal Usage
+
+```python
+from lammps_ast.sanitizer import sanitize
+from lammps_ast.parser import parse_to_AST
+
+script = """
+units metal
+atom_style atomic
+boundary p p p
+"""
+
+sanitized = sanitize(script)
+tree, errors = parse_to_AST(sanitized, lint=True)
+```
+
+`parse_to_AST(..., lint=True)` returns a parse tree plus collected parse errors. With `lint=False`, it behaves like a direct parser call and returns either a tree or an exception object.
+
+## Repository Layout
+
+- `lammps_ast/`: package source, including parser, sanitizer, grammar, and AST utilities
+- `examples/`: small examples of using the parser directly
+- `publication/`: notebook-based workflow used for the publication-oriented evaluation example
+- `ez-pipeline/`: script-oriented evaluation pipeline built on top of `lammps_ast`
+
+The PyPI distribution is focused on the `lammps_ast` package itself. The notebook and pipeline folders are repository examples and supporting workflows.
+
+## Development Install
+
+To work from a local clone:
+
+```bash
+pip install -e .
 ```
 
 ## Citation
 
-If you use `LAMMPS-AST` or the evaluation pipeline in academic work, please cite the associated publication.
+If you use `LAMMPS-AST` or the evaluation workflow in academic work, please cite the associated publication.
 
 ```bibtex
 @misc{lammps_ast_paper,
@@ -42,5 +66,4 @@ If you use `LAMMPS-AST` or the evaluation pipeline in academic work, please cite
   note         = {Manuscript in preparation}
 }
 ```
-
 

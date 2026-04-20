@@ -1,12 +1,23 @@
-from setuptools import setup, find_packages
+from pathlib import Path
+import re
+
+from setuptools import find_packages, setup
+
+
+ROOT = Path(__file__).resolve().parent
+README = (ROOT / "README.md").read_text(encoding="utf-8")
+INIT_TEXT = (ROOT / "lammps_ast" / "__init__.py").read_text(encoding="utf-8")
+VERSION_MATCH = re.search(r'^__version__\s*=\s*"([^"]+)"', INIT_TEXT, re.MULTILINE)
+if VERSION_MATCH is None:
+    raise RuntimeError("Could not determine package version from lammps_ast/__init__.py")
 
 setup(
     name="lammps_ast",
-    version="0.1.7",
+    version=VERSION_MATCH.group(1),
     author="Juan C. Verduzco, Ethan W. Holbrook",
     author_email="holbrooe@purdue.edu",
     description="A LAMMPS script parser and sanitizer using Lark",
-    long_description=open("README.md").read(),
+    long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/ethanholbrook/LAMMPS-AST",
     packages=find_packages(include=["lammps_ast", "lammps_ast.*"]),
@@ -30,9 +41,4 @@ setup(
         "Topic :: Scientific/Engineering :: Chemistry",
         "Intended Audience :: Science/Research",
     ],
-    entry_points={
-        "console_scripts": [
-            "lammps-parse=lammps_parser.parser:parse_to_AST",
-        ],
-    },
 )

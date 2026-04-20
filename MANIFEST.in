@@ -1,0 +1,2 @@
+include README.md
+recursive-include lammps_ast/grammar *.lark
