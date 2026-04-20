@@ -59,11 +59,13 @@ pip install -e .
 If you use `LAMMPS-AST` or the evaluation workflow in academic work, please cite the associated publication.
 
 ```bibtex
-@misc{lammps_ast_paper,
+@article{lammps_ast_paper,
   title        = {Evaluating LLM-generated code for domain-specific languages: molecular dynamics with LAMMPS},
   author       = {Holbrook, Ethan W. and Verduzco, Juan C. and Strachan, Alejandro},
   year         = {2026},
-  note         = {Manuscript in preparation}
+  eprint       = {2603.20630},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.SE},
+  url          = {https://arxiv.org/abs/2603.20630}
 }
 ```
-
