@@ -1,0 +1,94 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+variable alat equal 3.52
+variable tinit equal 600.0
+variable tstart equal 300.0
+variable tend equal 2500.0
+variable ptarget equal 1.01325
+variable tstep equal 0.001
+variable tdamp equal 0.1
+variable pdamp equal 1.0
+lattice fcc ${alat} origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice fcc 3.52 origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region unitcell block 0 1 0 1 0 1 units lattice
+create_box 1 unitcell
+Created orthogonal box = (0 0 0) to (3.52 3.52 3.52)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 4 atoms
+  using lattice units in orthogonal box = (0 0 0) to (3.52 3.52 3.52)
+  create_atoms CPU = 0.000 seconds
+replicate 10 10 10
+Replication is creating a 10x10x10 = 1000 times larger system...
+  orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+  4000 atoms
+  replicate CPU = 0.002 seconds
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/potentials/prompt2.potential Ni
+neighbor 2.0 bin
+neigh_modify every 1 delay 10 check yes
+timestep ${tstep}
+timestep 0.001
+run_style verlet
+velocity all create ${tinit} 4928459 dist gaussian mom yes rot no
+velocity all create 600 4928459 dist gaussian mom yes rot no
+reset_timestep 0
+thermo 1000
+thermo_style custom step time temp press pe ke etotal vol
+fix 1 all npt temp ${tstart} ${tend} ${tdamp} iso ${ptarget} ${ptarget} ${pdamp}
+fix 1 all npt temp 300 ${tend} ${tdamp} iso ${ptarget} ${ptarget} ${pdamp}
+fix 1 all npt temp 300 2500 ${tdamp} iso ${ptarget} ${ptarget} ${pdamp}
+fix 1 all npt temp 300 2500 0.1 iso ${ptarget} ${ptarget} ${pdamp}
+fix 1 all npt temp 300 2500 0.1 iso 1.01325 ${ptarget} ${pdamp}
+fix 1 all npt temp 300 2500 0.1 iso 1.01325 1.01325 ${pdamp}
+fix 1 all npt temp 300 2500 0.1 iso 1.01325 1.01325 1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 10 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.80375
+  ghost atom cutoff = 7.80375
+  binsize = 3.901875, bins = 10 10 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
+   Step          Time           Temp          Press          PotEng         KinEng         TotEng         Volume    
+         0   0              600            7594.6671     -17800          310.14679     -17489.853      43614.208    
+        10   0.01           505.93246      14571.376     -17750.464      261.52222     -17488.942      43629.466    
+Loop time of 0.0635035 on 1 procs for 10 steps with 4000 atoms
+
+Performance: 13.606 ns/day, 1.764 hours/ns, 157.472 timesteps/s, 629.887 katom-step/s
+98.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.062044   | 0.062044   | 0.062044   |   0.0 | 97.70
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00026819 | 0.00026819 | 0.00026819 |   0.0 |  0.42
+Output  | 2.2743e-05 | 2.2743e-05 | 2.2743e-05 |   0.0 |  0.04
+Modify  | 0.0011011  | 0.0011011  | 0.0011011  |   0.0 |  1.73
+Other   |            | 6.698e-05  |            |       |  0.11
+
+Nlocal:           4000 ave        4000 max        4000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           8195 ave        8195 max        8195 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         352000 ave      352000 max      352000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 352000
+Ave neighs/atom = 88
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00

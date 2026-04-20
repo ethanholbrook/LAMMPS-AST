@@ -1,0 +1,136 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+variable a equal 3.300758
+variable gap equal 15.0
+variable vac equal 500.0
+variable lx equal 20.0*v_a
+variable ly equal 20.0*v_a
+variable zhi equal 60.0*v_a+v_gap+v_vac
+variable Teq equal 300.0
+variable dt equal 0.001
+variable eqsteps equal 100000
+variable prodsteps equal 50000
+lattice bcc ${a} origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice bcc 3.300758 origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.300758 3.300758 3.300758
+region whole block 0.0 ${lx} 0.0 ${ly} -${vac} ${zhi} units box
+region whole block 0.0 66.01516 0.0 ${ly} -${vac} ${zhi} units box
+region whole block 0.0 66.01516 0.0 66.01516 -${vac} ${zhi} units box
+region whole block 0.0 66.01516 0.0 66.01516 -500 ${zhi} units box
+region whole block 0.0 66.01516 0.0 66.01516 -500 713.04548 units box
+create_box 1 whole
+Created orthogonal box = (0 0 -500) to (66.01516 66.01516 713.04548)
+  1 by 1 by 1 MPI processor grid
+region target_reg block 0.0 19.999 0.0 19.999 0.0 39.999 units lattice
+region projectile_reg block 0.0 19.999 0.0 19.999 40.0 59.999 units lattice
+create_atoms 1 region target_reg
+Created 32000 atoms
+  using lattice units in orthogonal box = (0 0 -500) to (66.01516 66.01516 713.04548)
+  create_atoms CPU = 0.006 seconds
+create_atoms 1 region projectile_reg
+Created 16000 atoms
+  using lattice units in orthogonal box = (0 0 -500) to (66.01516 66.01516 713.04548)
+  create_atoms CPU = 0.006 seconds
+group target region target_reg
+32000 atoms in group target
+group projectile region projectile_reg
+16000 atoms in group projectile
+mass 1 92.90638
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep ${dt}
+timestep 0.001
+run_style verlet
+thermo 1000
+thermo_style custom step time atoms temp pe ke etotal press pxx pyy pzz lx ly lz
+thermo_modify flush yes
+velocity all create ${Teq} 123456 mom yes rot no dist gaussian
+velocity all create 300 123456 mom yes rot no dist gaussian
+fix eq all nvt temp ${Teq} ${Teq} 0.1
+fix eq all nvt temp 300 ${Teq} 0.1
+fix eq all nvt temp 300 300 0.1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 20 20 360
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 22.19 | 22.19 | 22.19 Mbytes
+   Step          Time         Atoms         Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz             Lx             Ly             Lz      
+         0   0                  48000   300           -339015.29      1861.3073     -337153.98      1632.0153      1553.3957      1552.0291      1790.6212      66.01516       66.01516       1213.0455    
+        10   0.01               48000   280.51424     -338894.17      1740.4107     -337153.76      1776.3237      1697.2922      1696.3076      1935.3714      66.01516       66.01516       1213.0455    
+Loop time of 0.215517 on 1 procs for 10 steps with 48000 atoms
+
+Performance: 4.009 ns/day, 5.987 hours/ns, 46.400 timesteps/s, 2.227 Matom-step/s
+99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.20662    | 0.20662    | 0.20662    |   0.0 | 95.87
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.001251   | 0.001251   | 0.001251   |   0.0 |  0.58
+Output  | 0.00040051 | 0.00040051 | 0.00040051 |   0.0 |  0.19
+Modify  | 0.0061478  | 0.0061478  | 0.0061478  |   0.0 |  2.85
+Other   |            | 0.0011     |            |       |  0.51
+
+Nlocal:          48000 ave       48000 max       48000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24060 ave       24060 max       24060 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     1.5176e+06 ave  1.5176e+06 max  1.5176e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1517600
+Ave neighs/atom = 31.616667
+Neighbor list builds = 0
+Dangerous builds = 0
+velocity projectile set NULL NULL -20.0 sum yes units box
+reset_timestep 0
+fix prod all nve
+run 10
+WARNING: One or more atoms are time integrated more than once (src/src/modify.cpp:296)
+Per MPI rank memory allocation (min/avg/max) = 22.2 | 22.2 | 22.2 Mbytes
+   Step          Time         Atoms         Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz             Lx             Ly             Lz      
+         0   0                  48000   5250.4648     -338894.17      32575.762     -306318.41      8006.5461      1697.2922      1696.3076      20626.039      66.01516       66.01516       1213.0455    
+        10   0.01               48000   4851.6854     -337932.01      30101.591     -307830.42      9135.983       3082.1035      3082.961       21242.884      66.01516       66.01516       1213.0455    
+Loop time of 0.263007 on 1 procs for 10 steps with 48000 atoms
+
+Performance: 3.285 ns/day, 7.306 hours/ns, 38.022 timesteps/s, 1.825 Matom-step/s
+99.1% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.25149    | 0.25149    | 0.25149    |   0.0 | 95.62
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.001197   | 0.001197   | 0.001197   |   0.0 |  0.46
+Output  | 0.0004041  | 0.0004041  | 0.0004041  |   0.0 |  0.15
+Modify  | 0.0088846  | 0.0088846  | 0.0088846  |   0.0 |  3.38
+Other   |            | 0.001027   |            |       |  0.39
+
+Nlocal:          48000 ave       48000 max       48000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24060 ave       24060 max       24060 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     1.5176e+06 ave  1.5176e+06 max  1.5176e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1517600
+Ave neighs/atom = 31.616667
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00

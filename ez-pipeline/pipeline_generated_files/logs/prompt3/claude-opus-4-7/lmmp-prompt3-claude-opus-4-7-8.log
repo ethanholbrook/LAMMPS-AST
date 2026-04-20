@@ -1,0 +1,86 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+lattice bcc 3.3008
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+region box block 0 20 0 20 0 43
+create_box 1 box
+Created orthogonal box = (0 0 0) to (66.016 66.016 141.9344)
+  1 by 1 by 1 MPI processor grid
+region projectile block 0 20 0 20 0 20
+create_atoms 1 region projectile
+Created 16400 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66.016 66.016 141.9344)
+  create_atoms CPU = 0.010 seconds
+region target block 0 20 0 20 20.454545 40.454545
+create_atoms 1 region target
+Created 16000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66.016 66.016 141.9344)
+  create_atoms CPU = 0.004 seconds
+mass 1 92.90638
+pair_style eam/fs
+pair_coeff * * /home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/potentials/prompt3.potential Nb
+group projectile region projectile
+16400 atoms in group projectile
+group target region target
+16000 atoms in group target
+velocity all create 300.0 12345 mom yes rot yes dist gaussian
+timestep 0.001
+fix 1 all nvt temp 300.0 300.0 0.1
+thermo 100
+thermo_style custom step temp pe ke etotal press
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 20 20 43
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/fs, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 13.64 | 13.64 | 13.64 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press     
+         0   300           -228398.11      1256.3698     -227141.74      8066.4083    
+        10   280.81985     -228317.63      1176.0453     -227141.59      8883.3278    
+Loop time of 0.334371 on 1 procs for 10 steps with 32400 atoms
+
+Performance: 2.584 ns/day, 9.288 hours/ns, 29.907 timesteps/s, 968.984 katom-step/s
+45.6% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.32844    | 0.32844    | 0.32844    |   0.0 | 98.23
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00082229 | 0.00082229 | 0.00082229 |   0.0 |  0.25
+Output  | 0.00013457 | 0.00013457 | 0.00013457 |   0.0 |  0.04
+Modify  | 0.0041703  | 0.0041703  | 0.0041703  |   0.0 |  1.25
+Other   |            | 0.0007991  |            |       |  0.24
+
+Nlocal:          32400 ave       32400 max       32400 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          16265 ave       16265 max       16265 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     1.0184e+06 ave  1.0184e+06 max  1.0184e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1018400
+Ave neighs/atom = 31.432099
+Neighbor list builds = 0
+Dangerous builds = 0
+velocity projectile set 0.0 0.0 -20.0 sum yes units box
+fix 2 all nve
+dump 1 all custom 1000 dump.spall.lammpstrj id type x y z vx vy vz
+run 10
+WARNING: One or more atoms are time integrated more than once (src/src/modify.cpp:296)
+Per MPI rank memory allocation (min/avg/max) = 13.64 | 13.64 | 13.64 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press     
+ERROR: Lost atoms: original 32400 current 32230 (src/src/thermo.cpp:494)
+Last command: run 10

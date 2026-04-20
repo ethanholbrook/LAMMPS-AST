@@ -1,0 +1,59 @@
+units metal
+dimension 3
+boundary p p m
+atom_style atomic
+run_style verlet
+variable a equal 3.300
+variable nx equal 20
+variable ny equal 20
+variable nzt equal 40
+variable nzp equal 20
+variable pad equal 10
+variable gap equal 15.0
+variable dt equal 0.001
+variable tequil equal 100.0
+variable tprod equal 100.0
+variable temp0 equal 300.0
+variable tdamp equal 0.1
+variable vimp equal -20.0
+variable lx equal v_nx*v_a
+variable ly equal v_ny*v_a
+variable zpad equal v_pad*v_a
+variable ztlo equal v_zpad
+variable zthi equal v_zpad+v_nzt*v_a
+variable zplo equal v_zthi
+variable zphi equal v_zplo+v_nzp*v_a
+variable lz equal 2.0*v_zpad+(v_nzt+v_nzp)*v_a+v_gap
+variable nequil equal ceil(v_tequil/v_dt)
+variable nprod equal ceil(v_tprod/v_dt)
+lattice bcc ${a} origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0 ${lx} 0 ${ly} 0 ${lz} units box
+create_box 1 whole
+mass 1 92.90637
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep ${dt}
+region target block 0 ${lx} 0 ${ly} ${ztlo} ${zthi} units box
+region projectile block 0 ${lx} 0 ${ly} ${zplo} ${zphi} units box
+create_atoms 1 region target
+variable ntarget equal count(all)
+group target id 1:${ntarget}
+create_atoms 1 region projectile
+group projectile subtract all target
+thermo 1000
+thermo_style custom step time atoms temp pe ke etotal pxx pyy pzz lx ly lz
+thermo_modify flush yes norm no
+dump traj all custom 1000 nb_spall.lammpstrj id type x y z vx vy vz
+dump_modify traj sort id
+velocity all create ${temp0} 4928459 mom yes rot no dist gaussian
+fix eq all nvt temp ${temp0} ${temp0} ${tdamp}
+run 10
+velocity target zero linear
+velocity projectile zero linear
+velocity projectile add 0.0 0.0 ${vimp} units box
+reset_timestep 0
+fix prod all nve
+run 10
+write_data nb_spall_final.data

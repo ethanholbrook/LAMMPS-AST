@@ -1,0 +1,25 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+lattice bcc 3.308
+region projectile block 0 20 0 20 0 20 units lattice
+region target block 0 20 0 20 -41.5 -1.5 units lattice
+region simbox block 0 20 0 20 -41.5 20 units lattice
+create_box 1 simbox
+create_atoms 1 region projectile
+create_atoms 1 region target
+mass 1 92.90638
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/potentials/prompt3.potential Nb
+group projectile region projectile
+group target region target
+timestep 0.001
+velocity all create 300.0 12345 mom yes rot yes dist gaussian
+fix 1 all nvt temp 300.0 300.0 0.1
+thermo 1000
+thermo_style custom step temp pe ke etotal press
+run 10
+velocity projectile set 0.0 0.0 -20.0 sum yes units box
+fix 2 all nve
+run 10

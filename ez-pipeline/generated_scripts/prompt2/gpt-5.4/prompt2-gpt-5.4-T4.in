@@ -1,0 +1,33 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+run_style verlet
+variable a equal 3.52
+variable tinit equal 600.0
+variable tstart equal 300.0
+variable tstop equal 2500.0
+variable pstart equal 1.01325
+variable pstop equal 1.01325
+variable dt equal 0.001
+variable tdamp equal 0.1
+variable pdamp equal 1.0
+variable nsteps equal 220000
+lattice fcc ${a} origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region uc block 0 1 0 1 0 1 units lattice
+create_box 1 uc
+create_atoms 1 box
+replicate 10 10 10
+mass 1 58.6934
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Ni
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+velocity all create ${tinit} 4928459 mom yes rot no dist gaussian
+timestep ${dt}
+reset_timestep 0
+thermo 1000
+thermo_style custom step time temp press pe ke etotal vol lx ly lz
+fix 1 all npt temp ${tstart} ${tstop} ${tdamp} iso ${pstart} ${pstop} ${pdamp}
+run ${nsteps}
+write_data ni_melting_final.data

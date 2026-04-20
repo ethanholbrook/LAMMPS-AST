@@ -1,0 +1,22 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+neighbor 2 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+run_style verlet
+lattice fcc 4.05 origin 0 0 0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region unitcell block 0 1 0 1 0 1 units lattice
+create_box 1 unitcell
+create_atoms 1 box
+replicate 5 5 5
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Al
+mass 1 26.9815385
+velocity all create 300 12345 mom yes rot no dist gaussian
+fix 1 all npt temp 300 300 0.1 iso 1.01325 1.01325 1
+thermo 1000
+thermo_style custom step time temp press pe ke etotal vol lx ly lz
+reset_timestep 0
+run 500000

@@ -1,0 +1,34 @@
+accuracy errors
+prompt1	gpt-5.4	T0	unknown error
+prompt1	gpt-5.4	T2	unknown error
+prompt1	gpt-5.4	T5	unknown error
+prompt1	gpt-5.4	T7	unknown error
+prompt1	gpt-5.4	T8	unknown error
+prompt2	gpt-5.4	T0	no AST generated
+prompt2	gpt-5.4	T1	unknown error
+prompt2	gpt-5.4	T2	unknown error
+prompt2	gpt-5.4	T4	unknown error
+prompt2	gpt-5.4	T6	unknown error
+prompt2	gpt-5.4	T7	unknown error
+prompt2	gpt-5.4	T8	unknown error
+prompt2	gpt-5.4	T9	unknown error
+prompt3	gpt-5.4	T0	no AST generated
+prompt3	gpt-5.4	T1	box_region_missing, fixed bounds, projectile_region_missing, target_region_missing
+prompt3	gpt-5.4	T2	no AST generated
+prompt3	gpt-5.4	T3	box_region_missing, other bounds, projectile_region_missing, target_region_missing, unknown error
+prompt3	gpt-5.4	T4	no AST generated
+prompt3	gpt-5.4	T5	box_region_missing, extra_vel, other bounds, pair_style inaccurate, projectile_region_missing, target_region_size, unknown error
+prompt3	gpt-5.4	T6	no AST generated
+prompt3	gpt-5.4	T7	box_region_missing, extra_vel, other bounds, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.4	T8	box_region_missing, other bounds, pair_style inaccurate, projectile_region_size, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.4	T9	no AST generated
+prompt3	claude-opus-4-7	T0	box_region_size, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, v_set_direction, velocity_temp inaccurate
+prompt3	claude-opus-4-7	T1	box_region_missing, gap_size, projectile_region_size, target_region_size
+prompt3	claude-opus-4-7	T2	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, unknown error
+prompt3	claude-opus-4-7	T3	box_region_missing, gap_size, projectile_region_size, target_region_size
+prompt3	claude-opus-4-7	T4	box_region_missing, gap_size, projectile_region_size, target_region_size
+prompt3	claude-opus-4-7	T5	box_region_missing, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-opus-4-7	T6	box_region_missing, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error
+prompt3	claude-opus-4-7	T7	box_region_missing, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction, velocity_temp inaccurate
+prompt3	claude-opus-4-7	T8	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, unknown error
+prompt3	claude-opus-4-7	T9	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, unknown error, v_set_direction

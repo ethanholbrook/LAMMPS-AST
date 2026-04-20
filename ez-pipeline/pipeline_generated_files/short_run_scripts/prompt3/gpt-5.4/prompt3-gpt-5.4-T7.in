@@ -1,0 +1,65 @@
+units metal
+dimension 3
+boundary p p m
+atom_style atomic
+run_style verlet
+variable a equal 3.300
+variable nx equal 20
+variable ny equal 20
+variable nzp equal 20
+variable nzt equal 40
+variable gap equal 15.0
+variable vac equal 15.0
+variable eps equal 1.0e-6
+variable nxhi equal v_nx-v_eps
+variable nyhi equal v_ny-v_eps
+variable nzphi equal v_nzp-v_eps
+variable nzthi equal v_nzt-v_eps
+variable lx equal v_a*v_nx
+variable ly equal v_a*v_ny
+variable lzp equal v_a*v_nzp
+variable lzt equal v_a*v_nzt
+variable lz equal v_vac+v_lzp+v_gap+v_lzt+v_vac
+variable zproj equal v_vac
+variable ztarg equal v_vac+v_lzp+v_gap
+variable temp0 equal 300.0
+variable tdamp equal 0.1
+variable dt equal 0.001
+variable seed equal 4928459
+variable vimpact equal 20.0
+variable eq_steps equal 100000
+variable prod_steps equal 100000
+variable thermo_every equal 1000
+variable dump_every equal 1000
+lattice bcc ${a} origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0.0 ${lx} 0.0 ${ly} 0.0 ${lz} units box
+create_box 2 whole
+region proj_build block 0.0 ${nxhi} 0.0 ${nyhi} 0.0 ${nzphi} units lattice
+create_atoms 1 region proj_build
+group projectile type 1
+region targ_build block 0.0 ${nxhi} 0.0 ${nyhi} 0.0 ${nzthi} units lattice
+create_atoms 2 region targ_build
+group target type 2
+mass 1 92.90638
+mass 2 92.90638
+pair_style eam/fs
+pair_coeff * * /home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/potentials/prompt3.potential Nb Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep ${dt}
+thermo ${thermo_every}
+thermo_style custom step time temp pe ke etotal lx ly lz atoms
+thermo_modify flush yes
+velocity all create ${temp0} ${seed} mom yes rot no dist gaussian
+dump deq all custom ${dump_every} equilibration.lammpstrj id type x y z vx vy vz
+dump_modify deq sort id
+fix eq all nvt temp ${temp0} ${temp0} ${tdamp}
+run 10
+velocity all zero linear
+reset_timestep 0
+velocity projectile set 0.0 0.0 ${vimpact} sum yes units box
+dump dprod all custom ${dump_every} impact.lammpstrj id type x y z vx vy vz
+dump_modify dprod sort id
+fix prod all nve
+run 10
+write_data spall_final.data
