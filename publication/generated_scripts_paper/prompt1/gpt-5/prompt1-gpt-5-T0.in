@@ -1,0 +1,30 @@
+print "Initialization"
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+newton on
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+reset_timestep 0
+
+print "System Construction"
+lattice fcc 4.05
+region box block 0 5 0 5 0 5 units lattice
+create_box 1 box
+create_atoms 1 box
+
+print "Potential"
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Al
+
+print "Miscellaneous"
+velocity all create 300.0 12345 mom yes rot yes dist gaussian
+thermo 100
+thermo_style custom step temp press pe ke etotal vol
+
+print "Production Run"
+fix 1 all npt temp 300.0 300.0 0.1 iso 1.01325 1.01325 1.0
+run 500000
+unfix 1

@@ -1,0 +1,37 @@
+# Initialization
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+
+# System Construction
+lattice bcc 3.3008
+region projectile block 0 20 0 20 0 20
+create_box 1 projectile
+create_atoms 1 box
+group projectile region projectile
+
+lattice bcc 3.3008
+region target block 0 20 0 20 21.5 61.5
+create_box 1 target
+create_atoms 1 box
+group target region target
+
+# Potential
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+
+# Miscellaneous
+timestep 0.001
+thermo 1000
+thermo_style custom step temp pe ke etotal press vol
+
+# Production Run
+velocity all create 300.0 12345
+fix 1 all nvt temp 300.0 300.0 0.1
+run 100000
+unfix 1
+
+velocity projectile set 0.0 0.0 2.0 sum yes units box
+fix 2 all nve
+run 100000

@@ -1,0 +1,35 @@
+units metal
+atom_style atomic
+boundary p p p
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+variable a equal 3.52
+lattice fcc ${a}
+region box block 0 10 0 10 0 10 units lattice
+create_box 1 box
+create_atoms 1 box
+mass 1 58.6934
+
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Ni
+
+timestep 0.005
+reset_timestep 0
+
+velocity all create 600.0 4928459 mom yes rot yes dist gaussian
+
+variable Tstart equal 300.0
+variable Tstop equal 2500.0
+variable rate equal 10.0
+variable P equal 1.01325
+variable dt equal 0.005
+variable ttot equal (v_Tstop - v_Tstart)/v_rate
+variable nsteps equal ceil(v_ttot/v_dt)
+
+thermo 1000
+thermo_style custom step temp press pe ke etotal vol
+
+fix 1 all npt temp ${Tstart} ${Tstop} 0.1 iso ${P} ${P} 1.0
+
+run ${nsteps}

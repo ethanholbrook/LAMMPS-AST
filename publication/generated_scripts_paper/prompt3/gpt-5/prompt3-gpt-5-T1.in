@@ -1,0 +1,49 @@
+units metal
+atom_style atomic
+boundary p p f
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+
+variable a equal 1.0
+variable nx equal 20
+variable ny equal 20
+variable nzT equal 40
+variable nzP equal 20
+variable gap equal 15.0
+variable Lx equal ${nx}*${a}
+variable Ly equal ${ny}*${a}
+variable LzT equal ${nzT}*${a}
+variable LzP equal ${nzP}*${a}
+variable zloProj equal ${LzT}+${gap}
+variable zhiProj equal ${zloProj}+${LzP}
+variable LzTot equal ${LzT}+${gap}+${LzP}
+
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0.0 ${Lx} 0.0 ${Ly} 0.0 ${LzTot} units box
+create_box 1 whole
+mass 1 92.906
+
+region target block 0.0 ${Lx} 0.0 ${Ly} 0.0 ${LzT} units box
+create_atoms 1 region target
+region projectile block 0.0 ${Lx} 0.0 ${Ly} ${zloProj} ${zhiProj} units box
+create_atoms 1 region projectile
+
+group target region target
+group projectile region projectile
+
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz
+
+velocity all create 300.0 4928459 mom yes rot no dist gaussian
+fix thermostat all nvt temp 300.0 300.0 0.1
+run 100000
+unfix thermostat
+
+velocity projectile ramp 0.0 0.0 0.0 0.0 -20.0 -20.0 z sum yes
+
+fix integrator all nve
+run 100000

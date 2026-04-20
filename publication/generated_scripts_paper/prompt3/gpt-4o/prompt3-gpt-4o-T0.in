@@ -1,0 +1,33 @@
+# Initialization
+units           metal
+dimension       3
+boundary        p p f
+atom_style      atomic
+
+# System Construction
+lattice         bcc 3.3
+region          projectile block 0 20 0 20 0 20
+create_box      2 projectile
+create_atoms    1 region projectile
+
+region          target block 0 20 0 20 22 62
+create_atoms    1 region target
+
+displace_atoms  target move 0.0 0.0 22.0 
+
+# Potential
+pair_style      eam/alloy
+pair_coeff      * * ../../../potentials/prompt1.potential Nb
+
+# Miscellaneous
+
+# Equilibration
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+fix             1 all nvt temp 300.0 300.0 0.1
+run             10000
+
+# Production Run
+unfix           1
+velocity        projectile set 0.0 0.0 2000.0 units box
+fix             2 all nve
+run             20000

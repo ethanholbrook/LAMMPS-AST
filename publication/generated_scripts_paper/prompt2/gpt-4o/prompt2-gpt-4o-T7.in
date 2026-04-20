@@ -1,0 +1,30 @@
+# Initialization
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# System Construction
+lattice         fcc 3.52
+region          box block 0 10 0 10 0 10
+create_box      1 box
+create_atoms    1 box
+
+# Potential
+pair_style      eam/alloy
+pair_coeff      * * ../../../potentials/prompt1.potential Ni
+
+# Initial Velocities
+velocity        all create 600.0 12345 mom yes dist gaussian
+
+# Thermodynamic settings
+thermo          100
+
+# Pressure and Temperature Control
+fix             1 all npt temp 300.0 2500.0 $(10000.0) iso 1.0 1.0 $(10000.0)
+
+# Miscellaneous
+
+# Production Run
+timestep        0.001
+run             220000

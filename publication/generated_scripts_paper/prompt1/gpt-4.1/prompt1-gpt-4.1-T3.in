@@ -1,0 +1,25 @@
+# Initialization
+units           metal
+atom_style      atomic
+boundary        p p p
+
+# System Construction
+lattice         fcc 4.05
+region          box block 0 5 0 5 0 5
+create_box      1 box
+create_atoms    1 box
+
+# Potential
+pair_style      eam/alloy
+pair_coeff      * * ../../../potentials/prompt1.potential Al
+
+# Miscellaneous
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+mass            1 26.9815
+
+# Production Run
+timestep        0.001
+velocity        all create 300.0 12345 mom yes dist gaussian
+fix             1 all npt temp 300.0 300.0 0.1 iso 1.01325 1.01325 1.0
+run             500000

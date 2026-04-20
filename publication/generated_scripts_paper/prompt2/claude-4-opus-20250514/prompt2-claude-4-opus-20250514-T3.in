@@ -1,0 +1,28 @@
+# Initialization
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+
+# System Construction
+lattice fcc 3.52
+region box block 0 10 0 10 0 10
+create_box 1 box
+create_atoms 1 box
+mass 1 58.6934
+
+# Potential
+pair_style eam
+pair_coeff * * ../../../potentials/prompt1.potential
+
+# Miscellaneous
+velocity all create 600.0 12345 dist gaussian
+variable temp_start equal 300.0
+variable temp_end equal 2500.0
+variable temp_rate equal 10.0
+variable nsteps equal (${temp_end}-${temp_start})/${temp_rate}*1000
+
+# Production Run
+fix 1 all npt temp ${temp_start} ${temp_end} 0.1 iso 1.0 1.0 1.0
+timestep 0.001
+run ${nsteps}

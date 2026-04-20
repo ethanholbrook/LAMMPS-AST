@@ -1,0 +1,39 @@
+print "Initialization"
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+
+print "System Construction"
+variable a0 equal 3.52
+lattice fcc ${a0}
+region box block 0 10 0 10 0 10 units lattice
+create_box 1 box
+create_atoms 1 box
+mass 1 58.6934
+
+print "Potential"
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Ni
+
+print "Miscellaneous"
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+thermo 1000
+thermo_style custom step temp press pe ke etotal vol
+variable dt equal 0.001
+timestep ${dt}
+
+print "Production Run"
+variable Tstart equal 300.0
+variable Tend equal 2500.0
+variable rate equal 10.0
+variable Trange equal v_Tend - v_Tstart
+variable heatTime equal v_Trange/v_rate
+variable Tdamp equal 0.1
+variable Pdamp equal 1.0
+reset_timestep 0
+velocity all create 600.0 12345 mom yes rot yes dist gaussian
+fix 1 all npt temp ${Tstart} ${Tend} ${Tdamp} iso 1.01325 1.01325 ${Pdamp}
+variable nsteps equal ceil(v_heatTime/v_dt)
+run ${nsteps}
