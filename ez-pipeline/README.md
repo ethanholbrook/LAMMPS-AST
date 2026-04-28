@@ -19,11 +19,6 @@ The shared control file is [pipeline_config.py](/home/holbrooe/LAMMPS-AST/Evalua
 - [pipeline/pipeline_summary.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/pipeline_summary.py): summary stage implementation
 - [pipeline/run_pipeline.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/run_pipeline.py): main driver with stage selection
 - [pipeline/run_full_pipeline.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/run_full_pipeline.py): compatibility entrypoint
-- [pipeline/01_generate_scripts.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/01_generate_scripts.py)
-- [pipeline/02_parse_scripts.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/02_parse_scripts.py)
-- [pipeline/03_execute_scripts.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/03_execute_scripts.py)
-- [pipeline/04_accuracy.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/04_accuracy.py)
-- [pipeline/05_summarize.py](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/pipeline/05_summarize.py)
 
 ## Main Driver
 
@@ -64,16 +59,16 @@ Force regeneration even if script outputs already exist:
 ./.venv/bin/python pipeline/run_pipeline.py --stage generate --force-generate
 ```
 
-## Stage Scripts
+## Stage Invocation
 
-These are thin stage-specific entrypoints that all use the shared config and shared implementation:
+Use the single driver and choose stages with `--stage`:
 
 ```bash
-./.venv/bin/python pipeline/01_generate_scripts.py
-./.venv/bin/python pipeline/02_parse_scripts.py
-./.venv/bin/python pipeline/03_execute_scripts.py
-./.venv/bin/python pipeline/04_accuracy.py
-./.venv/bin/python pipeline/05_summarize.py
+./.venv/bin/python pipeline/run_pipeline.py --stage generate
+./.venv/bin/python pipeline/run_pipeline.py --stage parse
+./.venv/bin/python pipeline/run_pipeline.py --stage execute
+./.venv/bin/python pipeline/run_pipeline.py --stage accuracy
+./.venv/bin/python pipeline/run_pipeline.py --stage summarize
 ```
 
 ## Saved Outputs
@@ -82,7 +77,7 @@ The scratch directory now separates code from outputs:
 
 - `pipeline/` contains the pipeline code and stage entrypoints
 - `generated_scripts/` stays at the top level for generated LAMMPS inputs
-- `pipeline_generated_files/` contains run-created artifact folders such as `raw_responses/`, `sanitized_scripts/`, `asts/`, `short_run_scripts/`, `logs/`, `pair_change/`, `pair_change_logs/`, and `errors/`
+- `pipeline_generated_files/` contains run-created artifact folders such as `raw_responses/`, `sanitized_scripts/`, `asts/`, `short_run_scripts/`, `logs/`, `pair_change/`, `pair_change_logs/`, `errors/`, and `lammps_generated_files/`
 - `data/` contains checkpoint pickles such as `parsing_df.pkl`, `final_pair_df.pkl`, and `accuracy_df_trees.pkl`
 - `results/` contains summary tables and plots such as [summary_table.csv](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/results/summary_table.csv), [summary_table.md](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/results/summary_table.md), and [final_sankey.html](/home/holbrooe/LAMMPS-AST/EvaluationPipelineExample/Codex_scratch/results/final_sankey.html)
 
