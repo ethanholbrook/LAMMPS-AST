@@ -3,6 +3,19 @@ import re
 import math
 import simpleeval
 
+
+def find_unresolved_variables(script):
+    """Return variable-like tokens that remain unresolved in a script."""
+    unresolved = set()
+
+    for match in re.findall(r"\${([a-zA-Z_]\w*)}", script):
+        unresolved.add(f"${{{match}}}")
+
+    for match in re.findall(r"\bv_([a-zA-Z_]\w*)\b", script):
+        unresolved.add(f"v_{match}")
+
+    return sorted(unresolved)
+
 def remove_comments(script):
     """Removes inline comments while preserving meaningful lines."""
     return '\n'.join(line.split('#', 1)[0].rstrip() for line in script.splitlines() if line.split('#', 1)[0].strip())
@@ -31,7 +44,8 @@ def merge_ampersand_lines(script):
 
 def parse_variable_line(line):
     """Extracts variable name and expression from a LAMMPS variable definition line."""
-    tokens = line.split(maxsplit=3)  # Adjusted to ensure proper parsing
+    # tokens = line.split(maxsplit=3)  # Old method, meant to deal with spaces in variables
+    tokens = line.split() # Handles other variable cases, string etc.   
 
     if len(tokens) < 3 or tokens[0] != "variable":
         return None, None
@@ -87,7 +101,7 @@ def process_and_evaluate_variables(script):
                     resolved_vars.add(var_name)
                     del variable_definitions[var_name]
                     progress_made = True
-                except (NameError, SyntaxError, TypeError) as e:
+                except (NameError, SyntaxError, TypeError, simpleeval.NameNotDefined):
                     continue  # Skip if an undefined variable is encountered
 
         if not progress_made:
