@@ -1,0 +1,21 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+lattice fcc v_Ni_lattice
+region simulation_box block 0 10 0 10 0 10 units lattice
+create_box 1 simulation_box
+create_atoms 1 box
+mass 1 v_Ni_mass
+pair_style eam
+pair_coeff * * v_potential_file
+neighbor 2 bin
+neigh_modify every 1 delay 10 check yes
+timestep 0.001
+reset_timestep 0
+velocity all create 600 4928459 dist gaussian mom yes rot yes units box
+thermo 1000
+thermo_style custom step time temp press pe ke etotal enthalpy vol density
+thermo_modify flush yes
+fix ensemble all npt temp 300 2500 v_Tdamp iso 1.01325 1.01325 v_Pdamp
+run v_run_steps

@@ -1,0 +1,24 @@
+# Initialization
+units           metal
+atom_style      atomic
+boundary        p p p
+
+# System Construction
+lattice         fcc 3.52
+region          box block 0 10 0 10 0 10
+create_box      1 box
+create_atoms    1 box
+
+# Potential
+pair_style      eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+
+# Miscellaneous
+mass            1 58.6934
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# Production Run
+fix             1 all npt temp 300.0 2500.0 10.0 iso 1.01325 1.01325 100.0
+timestep        0.001
+thermo          100
+run 10

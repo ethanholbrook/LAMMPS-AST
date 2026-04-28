@@ -1,0 +1,53 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# LAMMPS Input Script: Melting of Bulk Ni Sample
+
+# Initialization
+units           metal
+boundary        p p p
+atom_style      atomic
+
+# System Construction
+lattice         fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region          box block 0 10 0 10 0 10
+create_box      1 box
+Created orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 box
+Created 4000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  create_atoms CPU = 0.001 seconds
+
+# Potential
+pair_style      eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+
+# Miscellaneous
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+# Initial velocities
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# Production Run
+fix             1 all npt temp 300.0 2500.0 100.0 iso 0.0 0.0 1000.0
+timestep        1.0
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.80375
+  ghost atom cutoff = 7.80375
+  binsize = 3.901875, bins = 10 10 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+         0   600           -17800          0             -17489.853      7594.6671      43614.208    
+ERROR: Lost atoms: original 4000 current 8 (src/src/thermo.cpp:494)
+Last command: run 10

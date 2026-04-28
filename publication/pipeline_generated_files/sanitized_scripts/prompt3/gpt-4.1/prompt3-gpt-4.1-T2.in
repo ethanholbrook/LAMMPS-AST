@@ -1,0 +1,23 @@
+units metal
+atom_style atomic
+boundary p p f
+lattice bcc 3.3
+region proj block 0 20 0 20 0 20
+region targ block 0 20 0 20 21 60
+region gap block 0 20 0 20 20 21
+region box block 0 20 0 20 0 60
+create_box 1 box
+create_atoms 1 region proj
+create_atoms 1 region targ
+pair_style eam
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+mass 1 92.90637
+velocity all create 300 12345 mom yes rot yes dist gaussian
+group projectile region proj
+velocity projectile set 0 0 2000 sum yes units box
+fix nvtfix all nvt temp 300 300 0.1
+timestep 0.001
+run 100000
+unfix nvtfix
+fix nvefix all nve
+run 200000

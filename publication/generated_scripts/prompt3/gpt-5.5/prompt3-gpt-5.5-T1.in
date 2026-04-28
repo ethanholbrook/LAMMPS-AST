@@ -1,0 +1,38 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+variable a equal 3.3008
+variable nx equal 20
+variable ny equal 20
+variable nz_target equal 40
+variable nz_projectile equal 20
+variable gap equal 15.0
+variable xhi equal ${nx}*${a}
+variable yhi equal ${ny}*${a}
+variable z_target_hi equal ${nz_target}*${a}
+variable z_combined_hi equal (${nz_target}+${nz_projectile})*${a}
+variable z_box_hi equal (${nz_target}+${nz_projectile})*${a}+${gap}
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1 origin 0.0 0.0 0.0 spacing ${a} ${a} ${a}
+region simulation_box block 0.0 ${xhi} 0.0 ${yhi} 0.0 ${z_box_hi} units box
+create_box 1 simulation_box
+region initial_solid block 0.0 ${xhi} 0.0 ${yhi} 0.0 ${z_combined_hi} units box
+create_atoms 1 region initial_solid
+mass 1 92.90638
+pair_style eam/fs
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+region projectile_initial block 0.0 ${xhi} 0.0 ${yhi} ${z_target_hi} ${z_combined_hi} units box
+group projectile region projectile_initial
+group target subtract all projectile
+timestep 0.001
+thermo 1000
+thermo_style custom step time temp pe ke etotal press vol
+thermo_modify flush yes lost error
+velocity all create 300.0 12345 mom yes rot no dist gaussian units box
+fix equilibration all nvt temp 300.0 300.0 0.1
+run 100000
+velocity projectile set NULL NULL -20.0 sum yes units box
+fix production all nve
+run 0

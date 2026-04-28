@@ -1,0 +1,163 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+variable a equal 3.3008
+variable gap equal 15.0
+variable nx equal 20
+variable ny equal 20
+variable nz_target equal 40
+variable nz_projectile equal 20
+variable lx equal ${nx}*${a}
+variable lx equal 20*${a}
+variable lx equal 20*3.3008
+variable ly equal ${ny}*${a}
+variable ly equal 20*${a}
+variable ly equal 20*3.3008
+variable lz_target equal ${nz_target}*${a}
+variable lz_target equal 40*${a}
+variable lz_target equal 40*3.3008
+variable lz_projectile equal ${nz_projectile}*${a}
+variable lz_projectile equal 20*${a}
+variable lz_projectile equal 20*3.3008
+variable z_projectile_lo equal ${lz_target}+${gap}
+variable z_projectile_lo equal 132.032+${gap}
+variable z_projectile_lo equal 132.032+15
+variable z_projectile_hi equal ${z_projectile_lo}+${lz_projectile}
+variable z_projectile_hi equal 147.032+${lz_projectile}
+variable z_projectile_hi equal 147.032+66.016
+variable originz equal (${gap}/${a})-floor(${gap}/${a})
+variable originz equal (15/${a})-floor(${gap}/${a})
+variable originz equal (15/3.3008)-floor(${gap}/${a})
+variable originz equal (15/3.3008)-floor(15/${a})
+variable originz equal (15/3.3008)-floor(15/3.3008)
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice bcc 3.3008 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+region box block 0 ${lx} 0 ${ly} 0 ${z_projectile_hi} units box
+region box block 0 66.016 0 ${ly} 0 ${z_projectile_hi} units box
+region box block 0 66.016 0 66.016 0 ${z_projectile_hi} units box
+region box block 0 66.016 0 66.016 0 213.048 units box
+create_box 1 box
+Created orthogonal box = (0 0 0) to (66.016 66.016 213.048)
+  1 by 1 by 1 MPI processor grid
+region target_region block 0 ${lx} 0 ${ly} 0 ${lz_target} units box
+region target_region block 0 66.016 0 ${ly} 0 ${lz_target} units box
+region target_region block 0 66.016 0 66.016 0 ${lz_target} units box
+region target_region block 0 66.016 0 66.016 0 132.032 units box
+create_atoms 1 region target_region
+Created 32400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0213048) to (66.016 66.016 213.0693)
+  create_atoms CPU = 0.003 seconds
+lattice bcc ${a} origin 0.0 0.0 ${originz} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice bcc 3.3008 origin 0.0 0.0 ${originz} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice bcc 3.3008 origin 0.0 0.0 0.544352884149297 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+region projectile_region block 0 ${lx} 0 ${ly} ${z_projectile_lo} ${z_projectile_hi} units box
+region projectile_region block 0 66.016 0 ${ly} ${z_projectile_lo} ${z_projectile_hi} units box
+region projectile_region block 0 66.016 0 66.016 ${z_projectile_lo} ${z_projectile_hi} units box
+region projectile_region block 0 66.016 0 66.016 147.032 ${z_projectile_hi} units box
+region projectile_region block 0 66.016 0 66.016 147.032 213.048 units box
+create_atoms 1 region projectile_region
+Created 16400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0213048) to (66.016 66.016 213.0693)
+  create_atoms CPU = 0.002 seconds
+mass 1 92.90638
+group target region target_region
+32400 atoms in group target
+group projectile region projectile_region
+16400 atoms in group projectile
+group mobile union target projectile
+48800 atoms in group mobile
+pair_style eam/fs
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz vol
+velocity mobile create 300.0 12345 mom yes rot yes dist gaussian
+fix equil mobile nvt temp 300.0 300.0 0.1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 20 20 64
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/fs, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 21.51 | 21.51 | 21.51 Mbytes
+   Step          Time           Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz           Volume    
+         0   0              300           -343342.53      1892.3297     -341450.2       6786.8201      5899.8436      5885.3344      8575.2824      928672.8     
+        10   0.01           281.29551     -343224.33      1774.3462     -341449.98      7610.4703      6723.0781      6705.7681      9402.5647      928672.8     
+Loop time of 0.199255 on 1 procs for 10 steps with 48800 atoms
+
+Performance: 4.336 ns/day, 5.535 hours/ns, 50.187 timesteps/s, 2.449 Matom-step/s
+98.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.19075    | 0.19075    | 0.19075    |   0.0 | 95.73
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0011944  | 0.0011944  | 0.0011944  |   0.0 |  0.60
+Output  | 0.00042699 | 0.00042699 | 0.00042699 |   0.0 |  0.21
+Modify  | 0.0059476  | 0.0059476  | 0.0059476  |   0.0 |  2.98
+Other   |            | 0.0009373  |            |       |  0.47
+
+Nlocal:          48800 ave       48800 max       48800 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24510 ave       24510 max       24510 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     1.5248e+06 ave  1.5248e+06 max  1.5248e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1524800
+Ave neighs/atom = 31.245902
+Neighbor list builds = 0
+Dangerous builds = 0
+reset_timestep 0
+velocity projectile set NULL NULL -20.0 units box sum yes
+fix impact mobile nve
+dump traj mobile custom 1000 dump.nb_spall.lammpstrj id type x y z vx vy vz
+dump_modify traj sort id
+run 10
+WARNING: One or more atoms are time integrated more than once (src/src/modify.cpp:296)
+Per MPI rank memory allocation (min/avg/max) = 21.52 | 21.52 | 21.52 Mbytes
+   Step          Time           Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz           Volume    
+         0   0              5286.0046     -343224.33      33342.879     -309881.45      43901.853      6720.4263      6703.1231      118282.01      929039.25    
+        10   0.01           4926.8072     -342518.11      31077.146     -311440.96      46563.499      11097.936      11074.943      117517.62      929039.25    
+Loop time of 0.249758 on 1 procs for 10 steps with 48800 atoms
+
+Performance: 3.459 ns/day, 6.938 hours/ns, 40.039 timesteps/s, 1.954 Matom-step/s
+97.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.2367     | 0.2367     | 0.2367     |   0.0 | 94.77
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0017184  | 0.0017184  | 0.0017184  |   0.0 |  0.69
+Output  | 0.00043899 | 0.00043899 | 0.00043899 |   0.0 |  0.18
+Modify  | 0.0095368  | 0.0095368  | 0.0095368  |   0.0 |  3.82
+Other   |            | 0.001366   |            |       |  0.55
+
+Nlocal:          48800 ave       48800 max       48800 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24510 ave       24510 max       24510 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     1.5248e+06 ave  1.5248e+06 max  1.5248e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1524800
+Ave neighs/atom = 31.245902
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00

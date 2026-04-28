@@ -1,0 +1,30 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units           metal
+dimension       3
+boundary        p p f
+atom_style      atomic
+
+# System Construction
+lattice         bcc 3.3
+Lattice spacing in x,y,z = 3.3 3.3 3.3
+region          projectile block 0 20 0 20 0 20
+create_box      2 projectile
+Created orthogonal box = (0 0 0) to (66 66 66)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 region projectile
+Created 16000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66 66 66)
+  create_atoms CPU = 0.002 seconds
+
+region          target block 0 20 0 20 22 62
+create_atoms    1 region target
+Created 0 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66 66 66)
+  create_atoms CPU = 0.000 seconds
+
+displace_atoms  target move 0.0 0.0 22.0
+Displacing atoms ...
+ERROR: Could not find displace_atoms group ID (src/src/displace_atoms.cpp:77)
+Last command: displace_atoms  target move 0.0 0.0 22.0

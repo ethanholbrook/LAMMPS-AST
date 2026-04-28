@@ -1,0 +1,126 @@
+Script started on 2026-04-28 18:05:28-04:00 [TERM="xterm-256color" TTY="/dev/pts/53" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:2715061] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+variable a equal 3.3008
+variable gap equal 15.0
+variable gap_lattice equal v_gap/v_a
+variable zhi equal 60.0+v_gap_lattice
+variable timestep equal 0.001
+variable temperature equal 300.0
+variable tdamp equal 0.1
+variable equil_steps equal 100000
+variable prod_steps equal 100000
+variable impact_vz equal -20.0
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice bcc 3.3008 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+region whole block 0 20 0 20 0 ${zhi} units lattice
+region whole block 0 20 0 20 0 64.5443528841493 units lattice
+create_box 1 whole
+Created orthogonal box = (0 0 0) to (66.016 66.016 213.048)
+  1 by 1 by 1 MPI processor grid
+region target_region block 0 20 0 20 0 40 units lattice
+region projectile_region_initial block 0 20 0 20 40 60 units lattice
+create_atoms 1 region target_region
+Created 32400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0213048) to (66.016 66.016 213.0693)
+  create_atoms CPU = 0.003 seconds
+group target region target_region
+32400 atoms in group target
+create_atoms 1 region projectile_region_initial
+Created 16400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0213048) to (66.016 66.016 213.0693)
+  create_atoms CPU = 0.002 seconds
+group projectile region projectile_region_initial
+16800 atoms in group projectile
+mass 1 92.90638
+pair_style eam/fs
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep ${timestep}
+timestep 0.001
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz vol
+thermo_modify flush yes
+velocity all create ${temperature} 4928459 mom yes rot yes dist gaussian
+velocity all create 300 4928459 mom yes rot yes dist gaussian
+fix equilibration all nvt temp ${temperature} ${temperature} ${tdamp}
+fix equilibration all nvt temp 300 ${temperature} ${tdamp}
+fix equilibration all nvt temp 300 300 ${tdamp}
+fix equilibration all nvt temp 300 300 0.1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 20 20 64
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/fs, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+WARNING: A per-atom density exceeded rhomax of EAM potential table - a linear extrapolation to the energy was made (src/src/MANYBODY/pair_eam.cpp:334)
+Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
+   Step          Time           Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz           Volume    
+         0   0              300           -nan            1892.3297     -nan           -nan           -nan           -nan           -nan            863301.11    
+        10   0.01          -nan            0             -nan           -nan           -nan           -nan           -nan           -nan            863301.11    
+Loop time of 0.063685 on 1 procs for 10 steps with 48800 atoms
+
+Performance: 13.567 ns/day, 1.769 hours/ns, 157.023 timesteps/s, 7.663 Matom-step/s
+99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.05503    | 0.05503    | 0.05503    |   0.0 | 86.41
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0012608  | 0.0012608  | 0.0012608  |   0.0 |  1.98
+Output  | 0.00039247 | 0.00039247 | 0.00039247 |   0.0 |  0.62
+Modify  | 0.0059068  | 0.0059068  | 0.0059068  |   0.0 |  9.28
+Other   |            | 0.001095   |            |       |  1.72
+
+Nlocal:          48800 ave       48800 max       48800 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24510 ave       24510 max       24510 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     1.5588e+06 ave  1.5588e+06 max  1.5588e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1558800
+Ave neighs/atom = 31.942623
+Neighbor list builds = 0
+Dangerous builds = 0
+velocity projectile set 0.0 0.0 ${impact_vz} sum yes units box
+velocity projectile set 0.0 0.0 -20 sum yes units box
+reset_timestep 0
+fix production all nve
+run 10
+WARNING: One or more atoms are time integrated more than once (src/src/modify.cpp:296)
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+ERROR on proc 0: Non-numeric atom coords - simulation unstable (src/src/domain.cpp:790)
+Last command: run 10
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 1.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+
+Script done on 2026-04-28 18:05:29-04:00 [COMMAND_EXIT_CODE="1"]

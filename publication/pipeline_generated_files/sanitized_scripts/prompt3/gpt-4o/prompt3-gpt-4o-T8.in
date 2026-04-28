@@ -1,0 +1,22 @@
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+lattice bcc 3.3
+region projectile block 0 20 0 20 0 20
+region target block 0 20 0 20 20.15 100.15
+region whole union 2 projectile target
+create_box 1 whole
+create_atoms 1 region projectile
+create_atoms 1 region target
+pair_style eam
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+neighbor 2 bin
+neigh_modify every 1
+velocity all create 300 12345
+fix 1 all nvt temp 300 300 0.1
+run 100000
+unfix 1
+velocity all set 0 0 20 units box region projectile
+fix 2 all nve
+run 100000

@@ -1,0 +1,11 @@
+execute errors
+prompt2	gpt-5.5	T1	["ERROR on proc 0: Not a valid integer number: 'Conversion' (src/src/MANYBODY/pair_eam.cpp:521)", 'Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential']
+prompt2	gpt-5.5	T2	["ERROR on proc 0: Not a valid integer number: 'Conversion' (src/src/MANYBODY/pair_eam.cpp:521)", 'Last command: pair_coeff 1 1 /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential']
+prompt2	gpt-5.5	T3	["ERROR on proc 0: Not a valid integer number: 'Conversion' (src/src/MANYBODY/pair_eam.cpp:521)", 'Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential']
+prompt2	gpt-5.5	T8	["ERROR on proc 0: Not a valid integer number: 'Conversion' (src/src/MANYBODY/pair_eam.cpp:521)", 'Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential']
+prompt2	gpt-5.5	T9	["ERROR on proc 0: Not a valid integer number: 'Conversion' (src/src/MANYBODY/pair_eam.cpp:521)", 'Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential']
+prompt3	gpt-5.5	T2	['ERROR on proc 0: Non-numeric atom coords - simulation unstable (src/src/domain.cpp:790)', 'Last command: run 10']
+prompt3	gpt-5.5	T3	['ERROR on proc 0: Non-numeric atom coords - simulation unstable (src/src/domain.cpp:790)', 'Last command: run 10']
+prompt3	gpt-5.5	T4	['ERROR on proc 0: Non-numeric atom coords - simulation unstable (src/src/domain.cpp:790)', 'Last command: run 10']
+prompt3	gpt-5.5	T7	['ERROR on proc 0: Non-numeric atom coords - simulation unstable (src/src/domain.cpp:790)', 'Last command: run 10']
+prompt3	gpt-5.5	T9	['ERROR on proc 0: Non-numeric atom coords - simulation unstable (src/src/domain.cpp:790)', 'Last command: run 10']

@@ -1,0 +1,43 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+variable a equal 3.30
+variable gap equal 15.0
+variable xdim equal 20*v_a
+variable ydim equal 20*v_a
+variable ztarget equal 40*v_a
+variable zproj equal 20*v_a
+variable zstartproj equal v_ztarget+v_gap
+variable zhi equal v_ztarget+v_gap+v_zproj
+
+region whole block 0.0 ${xdim} 0.0 ${ydim} 0.0 ${zhi} units box
+create_box 1 whole
+lattice bcc ${a}
+region target block 0.0 ${xdim} 0.0 ${ydim} 0.0 ${ztarget} units box
+region projectile block 0.0 ${xdim} 0.0 ${ydim} ${zstartproj} ${zhi} units box
+create_atoms 1 region target
+create_atoms 1 region projectile
+group target region target
+group projectile region projectile
+group all union target projectile
+
+mass 1 92.906
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+
+timestep 0.001
+thermo 1000
+thermo_style custom step time temp etotal pe ke press
+velocity all create 300.0 123456 mom yes rot yes dist gaussian
+fix equil all nvt temp 300.0 300.0 0.1
+run 10
+unfix equil
+velocity projectile add 0.0 0.0 -20.0
+
+fix impact all nve
+dump dmp all custom 1000 dump.impact id type x y z vx vy vz
+run 10

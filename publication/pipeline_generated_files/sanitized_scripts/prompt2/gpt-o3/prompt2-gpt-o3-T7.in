@@ -1,0 +1,19 @@
+units metal
+atom_style atomic
+boundary p p p
+timestep 0.001
+neighbor 2 bin
+neigh_modify delay 0 every 1 check yes
+lattice fcc 3.52
+region box block 0 10 0 10 0 10 units lattice
+create_box 1 box
+create_atoms 1 box
+mass 1 58.6934
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Ni
+velocity all create 600 12345 mom yes rot no dist gaussian
+thermo 1000
+thermo_style custom step temp press pe ke etotal
+reset_timestep 0
+fix 1 all npt temp 300 2500 0.1 iso 1.01325 1.01325 1
+run 220000

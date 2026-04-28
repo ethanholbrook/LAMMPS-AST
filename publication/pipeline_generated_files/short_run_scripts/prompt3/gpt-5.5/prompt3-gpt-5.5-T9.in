@@ -1,0 +1,39 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+variable a equal 3.3008
+variable gap equal 15.0
+variable gap_lattice equal v_gap/v_a
+variable zhi equal 60.0+v_gap_lattice
+variable timestep equal 0.001
+variable temperature equal 300.0
+variable tdamp equal 0.1
+variable equil_steps equal 100000
+variable prod_steps equal 100000
+variable impact_vz equal -20.0
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0 20 0 20 0 ${zhi} units lattice
+create_box 1 whole
+region target_region block 0 20 0 20 0 40 units lattice
+region projectile_region_initial block 0 20 0 20 40 60 units lattice
+create_atoms 1 region target_region
+group target region target_region
+create_atoms 1 region projectile_region_initial
+group projectile region projectile_region_initial
+mass 1 92.90638
+pair_style eam/fs
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep ${timestep}
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz vol
+thermo_modify flush yes
+velocity all create ${temperature} 4928459 mom yes rot yes dist gaussian
+fix equilibration all nvt temp ${temperature} ${temperature} ${tdamp}
+run 10
+velocity projectile set 0.0 0.0 ${impact_vz} sum yes units box
+reset_timestep 0
+fix production all nve
+run 10

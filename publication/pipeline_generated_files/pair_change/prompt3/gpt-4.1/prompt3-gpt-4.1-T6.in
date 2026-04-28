@@ -1,0 +1,32 @@
+# Initialization
+units           metal
+dimension       3
+boundary        p p f
+atom_style      atomic
+
+# System Construction
+lattice         bcc 3.300
+region          target block 0 66.0 0 66.0 0 132.0
+region          projectile block 0 66.0 0 66.0 133.5 199.5
+region          box union 2 target projectile
+create_box      1 box
+create_atoms    1 region target
+create_atoms    1 region projectile
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Miscellaneous
+mass            1 92.906
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+group           projectile region projectile
+velocity        projectile set 0.0 0.0 -2000.0 sum yes
+
+# Production Run
+fix             1 all nve
+thermo          100
+timestep        0.001
+run 10

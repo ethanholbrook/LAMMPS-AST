@@ -1,0 +1,28 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+lattice bcc 3.3 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region box block 0 20 0 20 0 64.54545454545455 units lattice
+create_box 1 box
+region target_initial block 0 20 0 20 0 40 units lattice
+create_atoms 1 region target_initial
+group target region target_initial
+region projectile_region block 0 20 0 20 0 20 units lattice
+create_atoms 1 region projectile_region
+group projectile region projectile_region
+group mobile union target projectile
+mass 1 92.90638
+pair_style eam/fs
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+neighbor 2 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+velocity mobile create 300 4928459 mom yes rot no dist gaussian units box
+thermo 1000
+thermo_style custom step time temp pe ke etotal press
+fix equil mobile nvt temp 300 300 0.1
+run 100000
+velocity projectile set NULL NULL 20 units box sum yes
+fix prod mobile nve
+run 100000

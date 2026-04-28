@@ -1,0 +1,102 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+variable alat equal 4.05
+variable nrep equal 5
+variable temperature equal 300.0
+variable pressure_atm equal 1.0
+variable pressure_bar equal 1.01325*v_pressure_atm
+variable tdamp equal 0.1
+variable pdamp equal 1.0
+variable dt equal 0.001
+variable steps equal 500000
+variable seed equal 4928459
+lattice fcc ${alat}
+lattice fcc 4.05
+Lattice spacing in x,y,z = 4.05 4.05 4.05
+region unitcell block 0 1 0 1 0 1 units lattice
+create_box 1 unitcell
+Created orthogonal box = (0 0 0) to (4.05 4.05 4.05)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 4 atoms
+  using lattice units in orthogonal box = (0 0 0) to (4.05 4.05 4.05)
+  create_atoms CPU = 0.000 seconds
+replicate ${nrep} ${nrep} ${nrep}
+replicate 5 ${nrep} ${nrep}
+replicate 5 5 ${nrep}
+replicate 5 5 5
+Replication is creating a 5x5x5 = 125 times larger system...
+  orthogonal box = (0 0 0) to (20.25 20.25 20.25)
+  1 by 1 by 1 MPI processor grid
+  500 atoms
+  replicate CPU = 0.000 seconds
+mass 1 26.9815385
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep ${dt}
+timestep 0.001
+run_style verlet
+velocity all create ${temperature} ${seed} mom yes rot no dist gaussian
+velocity all create 300 ${seed} mom yes rot no dist gaussian
+velocity all create 300 4928459 mom yes rot no dist gaussian
+reset_timestep 0
+thermo 1000
+thermo_style custom step time temp press pxx pyy pzz pe ke etotal vol lx ly lz
+thermo_modify flush yes
+fix 1 all npt temp ${temperature} ${temperature} ${tdamp} iso ${pressure_bar} ${pressure_bar} ${pdamp}
+fix 1 all npt temp 300 ${temperature} ${tdamp} iso ${pressure_bar} ${pressure_bar} ${pdamp}
+fix 1 all npt temp 300 300 ${tdamp} iso ${pressure_bar} ${pressure_bar} ${pdamp}
+fix 1 all npt temp 300 300 0.1 iso ${pressure_bar} ${pressure_bar} ${pdamp}
+fix 1 all npt temp 300 300 0.1 iso 1.01325 ${pressure_bar} ${pdamp}
+fix 1 all npt temp 300 300 0.1 iso 1.01325 1.01325 ${pdamp}
+fix 1 all npt temp 300 300 0.1 iso 1.01325 1.01325 1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.5580544
+  ghost atom cutoff = 7.5580544
+  binsize = 3.7790272, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
+   Step          Time           Temp          Press           Pxx            Pyy            Pzz           PotEng         KinEng         TotEng         Volume           Lx             Ly             Lz      
+         0   0              300           -8008.0096     -8028.6097     -8066.6047     -7928.8143     -1679.6369      19.350244     -1660.2867      8303.7656      20.25          20.25          20.25        
+        10   0.01           257.42483     -6875.7623     -6923.8156     -6868.4875     -6834.9838     -1676.9032      16.604111     -1660.299       8299.8735      20.246836      20.246836      20.246836    
+Loop time of 0.0031891 on 1 procs for 10 steps with 500 atoms
+
+Performance: 270.923 ns/day, 0.089 hours/ns, 3135.678 timesteps/s, 1.568 Matom-step/s
+93.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.0029561  | 0.0029561  | 0.0029561  |   0.0 | 92.69
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 5.5685e-05 | 5.5685e-05 | 5.5685e-05 |   0.0 |  1.75
+Output  | 1.8265e-05 | 1.8265e-05 | 1.8265e-05 |   0.0 |  0.57
+Modify  | 0.00014104 | 0.00014104 | 0.00014104 |   0.0 |  4.42
+Other   |            | 1.802e-05  |            |       |  0.57
+
+Nlocal:            500 ave         500 max         500 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1956 ave        1956 max        1956 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          21500 ave       21500 max       21500 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 21500
+Ave neighs/atom = 43
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00

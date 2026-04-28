@@ -1,0 +1,68 @@
+Script started on 2026-04-21 14:27:18-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units metal
+atom_style atomic
+boundary p p f
+
+# System Construction
+lattice bcc 3.300
+Lattice spacing in x,y,z = 3.3 3.3 3.3
+region target block 0 20 0 20 0 40
+region projectile block 0 20 0 20 41.5 61.5
+region whole union 2 target projectile
+create_box 1 whole
+Created orthogonal box = (0 0 0) to (66 66 202.95)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 region target
+Created 32400 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66 66 202.95)
+  create_atoms CPU = 0.003 seconds
+create_atoms 1 region projectile
+Created 16000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66 66 202.95)
+  create_atoms CPU = 0.002 seconds
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Miscellaneous
+mass 1 92.906
+
+# Production Run
+velocity all create 300.0 87287 mom yes rot no dist gaussian
+group projectile region projectile
+16000 atoms in group projectile
+velocity projectile set 0.0 0.0 2000.0 sum yes units box
+fix 1 all nve
+fix 2 all temp/rescale 1 300.0 300.0 0.01 1.0 region target
+timestep 0.001
+run 10
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 11 11 34
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+Per MPI rank memory allocation (min/avg/max) = 54.55 | 54.55 | 54.55 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   49252279       0              0              3.081253e+08   3.7227985e+08
+ERROR: Lost atoms: original 48400 current 47792 (src/src/thermo.cpp:494)
+Last command: run 10
+
+Script done on 2026-04-21 14:27:21-04:00 [COMMAND_EXIT_CODE="1"]

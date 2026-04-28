@@ -1,0 +1,80 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+lattice fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region unitcell block 0 1 0 1 0 1 units lattice
+create_box 1 unitcell
+Created orthogonal box = (0 0 0) to (3.52 3.52 3.52)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 4 atoms
+  using lattice units in orthogonal box = (0 0 0) to (3.52 3.52 3.52)
+  create_atoms CPU = 0.000 seconds
+replicate 10 10 10
+Replication is creating a 10x10x10 = 1000 times larger system...
+  orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+  4000 atoms
+  replicate CPU = 0.000 seconds
+mass 1 58.6934
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+reset_timestep 0
+velocity all create 600.0 4928459 mom yes rot yes dist gaussian
+thermo 1000
+thermo_style custom step time temp press pe ke etotal enthalpy vol density lx ly lz
+thermo_modify norm yes flush yes
+fix 1 all npt temp 300.0 2500.0 0.1 iso 1.01325 1.01325 1.0
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.80375
+  ghost atom cutoff = 7.80375
+  binsize = 3.901875, bins = 10 10 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
+   Step          Time           Temp          Press          PotEng         KinEng         TotEng        Enthalpy        Volume        Density           Lx             Ly             Lz      
+         0   0              600            7594.6671     -4.45           0.077536698   -4.3724633     -4.3207781      43614.208      8.9411451      35.2           35.2           35.2         
+        10   0.01           505.92314      14571.95      -4.4376148      0.065379349   -4.3722354     -4.2730319      43629.466      8.9380182      35.204104      35.204104      35.204104    
+Loop time of 0.0614343 on 1 procs for 10 steps with 4000 atoms
+
+Performance: 14.064 ns/day, 1.707 hours/ns, 162.776 timesteps/s, 651.102 katom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.059926   | 0.059926   | 0.059926   |   0.0 | 97.55
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00026289 | 0.00026289 | 0.00026289 |   0.0 |  0.43
+Output  | 6.5643e-05 | 6.5643e-05 | 6.5643e-05 |   0.0 |  0.11
+Modify  | 0.0010578  | 0.0010578  | 0.0010578  |   0.0 |  1.72
+Other   |            | 0.0001216  |            |       |  0.20
+
+Nlocal:           4000 ave        4000 max        4000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           8195 ave        8195 max        8195 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         352000 ave      352000 max      352000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 352000
+Ave neighs/atom = 88
+Neighbor list builds = 0
+Dangerous builds = 0
+write_data ni_melting_final.data
+System init for write_data ...
+Total wall time: 0:00:00

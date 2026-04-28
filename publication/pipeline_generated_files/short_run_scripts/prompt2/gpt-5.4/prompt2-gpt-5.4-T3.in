@@ -1,0 +1,29 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+variable alat equal 3.52
+variable tinit equal 600.0
+variable tstart equal 300.0
+variable tend equal 2500.0
+variable ptarget equal 1.01325
+variable tstep equal 0.001
+variable tdamp equal 0.1
+variable pdamp equal 1.0
+lattice fcc ${alat} origin 0.0 0.0 0.0 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region unitcell block 0 1 0 1 0 1 units lattice
+create_box 1 unitcell
+create_atoms 1 box
+replicate 10 10 10
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+neighbor 2.0 bin
+neigh_modify every 1 delay 10 check yes
+timestep ${tstep}
+run_style verlet
+velocity all create ${tinit} 4928459 dist gaussian mom yes rot no
+reset_timestep 0
+thermo 1000
+thermo_style custom step time temp press pe ke etotal vol
+fix 1 all npt temp ${tstart} ${tend} ${tdamp} iso ${ptarget} ${ptarget} ${pdamp}
+run 10

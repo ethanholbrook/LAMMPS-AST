@@ -1,0 +1,32 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+variable potential_file string ../../../potentials/prompt1.potential
+variable Ni_mass file Ni_mass.tmp
+variable Ni_lattice file Ni_lattice.tmp
+lattice fcc ${Ni_lattice}
+region simulation_box block 0 10 0 10 0 10 units lattice
+create_box 1 simulation_box
+create_atoms 1 box
+mass 1 ${Ni_mass}
+pair_style eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential
+neighbor 2.0 bin
+neigh_modify every 1 delay 10 check yes
+timestep 0.001
+reset_timestep 0
+variable Tvelocity equal 600.0
+variable Tstart equal 300.0
+variable Tstop equal 2500.0
+variable heat_rate equal 10.0
+variable pressure_atm_bar equal 1.01325
+variable Tdamp equal 100.0*dt
+variable Pdamp equal 1000.0*dt
+variable run_steps equal ceil((v_Tstop-v_Tstart)/(v_heat_rate*dt))
+velocity all create ${Tvelocity} 4928459 dist gaussian mom yes rot yes units box
+thermo 1000
+thermo_style custom step time temp press pe ke etotal enthalpy vol density
+thermo_modify flush yes
+fix ensemble all npt temp ${Tstart} ${Tstop} ${Tdamp} iso ${pressure_atm_bar} ${pressure_atm_bar} ${Pdamp}
+run 10

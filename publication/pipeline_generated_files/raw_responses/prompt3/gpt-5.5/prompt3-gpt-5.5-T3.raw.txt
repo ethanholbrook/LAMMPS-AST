@@ -1,0 +1,67 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+atom_modify map array
+newton on
+
+variable a equal 3.3008
+variable gap equal 15.0
+variable nx equal 20
+variable ny equal 20
+variable npz equal 20
+variable ntz equal 40
+variable dt equal 0.001
+variable temperature equal 300.0
+variable tdamp equal 0.1
+variable equil_steps equal 100000
+variable production_steps equal 100000
+variable vimpact equal 20.0
+
+variable xhi equal v_nx*v_a
+variable yhi equal v_ny*v_a
+variable projectile_zhi equal v_npz*v_a
+variable target_zlo equal v_npz*v_a
+variable target_zhi_initial equal (v_npz+v_ntz)*v_a
+variable zhi equal (v_npz+v_ntz)*v_a+v_gap
+
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1 origin 0.0 0.0 0.0
+
+region box block 0 ${xhi} 0 ${yhi} 0 ${zhi} units box
+create_box 1 box
+
+region target_initial block 0 ${xhi} 0 ${yhi} ${target_zlo} ${target_zhi_initial} units box
+create_atoms 1 region target_initial
+group target region target_initial
+displace_atoms target move 0.0 0.0 ${gap} units box
+
+region projectile_region block 0 ${xhi} 0 ${yhi} 0 ${projectile_zhi} units box
+create_atoms 1 region projectile_region
+group projectile region projectile_region
+
+mass 1 92.90638
+
+pair_style eam/fs
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+
+timestep ${dt}
+
+velocity all create ${temperature} 12345 mom yes rot no dist gaussian
+
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz lx ly lz atoms
+thermo_modify flush yes lost error
+
+fix equilibration all nvt temp ${temperature} ${temperature} ${tdamp}
+reset_timestep 0
+run ${equil_steps}
+unfix equilibration
+
+velocity projectile set NULL NULL ${vimpact} sum yes units box
+
+fix production all nve
+reset_timestep 0
+run ${production_steps}

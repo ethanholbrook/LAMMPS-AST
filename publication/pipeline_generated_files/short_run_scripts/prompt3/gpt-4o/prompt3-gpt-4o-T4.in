@@ -1,0 +1,36 @@
+# Initialization
+units           metal
+dimension       3
+boundary        p p f
+atom_style      atomic
+
+# System Construction
+lattice bcc 3.300  # Nb lattice parameter approximation
+region projectile block 0 20 0 20 0 20 units lattice
+region target block 0 20 0 20 20 60 units lattice
+region gap block 0 20 0 20 19.5 20 units lattice
+
+create_box 2 all
+create_atoms 1 region projectile
+create_atoms 2 region target
+
+region full block 0 20 0 20 0 60 units lattice
+
+# Potential
+pair_style eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+
+# Miscellaneous
+neighbor 2.0 bin
+neigh_modify delay 5
+
+# Equilibration
+velocity all create 300.0 12345 mom yes dist gaussian
+fix 1 all nvt temp 300.0 300.0 0.1
+run 10
+
+# Production Run
+unfix 1
+velocity projectile set 0.0 0.0 2000.0 sum yes units box
+fix 2 all nve
+run 10

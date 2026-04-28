@@ -1,0 +1,31 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+
+# System Construction
+lattice bcc 3.300
+Lattice spacing in x,y,z = 3.3 3.3 3.3
+region projectile_block block 0 20 0 20 0 20 units lattice
+region target_block block 0 20 0 20 21.5 61.5 units lattice
+region simulation_box union 2 projectile_block target_block
+create_box 1 simulation_box
+Created orthogonal box = (0 0 0) to (66 66 202.95)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 region projectile_block
+Created 16400 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66 66 202.95)
+  create_atoms CPU = 0.002 seconds
+create_atoms 1 region target_block
+Created 32000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66 66 202.95)
+  create_atoms CPU = 0.004 seconds
+
+# Potential
+pair_style eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+ERROR: Incorrect args for pair coefficients (src/src/MANYBODY/pair_eam.cpp:387)
+Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb

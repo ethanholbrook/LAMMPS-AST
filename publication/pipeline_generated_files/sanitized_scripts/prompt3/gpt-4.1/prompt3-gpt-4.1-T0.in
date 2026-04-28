@@ -1,0 +1,28 @@
+Initialization
+units metal
+atom_style atomic
+boundary p p f
+System Construction
+lattice bcc 3.3
+region proj block 0 20 0 20 0 20
+region targ block 0 20 0 20 21 60
+region whole union 2 proj targ
+create_box 1 whole
+create_atoms 1 region proj
+create_atoms 1 region targ
+group projectile region proj
+group target region targ
+Potential
+pair_style eam
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+Miscellaneous
+velocity all create 300 12345 mom yes rot yes dist gaussian
+fix eq all nvt temp 300 300 0.1
+timestep 0.001
+run 100000
+unfix eq
+displace_atoms target move 0 0 0.4545454545454546 units lattice
+velocity projectile set 0 0 -2000 units box
+Production Run
+fix nve all nve
+run 200000

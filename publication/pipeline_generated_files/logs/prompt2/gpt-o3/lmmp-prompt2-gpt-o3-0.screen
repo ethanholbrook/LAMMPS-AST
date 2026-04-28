@@ -1,0 +1,71 @@
+Script started on 2026-04-21 14:21:46-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+
+lattice fcc 1.0
+Lattice spacing in x,y,z = 1 1 1
+region box block 0 1 0 1 0 1 units lattice
+create_box 1 box
+Created orthogonal box = (0 0 0) to (1 1 1)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 4 atoms
+  using lattice units in orthogonal box = (0 0 0) to (1 1 1)
+  create_atoms CPU = 0.000 seconds
+replicate 10 10 10
+Replication is creating a 10x10x10 = 1000 times larger system...
+  orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+  4000 atoms
+  replicate CPU = 0.001 seconds
+
+mass 1 58.6934
+
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+velocity all create 600.0 12345 mom yes rot yes dist gaussian
+
+timestep 0.001
+
+fix 1 all npt temp 300.0 2500.0 1.0 iso 1.01325 1.01325 10.0
+
+thermo 1000
+thermo_style custom step temp press pe ke etotal
+
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.80375
+  ghost atom cutoff = 7.80375
+  binsize = 3.901875, bins = 3 3 3
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+ERROR on proc 0: Neighbor list overflow, boost neigh_modify one (src/src/npair_bin.cpp:248)
+Last command: run 10
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 1.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+
+Script done on 2026-04-21 14:21:47-04:00 [COMMAND_EXIT_CODE="1"]

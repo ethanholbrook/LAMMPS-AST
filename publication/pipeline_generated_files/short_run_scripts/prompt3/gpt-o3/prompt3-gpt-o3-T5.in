@@ -1,0 +1,26 @@
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+lattice bcc 1.0
+region whole block 0 20 0 20 0 75 units lattice
+create_box 1 whole
+region projectile block 0 20 0 20 0 20 units lattice
+create_atoms 1 region projectile
+region target block 0 20 0 20 35 75 units lattice
+create_atoms 1 region target
+mass 1 92.906
+group projectile region projectile
+group target region target
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+velocity all create 300.0 12345 mom yes rot no dist gaussian
+fix equil all nvt temp 300.0 300.0 0.1
+timestep 0.001
+run 10
+unfix equil
+velocity projectile set 0.0 0.0 20.0 sum yes
+fix impact all nve
+run 10

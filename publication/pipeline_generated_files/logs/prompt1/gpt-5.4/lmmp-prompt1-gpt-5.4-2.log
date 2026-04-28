@@ -1,0 +1,10 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+timestep 0.001
+run_style verlet
+ERROR: Run_style command before simulation box is defined (src/src/input.cpp:1851)
+Last command: run_style verlet

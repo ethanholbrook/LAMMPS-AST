@@ -1,0 +1,17 @@
+accuracy errors
+prompt2	gpt-5.5	T1	PSZ, pair_style inaccurate
+prompt2	gpt-5.5	T2	PSZ, pair_style inaccurate
+prompt2	gpt-5.5	T3	PSZ, pair_style inaccurate
+prompt2	gpt-5.5	T5	no AST generated
+prompt2	gpt-5.5	T8	PSZ, pair_style inaccurate
+prompt2	gpt-5.5	T9	PSZ, pair_style inaccurate
+prompt3	gpt-5.5	T0	box_region_size, extra_vel, pair_style inaccurate, projectile_region_missing, target_region_missing
+prompt3	gpt-5.5	T1	box_region_missing, pair_style inaccurate, projectile_region_missing, target_region_missing
+prompt3	gpt-5.5	T2	box_region_size, projectile_region_missing, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.5	T3	box_region_size, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.5	T4	box_region_missing, projectile_region_missing, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.5	T5	no AST generated
+prompt3	gpt-5.5	T6	box_region_missing, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size
+prompt3	gpt-5.5	T7	extra_vel, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.5	T8	box_region_size, pair_style inaccurate, projectile_region_missing, target_region_missing, v_set_direction
+prompt3	gpt-5.5	T9	box_region_missing, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error

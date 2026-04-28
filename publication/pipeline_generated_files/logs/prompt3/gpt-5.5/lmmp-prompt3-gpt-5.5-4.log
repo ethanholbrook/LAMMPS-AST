@@ -1,0 +1,110 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+variable a equal 3.3008
+variable gap equal 15.0
+variable nx equal 20
+variable ny equal 20
+variable nzp equal 20
+variable nzt equal 40
+variable Lx equal v_nx*v_a
+variable Ly equal v_ny*v_a
+variable Lp equal v_nzp*v_a
+variable Lt equal v_nzt*v_a
+variable ztlo equal v_Lp+v_gap
+variable Lz equal v_Lp+v_gap+v_Lt
+variable dt equal 0.001
+variable teq equal 100.0
+variable nequil equal v_teq/v_dt
+variable tdamp equal 0.1
+variable impactvz equal 20.0
+variable nprod equal 0
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice bcc 3.3008 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+region whole block 0 ${Lx} 0 ${Ly} 0 ${Lz} units box
+region whole block 0 66.016 0 ${Ly} 0 ${Lz} units box
+region whole block 0 66.016 0 66.016 0 ${Lz} units box
+region whole block 0 66.016 0 66.016 0 213.048 units box
+create_box 1 whole
+Created orthogonal box = (0 0 0) to (66.016 66.016 213.048)
+  1 by 1 by 1 MPI processor grid
+region projectile_region block 0 ${Lx} 0 ${Ly} 0 ${Lp} units box
+region projectile_region block 0 66.016 0 ${Ly} 0 ${Lp} units box
+region projectile_region block 0 66.016 0 66.016 0 ${Lp} units box
+region projectile_region block 0 66.016 0 66.016 0 66.016 units box
+create_atoms 1 region projectile_region
+Created 16400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0213048) to (66.016 66.016 213.0693)
+  create_atoms CPU = 0.002 seconds
+group projectile region projectile_region
+16400 atoms in group projectile
+region target_initial_region block 0 ${Lx} 0 ${Ly} 0 ${Lt} units box
+region target_initial_region block 0 66.016 0 ${Ly} 0 ${Lt} units box
+region target_initial_region block 0 66.016 0 66.016 0 ${Lt} units box
+region target_initial_region block 0 66.016 0 66.016 0 132.032 units box
+create_atoms 1 region target_initial_region
+Created 32400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0213048) to (66.016 66.016 213.0693)
+  create_atoms CPU = 0.004 seconds
+group target subtract all projectile
+32400 atoms in group target
+mass 1 92.90638
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep ${dt}
+timestep 0.001
+thermo 1000
+thermo_style custom step time temp pe ke etotal press vol
+velocity all create 300.0 12345 mom yes rot no dist gaussian
+fix equilibration all nvt temp 300.0 300.0 ${tdamp}
+fix equilibration all nvt temp 300.0 300.0 0.1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 20 20 64
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+WARNING: A per-atom density exceeded rhomax of EAM potential table - a linear extrapolation to the energy was made (src/src/MANYBODY/pair_eam.cpp:334)
+Per MPI rank memory allocation (min/avg/max) = 25.65 | 25.65 | 25.65 Mbytes
+   Step          Time           Temp          PotEng         KinEng         TotEng         Press          Volume    
+         0   0              300           -nan            1892.3297     -nan           -nan            575595.97    
+        10   0.01          -nan            0             -nan           -nan           -nan            575595.97    
+Loop time of 0.0821527 on 1 procs for 10 steps with 48800 atoms
+
+Performance: 10.517 ns/day, 2.282 hours/ns, 121.725 timesteps/s, 5.940 Matom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.073508   | 0.073508   | 0.073508   |   0.0 | 89.48
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0012611  | 0.0012611  | 0.0012611  |   0.0 |  1.54
+Output  | 0.00021332 | 0.00021332 | 0.00021332 |   0.0 |  0.26
+Modify  | 0.0060504  | 0.0060504  | 0.0060504  |   0.0 |  7.36
+Other   |            | 0.00112    |            |       |  1.36
+
+Nlocal:          48800 ave       48800 max       48800 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24510 ave       24510 max       24510 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:     2.5724e+06 ave  2.5724e+06 max  2.5724e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2572400
+Ave neighs/atom = 52.713115
+Neighbor list builds = 0
+Dangerous builds = 0

@@ -1,0 +1,158 @@
+Script started on 2026-04-28 18:05:21-04:00 [TERM="xterm-256color" TTY="/dev/pts/53" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:2714000] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+variable a equal 3.300
+variable nx equal 20
+variable ny equal 20
+variable nztarget equal 40
+variable nzprojectile equal 20
+variable gap equal 15.0
+variable dt equal 0.001
+variable eqsteps equal 100000
+variable prodsteps equal 100000
+variable impactvel equal -20.0
+variable lx equal v_nx*v_a
+variable ly equal v_ny*v_a
+variable ztarget equal v_nztarget*v_a
+variable zprojlo equal v_ztarget+v_gap
+variable zprojhi equal v_zprojlo+v_nzprojectile*v_a
+variable zlo equal -v_a
+variable zhi equal v_zprojhi+v_a
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice bcc 3.3 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.3 3.3 3.3
+region whole block 0 ${lx} 0 ${ly} ${zlo} ${zhi} units box
+region whole block 0 66 0 ${ly} ${zlo} ${zhi} units box
+region whole block 0 66 0 66 ${zlo} ${zhi} units box
+region whole block 0 66 0 66 -3.3 ${zhi} units box
+region whole block 0 66 0 66 -3.3 216.3 units box
+create_box 1 whole
+Created orthogonal box = (0 0 -3.3) to (66 66 216.3)
+  1 by 1 by 1 MPI processor grid
+region target block 0 ${lx} 0 ${ly} 0 ${ztarget} units box
+region target block 0 66 0 ${ly} 0 ${ztarget} units box
+region target block 0 66 0 66 0 ${ztarget} units box
+region target block 0 66 0 66 0 132 units box
+region projectile block 0 ${lx} 0 ${ly} ${zprojlo} ${zprojhi} units box
+region projectile block 0 66 0 ${ly} ${zprojlo} ${zprojhi} units box
+region projectile block 0 66 0 66 ${zprojlo} ${zprojhi} units box
+region projectile block 0 66 0 66 147 ${zprojhi} units box
+region projectile block 0 66 0 66 147 213 units box
+create_atoms 1 region target
+Created 32400 atoms
+  using lattice units in orthogonal box = (0 0 -3.3) to (66 66 216.3)
+  create_atoms CPU = 0.005 seconds
+create_atoms 1 region projectile
+Created 16000 atoms
+  using lattice units in orthogonal box = (0 0 -3.3) to (66 66 216.3)
+  create_atoms CPU = 0.003 seconds
+mass 1 92.90638
+group target region target
+32400 atoms in group target
+group projectile region projectile
+16000 atoms in group projectile
+pair_style eam/fs
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep ${dt}
+timestep 0.001
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz lx ly lz atoms
+velocity all create 300.0 123456 dist gaussian mom yes rot no units box
+fix equil all nvt temp 300.0 300.0 0.1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 20 20 66
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/fs, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
+   Step          Time           Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz             Lx             Ly             Lz          Atoms   
+         0   0              300           -340504.05      1876.8185     -338627.23      7553.2643      6684.5262      6678.2509      9297.0158      66             66             219.6              48400 
+        10   0.01           281.27288     -340386.67      1759.6605     -338627.01      8359.2715      7485.9654      7483.0695      10108.78       66             66             219.6              48400 
+Loop time of 0.217493 on 1 procs for 10 steps with 48400 atoms
+
+Performance: 3.973 ns/day, 6.041 hours/ns, 45.978 timesteps/s, 2.225 Matom-step/s
+99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.20846    | 0.20846    | 0.20846    |   0.0 | 95.85
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.001307   | 0.001307   | 0.001307   |   0.0 |  0.60
+Output  | 0.00044893 | 0.00044893 | 0.00044893 |   0.0 |  0.21
+Modify  | 0.0061968  | 0.0061968  | 0.0061968  |   0.0 |  2.85
+Other   |            | 0.001082   |            |       |  0.50
+
+Nlocal:          48400 ave       48400 max       48400 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24285 ave       24285 max       24285 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:      1.512e+06 ave   1.512e+06 max   1.512e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1512000
+Ave neighs/atom = 31.239669
+Neighbor list builds = 0
+Dangerous builds = 0
+reset_timestep 0
+velocity projectile set 0.0 0.0 ${impactvel} sum yes units box
+velocity projectile set 0.0 0.0 -20 sum yes units box
+fix impact all nve
+run 10
+WARNING: One or more atoms are time integrated more than once (src/src/modify.cpp:296)
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+Per MPI rank memory allocation (min/avg/max) = 21.51 | 21.51 | 21.51 Mbytes
+   Step          Time           Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz             Lx             Ly             Lz          Atoms   
+         0   0              5209.8438     -340386.67      32593.104     -307793.57      42787.996      7485.9654      7483.0695      113394.95      66             66             219.6              48400 
+        10   0.01           4856.1498     -339684.49      30380.373     -309304.12      45460.883      11758.568      11768.776      112855.3       66             66             219.6              48400 
+Loop time of 0.262271 on 1 procs for 10 steps with 48400 atoms
+
+Performance: 3.294 ns/day, 7.285 hours/ns, 38.129 timesteps/s, 1.845 Matom-step/s
+97.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.2502     | 0.2502     | 0.2502     |   0.0 | 95.40
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0012885  | 0.0012885  | 0.0012885  |   0.0 |  0.49
+Output  | 0.00051863 | 0.00051863 | 0.00051863 |   0.0 |  0.20
+Modify  | 0.0092444  | 0.0092444  | 0.0092444  |   0.0 |  3.52
+Other   |            | 0.001019   |            |       |  0.39
+
+Nlocal:          48400 ave       48400 max       48400 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24285 ave       24285 max       24285 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:      1.512e+06 ave   1.512e+06 max   1.512e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1512000
+Ave neighs/atom = 31.239669
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00
+
+Script done on 2026-04-28 18:05:23-04:00 [COMMAND_EXIT_CODE="0"]

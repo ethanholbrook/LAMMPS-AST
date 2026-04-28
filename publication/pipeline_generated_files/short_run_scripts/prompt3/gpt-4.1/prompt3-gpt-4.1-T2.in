@@ -1,0 +1,34 @@
+# Initialization
+units           metal
+atom_style      atomic
+boundary        p p f
+
+# System Construction
+lattice         bcc 3.300
+region          proj block 0 20 0 20 0 20
+region          targ block 0 20 0 20 21 60
+region          gap  block 0 20 0 20 20 21
+region          box  block 0 20 0 20 0 60
+create_box      1 box
+create_atoms    1 region proj
+create_atoms    1 region targ
+
+# Potential
+pair_style      eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+
+# Miscellaneous
+mass            1 92.90637
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+group           projectile region proj
+velocity        projectile set 0.0 0.0 2000.0 sum yes units box
+
+# Equilibration
+fix             nvtfix all nvt temp 300.0 300.0 0.1
+timestep        0.001
+run 10
+unfix           nvtfix
+
+# Production Run
+fix             nvefix all nve
+run 10

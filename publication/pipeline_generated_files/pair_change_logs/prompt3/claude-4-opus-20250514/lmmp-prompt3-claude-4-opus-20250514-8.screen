@@ -1,0 +1,31 @@
+Script started on 2026-04-21 13:13:35-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+
+# System Construction
+lattice bcc 3.3008
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+region projectile block 0 20 0 20 0 20
+create_box 1 projectile
+Created orthogonal box = (0 0 0) to (66.016 66.016 66.016)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 16000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (66.016 66.016 66.016)
+  create_atoms CPU = 0.002 seconds
+group projectile region projectile
+16000 atoms in group projectile
+
+lattice bcc 3.3008
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+region target block 0 20 0 20 21.5 61.5
+create_box 1 target
+ERROR: Cannot create_box after simulation box is defined (src/src/create_box.cpp:41)
+Last command: create_box 1 target
+
+Script done on 2026-04-21 13:13:39-04:00 [COMMAND_EXIT_CODE="1"]

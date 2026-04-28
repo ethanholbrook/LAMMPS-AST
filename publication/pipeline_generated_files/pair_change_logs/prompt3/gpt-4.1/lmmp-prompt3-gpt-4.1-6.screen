@@ -1,0 +1,69 @@
+Script started on 2026-04-21 14:27:38-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units           metal
+dimension       3
+boundary        p p f
+atom_style      atomic
+
+# System Construction
+lattice         bcc 3.300
+Lattice spacing in x,y,z = 3.3 3.3 3.3
+region          target block 0 66.0 0 66.0 0 132.0
+region          projectile block 0 66.0 0 66.0 133.5 199.5
+region          box union 2 target projectile
+create_box      1 box
+Created orthogonal box = (0 0 0) to (217.8 217.8 658.35)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 region target
+Created 1154340 atoms
+  using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
+  create_atoms CPU = 0.106 seconds
+create_atoms    1 region projectile
+Created 574992 atoms
+  using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
+  create_atoms CPU = 0.057 seconds
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Miscellaneous
+mass            1 92.906
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+group           projectile region projectile
+574992 atoms in group projectile
+velocity        projectile set 0.0 0.0 -2000.0 sum yes
+
+# Production Run
+fix             1 all nve
+thermo          100
+timestep        0.001
+run 10
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 37 37 110
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+Per MPI rank memory allocation (min/avg/max) = 1733 | 1733 | 1733 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   5.3946038e+08  0              0              1.2058751e+11  4.1242865e+09
+ERROR: Lost atoms: original 1729332 current 1727178 (src/src/thermo.cpp:494)
+Last command: run 10
+
+Script done on 2026-04-21 14:28:59-04:00 [COMMAND_EXIT_CODE="1"]

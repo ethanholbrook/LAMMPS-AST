@@ -1,0 +1,19 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+lattice fcc 3.52
+region box block 0 10 0 10 0 10
+create_box 1 box
+create_atoms 1 box
+mass 1 58.6934
+pair_style eam
+pair_coeff * * ../../../potentials/prompt1.potential
+velocity all create 600 4928459 dist gaussian
+neighbor 2 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+fix 1 all npt temp 300 2500 0.1 iso 1 1 1
+thermo 100
+thermo_style custom step temp press pe ke etotal vol
+run 220000

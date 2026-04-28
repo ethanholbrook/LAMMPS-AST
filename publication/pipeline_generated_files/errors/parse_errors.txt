@@ -1,0 +1,3 @@
+parse errors
+prompt2	gpt-5.5	T5	sanitized=False, parsed=n/a, unresolved=v_Ni_lattice, v_Ni_mass, v_Pdamp, v_Tdamp, v_potential_file, v_run_steps
+prompt3	gpt-5.5	T5	sanitized=True, parsed=[{"line": 27, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 20 units box"}]

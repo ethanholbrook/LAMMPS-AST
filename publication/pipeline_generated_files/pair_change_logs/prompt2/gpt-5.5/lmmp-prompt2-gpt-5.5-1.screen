@@ -1,0 +1,102 @@
+Script started on 2026-04-28 18:05:29-04:00 [TERM="xterm-256color" TTY="/dev/pts/53" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:2715188] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+variable a equal 3.52
+variable dt equal 0.001
+variable Tinit equal 600.0
+variable Tstart equal 300.0
+variable Tstop equal 2500.0
+variable P equal 1.01325
+variable Tdamp equal 0.1
+variable Pdamp equal 1.0
+variable seed equal 12345
+lattice fcc ${a}
+lattice fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region box block 0 10 0 10 0 10 units lattice
+create_box 1 box
+Created orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 4000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  create_atoms CPU = 0.001 seconds
+mass 1 58.6934
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+neighbor 2.0 bin
+neigh_modify every 1 delay 10 check yes
+timestep ${dt}
+timestep 0.001
+velocity all create ${Tinit} ${seed} mom yes rot yes dist gaussian
+velocity all create 600 ${seed} mom yes rot yes dist gaussian
+velocity all create 600 12345 mom yes rot yes dist gaussian
+thermo 1000
+thermo_style custom step time temp press pe ke etotal enthalpy vol lx ly lz density
+thermo_modify flush yes
+reset_timestep 0
+fix npt_heating all npt temp ${Tstart} ${Tstop} ${Tdamp} iso ${P} ${P} ${Pdamp}
+fix npt_heating all npt temp 300 ${Tstop} ${Tdamp} iso ${P} ${P} ${Pdamp}
+fix npt_heating all npt temp 300 2500 ${Tdamp} iso ${P} ${P} ${Pdamp}
+fix npt_heating all npt temp 300 2500 0.1 iso ${P} ${P} ${Pdamp}
+fix npt_heating all npt temp 300 2500 0.1 iso 1.01325 ${P} ${Pdamp}
+fix npt_heating all npt temp 300 2500 0.1 iso 1.01325 1.01325 ${Pdamp}
+fix npt_heating all npt temp 300 2500 0.1 iso 1.01325 1.01325 1
+run 10
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 10 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+Per MPI rank memory allocation (min/avg/max) = 10.96 | 10.96 | 10.96 Mbytes
+   Step          Time           Temp          Press          PotEng         KinEng         TotEng        Enthalpy        Volume           Lx             Ly             Lz          Density    
+         0   0              600            7595.5356      0              310.14679      310.14679      516.91132      43614.208      35.2           35.2           35.2           4.1119216    
+        10   0.01           602.0088       7618.6796      0              311.18516      311.18516      518.64194      43627.294      35.20352       35.20352       35.20352       4.1106883    
+Loop time of 0.00219191 on 1 procs for 10 steps with 4000 atoms
+
+Performance: 394.177 ns/day, 0.061 hours/ns, 4562.233 timesteps/s, 18.249 Matom-step/s
+92.8% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.00048369 | 0.00048369 | 0.00048369 |   0.0 | 22.07
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00045075 | 0.00045075 | 0.00045075 |   0.0 | 20.56
+Output  | 5.2018e-05 | 5.2018e-05 | 5.2018e-05 |   0.0 |  2.37
+Modify  | 0.0011145  | 0.0011145  | 0.0011145  |   0.0 | 50.85
+Other   |            | 9.096e-05  |            |       |  4.15
+
+Nlocal:           4000 ave        4000 max        4000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          13969 ave       13969 max       13969 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:      1.348e+06 ave   1.348e+06 max   1.348e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1348000
+Ave neighs/atom = 337
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00
+
+Script done on 2026-04-28 18:05:31-04:00 [COMMAND_EXIT_CODE="0"]

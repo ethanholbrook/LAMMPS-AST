@@ -1,0 +1,43 @@
+variable a equal 3.52
+variable nx equal 10
+variable ny equal 10
+variable nz equal 10
+variable Tinit equal 600.0
+variable Tstart equal 300.0
+variable Tstop equal 2500.0
+variable rate equal 10.0
+variable P equal 1.01325
+variable dt equal 0.001
+variable Tdamp equal 0.1
+variable Pdamp equal 1.0
+variable total_ps equal (v_Tstop - v_Tstart)/v_rate
+variable nsteps equal ceil(v_total_ps/v_dt)
+
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+newton on
+run_style verlet
+neighbor 2.0 bin
+neigh_modify delay 10 every 1 check yes
+
+lattice fcc ${a}
+region whole block 0 ${nx} 0 ${ny} 0 ${nz} units lattice
+create_box 1 whole
+create_atoms 1 box
+
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+
+timestep ${dt}
+thermo 1000
+thermo_style custom step temp pe ke etotal press vol density
+thermo_modify flush yes
+
+velocity all create ${Tinit} 4928459 mom yes rot yes dist gaussian
+
+fix 1 all npt temp ${Tstart} ${Tstop} ${Tdamp} iso ${P} ${P} ${Pdamp}
+reset_timestep 0
+
+run 10

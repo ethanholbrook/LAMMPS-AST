@@ -1,0 +1,81 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+timestep 0.001
+
+variable lat equal 3.52
+lattice fcc ${lat}
+lattice fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region box block 0 10 0 10 0 10 units lattice
+create_box 1 box
+Created orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 4000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  create_atoms CPU = 0.001 seconds
+
+mass 1 58.6934
+
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+
+velocity all create 600.0 12345 mom yes rot no dist gaussian
+
+compute thermo all temp
+thermo_style custom step temp press etotal
+thermo 1000
+
+fix 1 all npt temp 300.0 2500.0 0.1 iso 1.01325 1.01325 1.0
+
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.80375
+  ghost atom cutoff = 7.80375
+  binsize = 3.901875, bins = 10 10 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
+   Step          Temp          Press          TotEng    
+         0   600            7594.6671     -17489.853    
+        10   504.69812      14722.151     -17488.943    
+Loop time of 0.0684341 on 1 procs for 10 steps with 4000 atoms
+
+Performance: 12.625 ns/day, 1.901 hours/ns, 146.126 timesteps/s, 584.504 katom-step/s
+96.5% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.06686    | 0.06686    | 0.06686    |   0.0 | 97.70
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00027651 | 0.00027651 | 0.00027651 |   0.0 |  0.40
+Output  | 4.3803e-05 | 4.3803e-05 | 4.3803e-05 |   0.0 |  0.06
+Modify  | 0.0011064  | 0.0011064  | 0.0011064  |   0.0 |  1.62
+Other   |            | 0.0001473  |            |       |  0.22
+
+Nlocal:           4000 ave        4000 max        4000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           8195 ave        8195 max        8195 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         352000 ave      352000 max      352000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 352000
+Ave neighs/atom = 88
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00

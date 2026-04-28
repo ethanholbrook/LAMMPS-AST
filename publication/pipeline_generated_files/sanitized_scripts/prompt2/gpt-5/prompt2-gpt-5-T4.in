@@ -1,0 +1,19 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+newton on
+timestep 0.001
+lattice fcc 3.52
+region whole block 0 10 0 10 0 10 units lattice
+create_box 1 whole
+create_atoms 1 box
+mass 1 58.6934
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Ni
+velocity all create 600 12345 mom yes rot yes dist gaussian
+thermo_style custom step temp press pe ke etotal vol density lx ly lz
+thermo 100
+fix 1 all npt temp 300 2500 1 iso 1.01325 1.01325 10
+run 220000
+unfix 1

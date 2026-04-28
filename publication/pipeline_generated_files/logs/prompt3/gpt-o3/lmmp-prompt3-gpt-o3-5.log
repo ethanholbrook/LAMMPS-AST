@@ -1,0 +1,53 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+lattice bcc 1.0
+Lattice spacing in x,y,z = 1 1 1
+region whole block 0 20 0 20 0 75 units lattice
+create_box 1 whole
+Created orthogonal box = (0 0 0) to (20 20 75)
+  1 by 1 by 1 MPI processor grid
+region projectile block 0 20 0 20 0 20 units lattice
+create_atoms 1 region projectile
+Created 16400 atoms
+  using lattice units in orthogonal box = (0 0 0) to (20 20 75)
+  create_atoms CPU = 0.002 seconds
+region target block 0 20 0 20 35 75 units lattice
+create_atoms 1 region target
+Created 32000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (20 20 75)
+  create_atoms CPU = 0.004 seconds
+mass 1 92.906
+group projectile region projectile
+16400 atoms in group projectile
+group target region target
+32000 atoms in group target
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+velocity all create 300.0 12345 mom yes rot no dist gaussian
+fix equil all nvt temp 300.0 300.0 0.1
+timestep 0.001
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 6 6 23
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+WARNING: A per-atom density exceeded rhomax of EAM potential table - a linear extrapolation to the energy was made (src/src/MANYBODY/pair_eam.cpp:334)
+Per MPI rank memory allocation (min/avg/max) = 255.6 | 255.6 | 255.6 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   300            3.6869074e+08  0              3.6869261e+08  2.0821645e+10
+ERROR: Lost atoms: original 48400 current 45600 (src/src/thermo.cpp:494)
+Last command: run 10

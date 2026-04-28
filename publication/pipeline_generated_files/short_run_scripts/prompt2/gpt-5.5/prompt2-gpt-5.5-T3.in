@@ -1,0 +1,21 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+timestep 0.001
+lattice fcc 3.52
+region unitcell block 0 1 0 1 0 1 units lattice
+create_box 1 unitcell
+create_atoms 1 box
+replicate 10 10 10
+mass 1 58.6934
+pair_style eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+velocity all create 600.0 12345 mom yes rot yes dist gaussian
+thermo 1000
+thermo_style custom step time temp press pe ke etotal enthalpy vol density
+thermo_modify norm no flush yes
+fix npt_heating all npt temp 300.0 2500.0 0.1 iso 1.01325 1.01325 1.0
+run 10

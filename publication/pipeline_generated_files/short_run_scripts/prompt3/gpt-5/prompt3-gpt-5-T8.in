@@ -1,0 +1,54 @@
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+newton on
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+
+variable a equal 3.3
+variable nx equal 20
+variable ny equal 20
+variable nz_t equal 40
+variable nz_p equal 20
+variable gap equal 15.0
+
+variable Lx equal v_a*v_nx
+variable Ly equal v_a*v_ny
+variable Lz_t equal v_a*v_nz_t
+variable Lz_p equal v_a*v_nz_p
+variable zlo_p equal v_Lz_t+v_gap
+variable zhi_p equal v_Lz_t+v_gap+v_Lz_p
+variable Lz equal v_zhi_p
+
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0 v_Lx 0 v_Ly 0 v_Lz units box
+create_box 1 whole
+
+region target block 0 v_Lx 0 v_Ly 0 v_Lz_t units box
+region proj block 0 v_Lx 0 v_Ly v_zlo_p v_zhi_p units box
+create_atoms 1 region target
+create_atoms 1 region proj
+
+group target region target
+group projectile region proj
+group all union target projectile
+
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+mass 1 92.90638
+
+thermo 1000
+thermo_style custom step temp pe ke etotal press pxx pyy pzz lx ly lz
+
+velocity all create 300.0 12345 mom yes rot yes dist gaussian
+
+fix nvt all nvt temp 300.0 300.0 0.1
+run 10
+unfix nvt
+
+velocity projectile add 0.0 0.0 -20.0 sum yes
+
+fix nve all nve
+run 10

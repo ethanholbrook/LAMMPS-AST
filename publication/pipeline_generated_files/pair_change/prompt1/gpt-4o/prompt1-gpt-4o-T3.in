@@ -1,0 +1,26 @@
+# Initialization
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+
+# System Construction
+lattice fcc 4.05
+region box block 0 5 0 5 0 5
+create_box 1 box
+create_atoms 1 box
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Miscellaneous
+
+# Production Run
+timestep 0.001
+thermo 100
+
+fix 1 all npt temp 300 300 0.1 iso 1 1 1.0
+run 10

@@ -1,0 +1,40 @@
+# LAMMPS input script for Ni melting
+
+# Initialization
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+
+# System Construction
+lattice fcc 3.52   # lattice parameter in Angstroms as typical for bulk Ni
+region box block 0 10 0 10 0 10
+create_box 1 box
+create_atoms 1 box
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Velocities
+velocity all create 600.0 12345 mom yes rot yes dist gaussian
+
+# Thermo and neighbor settings
+neighbor 2.0 bin
+neigh_modify delay 5
+
+# Thermo settings
+thermo 1000
+thermo_style custom step temp press pe ke etotal
+
+# Minimization (optional, ensure a relaxed initial structure)
+minimize 1.0e-4 1.0e-6 100 1000
+
+# Fixes
+fix 1 all npt temp 300.0 2500.0 100.0 iso 1.0 1.0 1000.0
+
+# Production Run
+timestep 0.001
+run 10

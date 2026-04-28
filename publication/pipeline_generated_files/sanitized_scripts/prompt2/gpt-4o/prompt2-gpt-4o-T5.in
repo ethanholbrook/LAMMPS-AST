@@ -1,0 +1,16 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+lattice fcc 3.52
+region my_box block 0 10 0 10 0 10
+create_box 1 my_box
+create_atoms 1 box
+pair_style eam
+pair_coeff * * ../../../potentials/prompt1.potential Ni
+velocity all create 600 12345 mom yes rot no dist gaussian
+timestep 0.001
+fix 1 all npt temp 300 2500 0.1 iso 1 1 1
+thermo 100
+thermo_style custom step temp press
+run 2200

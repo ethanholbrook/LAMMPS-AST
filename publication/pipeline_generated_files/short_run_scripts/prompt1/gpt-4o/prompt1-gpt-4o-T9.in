@@ -1,0 +1,23 @@
+# Initialization
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# System Construction
+lattice         fcc 4.05
+region          mybox block 0 5 0 5 0 5
+create_box      1 mybox
+create_atoms    1 box
+
+# Potential
+pair_style      eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+
+# NPT Ensemble
+timestep        0.001
+thermo          100
+fix             1 all npt temp 300.0 300.0 0.1 iso 1.0 1.0 1.0
+
+# Production Run
+run 10

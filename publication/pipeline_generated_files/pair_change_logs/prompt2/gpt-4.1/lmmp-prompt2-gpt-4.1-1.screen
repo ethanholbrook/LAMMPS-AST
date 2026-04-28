@@ -1,0 +1,83 @@
+Script started on 2026-04-21 14:25:12-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+lattice         fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region          box block 0 10 0 10 0 10
+create_box      1 box
+Created orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 box
+Created 4000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  create_atoms CPU = 0.001 seconds
+
+mass            1 58.6934
+
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+timestep        0.001
+
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+fix             pbar all npt temp 300.0 2500.0 0.1 iso 1.01325 1.01325 1.0
+
+run 10
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+Per MPI rank memory allocation (min/avg/max) = 10.96 | 10.96 | 10.96 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+         0   600            0              0              310.14679      7595.5356      43614.208    
+        10   602.0088       0              0              311.18516      7618.6796      43627.294    
+Loop time of 0.00222914 on 1 procs for 10 steps with 4000 atoms
+
+Performance: 387.593 ns/day, 0.062 hours/ns, 4486.033 timesteps/s, 17.944 Matom-step/s
+89.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.00049259 | 0.00049259 | 0.00049259 |   0.0 | 22.10
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00044151 | 0.00044151 | 0.00044151 |   0.0 | 19.81
+Output  | 2.3975e-05 | 2.3975e-05 | 2.3975e-05 |   0.0 |  1.08
+Modify  | 0.0011174  | 0.0011174  | 0.0011174  |   0.0 | 50.13
+Other   |            | 0.0001536  |            |       |  6.89
+
+Nlocal:           4000 ave        4000 max        4000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          13969 ave       13969 max       13969 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:      1.348e+06 ave   1.348e+06 max   1.348e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1348000
+Ave neighs/atom = 337
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00
+
+Script done on 2026-04-21 14:25:15-04:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,19 @@
+Script started on 2026-04-21 13:12:45-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units           metal
+dimension       3
+boundary        p p f
+atom_style      atomic
+
+# System Construction
+lattice         bcc 3.3
+Lattice spacing in x,y,z = 3.3 3.3 3.3
+region          projectile block 0 20 0 20 0 20 units lattice
+region          target block 0 20 0 20 21.5 61.5 units lattice
+create_box      2 all
+ERROR: Create_box region all does not exist (src/src/create_box.cpp:55)
+Last command: create_box      2 all
+
+Script done on 2026-04-21 13:12:49-04:00 [COMMAND_EXIT_CODE="1"]

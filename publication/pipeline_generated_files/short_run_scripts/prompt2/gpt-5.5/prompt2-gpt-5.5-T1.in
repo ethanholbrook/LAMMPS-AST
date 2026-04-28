@@ -1,0 +1,30 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+variable a equal 3.52
+variable dt equal 0.001
+variable Tinit equal 600.0
+variable Tstart equal 300.0
+variable Tstop equal 2500.0
+variable P equal 1.01325
+variable Tdamp equal 0.1
+variable Pdamp equal 1.0
+variable seed equal 12345
+lattice fcc ${a}
+region box block 0 10 0 10 0 10 units lattice
+create_box 1 box
+create_atoms 1 box
+mass 1 58.6934
+pair_style eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential
+neighbor 2.0 bin
+neigh_modify every 1 delay 10 check yes
+timestep ${dt}
+velocity all create ${Tinit} ${seed} mom yes rot yes dist gaussian
+thermo 1000
+thermo_style custom step time temp press pe ke etotal enthalpy vol lx ly lz density
+thermo_modify flush yes
+reset_timestep 0
+fix npt_heating all npt temp ${Tstart} ${Tstop} ${Tdamp} iso ${P} ${P} ${Pdamp}
+run 10

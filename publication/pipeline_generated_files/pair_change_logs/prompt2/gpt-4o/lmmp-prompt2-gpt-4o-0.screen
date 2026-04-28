@@ -1,0 +1,65 @@
+Script started on 2026-04-21 14:25:36-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+# System Construction
+lattice         fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region          whole block 0 10 0 10 0 10
+create_box      1 whole
+Created orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 box
+Created 4000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  create_atoms CPU = 0.001 seconds
+replicate       10 10 10
+Replication is creating a 10x10x10 = 1000 times larger system...
+  orthogonal box = (0 0 0) to (352 352 352)
+  1 by 1 by 1 MPI processor grid
+  4000000 atoms
+  replicate CPU = 0.251 seconds
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Velocities
+velocity        all create 600.0 4928459 mom yes rot yes dist gaussian
+
+# Thermo
+thermo          100
+thermo_style    custom step temp press
+
+# NPT Ensemble
+fix             1 all npt temp 300.0 2500.0 0.1 iso 1.0 1.0 1.0
+
+# Production Run
+timestep        0.001
+run 10
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 59 59 59
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+
+Script done on 2026-04-21 14:26:02-04:00 [COMMAND_EXIT_CODE="137"]

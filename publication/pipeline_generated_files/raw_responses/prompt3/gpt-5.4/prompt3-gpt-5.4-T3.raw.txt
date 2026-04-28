@@ -1,0 +1,72 @@
+units metal
+dimension 3
+boundary p p m
+atom_style atomic
+newton on
+run_style verlet
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep 0.001
+
+variable a equal 3.3000
+variable nx equal 20
+variable ny equal 20
+variable nzt equal 40
+variable nzp equal 20
+variable gap equal 15.0
+variable eps equal 1.0e-6
+variable lx equal v_nx*v_a
+variable ly equal v_ny*v_a
+variable lzt equal v_nzt*v_a
+variable lzp equal v_nzp*v_a
+variable xhi equal v_lx-v_eps
+variable yhi equal v_ly-v_eps
+variable zprojlo equal v_lzt+v_gap
+variable ztargethi equal v_lzt-v_eps
+variable zprojhi equal v_lzt+v_gap+v_lzp-v_eps
+variable lz equal v_lzt+v_gap+v_lzp
+variable zoriginp equal (v_zprojlo/v_a)-floor(v_zprojlo/v_a)
+variable t0 equal 300.0
+variable tdamp equal 0.1
+variable impact_v equal 20.0
+variable equil_steps equal 100000
+variable prod_steps equal 100000
+
+region r_whole block 0 ${lx} 0 ${ly} 0 ${lz} units box
+create_box 1 r_whole
+mass 1 92.90638
+
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1 origin 0.0 0.0 0.0
+region r_target block 0 ${xhi} 0 ${yhi} 0 ${ztargethi} units box
+create_atoms 1 region r_target
+
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1 origin 0.0 0.0 ${zoriginp}
+region r_projectile block 0 ${xhi} 0 ${yhi} ${zprojlo} ${zprojhi} units box
+create_atoms 1 region r_projectile
+
+group target region r_target
+group projectile region r_projectile
+
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+
+compute cthermo all temp
+thermo 1000
+thermo_style custom step time atoms temp pe ke etotal press pxx pyy pzz lx ly lz
+thermo_modify temp cthermo flush yes
+
+velocity all create ${t0} 12345 dist gaussian mom yes rot no
+
+fix eq all nvt temp ${t0} ${t0} ${tdamp}
+fix_modify eq temp cthermo
+
+run ${equil_steps}
+
+unfix eq
+reset_timestep 0
+
+velocity projectile set 0.0 0.0 -${impact_v} sum yes
+
+fix prod all nve
+
+run ${prod_steps}

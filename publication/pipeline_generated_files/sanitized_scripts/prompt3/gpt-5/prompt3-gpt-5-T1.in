@@ -1,0 +1,27 @@
+units metal
+atom_style atomic
+boundary p p f
+neighbor 2 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+lattice bcc 1 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0 20 0 20 0 75 units box
+create_box 1 whole
+mass 1 92.906
+region target block 0 20 0 20 0 40 units box
+create_atoms 1 region target
+region projectile block 0 20 0 20 55 75 units box
+create_atoms 1 region projectile
+group target region target
+group projectile region projectile
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz
+velocity all create 300 4928459 mom yes rot no dist gaussian
+fix thermostat all nvt temp 300 300 0.1
+run 100000
+unfix thermostat
+velocity projectile ramp 0 0 0 0 -20 -20 z sum yes
+fix integrator all nve
+run 100000

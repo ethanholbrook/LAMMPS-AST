@@ -1,0 +1,45 @@
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+variable a equal 3.300
+variable nx equal 20
+variable ny equal 20
+variable nztarget equal 40
+variable nzprojectile equal 20
+variable gap equal 15.0
+variable dt equal 0.001
+variable eqsteps equal 100000
+variable prodsteps equal 100000
+variable impactvel equal -20.0
+variable lx equal v_nx*v_a
+variable ly equal v_ny*v_a
+variable ztarget equal v_nztarget*v_a
+variable zprojlo equal v_ztarget+v_gap
+variable zprojhi equal v_zprojlo+v_nzprojectile*v_a
+variable zlo equal -v_a
+variable zhi equal v_zprojhi+v_a
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0 ${lx} 0 ${ly} ${zlo} ${zhi} units box
+create_box 1 whole
+region target block 0 ${lx} 0 ${ly} 0 ${ztarget} units box
+region projectile block 0 ${lx} 0 ${ly} ${zprojlo} ${zprojhi} units box
+create_atoms 1 region target
+create_atoms 1 region projectile
+mass 1 92.90638
+group target region target
+group projectile region projectile
+pair_style eam/fs
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+timestep ${dt}
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz lx ly lz atoms
+velocity all create 300.0 123456 dist gaussian mom yes rot no units box
+fix equil all nvt temp 300.0 300.0 0.1
+run ${eqsteps}
+reset_timestep 0
+velocity projectile set 0.0 0.0 ${impactvel} sum yes units box
+fix impact all nve
+run ${prodsteps}

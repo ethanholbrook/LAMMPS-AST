@@ -1,0 +1,37 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+
+lattice fcc 3.52
+region simulation_box block 0 10 0 10 0 10 units lattice
+create_box 1 simulation_box
+create_atoms 1 box
+
+mass 1 58.6934
+
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Ni
+
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+
+timestep 0.001
+
+velocity all create 600.0 4928459 mom yes rot yes dist gaussian
+
+thermo 1000
+thermo_style custom step time temp press pe ke etotal vol density
+
+variable Tstart equal 300.0
+variable Tstop equal 2500.0
+variable Pramp equal 1.01325
+variable heatrate equal 10.0
+variable dt equal 0.001
+variable nsteps equal ceil((v_Tstop-v_Tstart)/(v_heatrate*v_dt))
+
+fix ensemble all npt temp ${Tstart} ${Tstop} 0.1 iso ${Pramp} ${Pramp} 1.0
+
+run ${nsteps}
+
+unfix ensemble

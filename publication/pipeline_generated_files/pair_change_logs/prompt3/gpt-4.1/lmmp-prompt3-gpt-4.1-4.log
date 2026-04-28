@@ -1,0 +1,65 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# Initialization
+units           metal
+atom_style      atomic
+boundary        p p f
+
+# System Construction
+lattice         bcc 3.300
+Lattice spacing in x,y,z = 3.3 3.3 3.3
+region          target block 0 66.0 0 66.0 0 132.0
+region          projectile block 0 66.0 0 66.0 133.5 199.5
+region          whole union 2 target projectile
+create_box      1 whole
+Created orthogonal box = (0 0 0) to (217.8 217.8 658.35)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 region target
+Created 1154340 atoms
+  using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
+  create_atoms CPU = 0.131 seconds
+create_atoms    1 region projectile
+Created 574992 atoms
+  using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
+  create_atoms CPU = 0.060 seconds
+
+mass            1 92.90637
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Miscellaneous
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+velocity        all create 300.0 87287 mom yes rot no dist gaussian
+
+group           projectile region projectile
+574992 atoms in group projectile
+velocity        projectile set 0.0 0.0 -2000.0 units box
+
+# Production Run
+fix             1 all nvt temp 300.0 300.0 0.1
+timestep        0.001
+run 10
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 37 37 110
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 1733 | 1733 | 1733 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   14396520       0              0              3.2181055e+09  1.1006438e+08
+ERROR: Lost atoms: original 1729332 current 1727173 (src/src/thermo.cpp:494)
+Last command: run 10

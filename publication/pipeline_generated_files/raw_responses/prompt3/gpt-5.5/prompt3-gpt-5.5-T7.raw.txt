@@ -1,0 +1,58 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+atom_modify map array
+
+variable a equal 3.300
+variable gap equal 15.0
+variable nx equal 20
+variable ny equal 20
+variable nzp equal 20
+variable nzt equal 40
+variable ztot equal v_nzp+v_nzt+v_gap/v_a
+variable target_shift equal v_nzp*v_a+v_gap
+variable dt equal 0.001
+variable equil_steps equal 100000
+variable prod_steps equal 100000
+variable tdamp equal 0.1
+variable impact_velocity equal 20.0
+
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+
+region box block 0 ${nx} 0 ${ny} 0 ${ztot} units lattice
+create_box 1 box
+
+region target_initial block 0 ${nx} 0 ${ny} 0 ${nzt} units lattice
+create_atoms 1 region target_initial
+group target region target_initial
+displace_atoms target move 0.0 0.0 ${target_shift} units box
+
+region projectile_region block 0 ${nx} 0 ${ny} 0 ${nzp} units lattice
+create_atoms 1 region projectile_region
+group projectile region projectile_region
+group mobile union target projectile
+
+mass 1 92.90638
+
+pair_style eam/fs
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+timestep ${dt}
+
+velocity mobile create 300.0 4928459 mom yes rot no dist gaussian units box
+
+thermo 1000
+thermo_style custom step time temp pe ke etotal press
+
+fix equil mobile nvt temp 300.0 300.0 ${tdamp}
+run ${equil_steps}
+unfix equil
+
+velocity projectile set NULL NULL ${impact_velocity} units box sum yes
+
+fix prod mobile nve
+run ${prod_steps}

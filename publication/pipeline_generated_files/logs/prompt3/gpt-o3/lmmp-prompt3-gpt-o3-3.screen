@@ -1,0 +1,135 @@
+Script started on 2026-04-21 14:23:32-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+
+lattice bcc 1.0
+Lattice spacing in x,y,z = 1 1 1
+region box block 0 20 0 20 0 75 units lattice
+create_box 1 box
+Created orthogonal box = (0 0 0) to (20 20 75)
+  1 by 1 by 1 MPI processor grid
+region target block 0 20 0 20 0 40 units lattice
+region projectile block 0 20 0 20 55 75 units lattice
+create_atoms 1 region target
+Created 32400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0075) to (20 20 75.0075)
+  create_atoms CPU = 0.004 seconds
+create_atoms 1 region projectile
+Created 16400 atoms
+  using lattice units in orthogonal box = (0 0 -0.0075) to (20 20 75.0075)
+  create_atoms CPU = 0.003 seconds
+
+group target region target
+32400 atoms in group target
+group projectile region projectile
+16400 atoms in group projectile
+
+mass 1 92.906
+
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+
+timestep 0.001
+
+velocity all create 300.0 12345 mom yes rot yes dist gaussian
+
+fix equil all nvt temp 300.0 300.0 0.1
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 6 6 23
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 0
+  Time step     : 0.001
+WARNING: A per-atom density exceeded rhomax of EAM potential table - a linear extrapolation to the energy was made (src/src/MANYBODY/pair_eam.cpp:334)
+Per MPI rank memory allocation (min/avg/max) = 257.6 | 257.6 | 257.6 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+         0   300            3.718278e+08   0              3.7182969e+08  2.0996235e+10  30006        
+        10   70466.122      3.2406111e+08  0              3.2450559e+08  1.6629731e+10  32627.99     
+Loop time of 12.7893 on 1 procs for 10 steps with 48800 atoms
+
+Performance: 0.068 ns/day, 355.257 hours/ns, 0.782 timesteps/s, 38.157 katom-step/s
+98.2% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 9.7834     | 9.7834     | 9.7834     |   0.0 | 76.50
+Neigh   | 2.9852     | 2.9852     | 2.9852     |   0.0 | 23.34
+Comm    | 0.0085062  | 0.0085062  | 0.0085062  |   0.0 |  0.07
+Output  | 0.00027034 | 0.00027034 | 0.00027034 |   0.0 |  0.00
+Modify  | 0.0081936  | 0.0081936  | 0.0081936  |   0.0 |  0.06
+Other   |            | 0.003723   |            |       |  0.03
+
+Nlocal:          48800 ave       48800 max       48800 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          88078 ave       88078 max       88078 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    5.35798e+07 ave 5.35798e+07 max 5.35798e+07 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 53579759
+Ave neighs/atom = 1097.9459
+Neighbor list builds = 3
+Dangerous builds = 0
+unfix equil
+
+velocity projectile set 0.0 0.0 -20.0 sum yes
+
+fix impact all nve
+run 10
+Setting up Verlet run ...
+  Unit style    : metal
+  Current step  : 10
+  Time step     : 0.001
+WARNING: A per-atom density exceeded rhomax of EAM potential table - a linear extrapolation to the energy was made (src/src/MANYBODY/pair_eam.cpp:334)
+Per MPI rank memory allocation (min/avg/max) = 257.6 | 257.6 | 257.6 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+        10   75473.178      3.2406111e+08  0              3.2453718e+08  1.6494356e+10  32897.826    
+        20   11284855       2.5507543e+08  0              3.2625765e+08  1.2558194e+10  39388.538    
+Loop time of 14.0489 on 1 procs for 10 steps with 48800 atoms
+
+Performance: 0.061 ns/day, 390.248 hours/ns, 0.712 timesteps/s, 34.736 katom-step/s
+98.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 8.9692     | 8.9692     | 8.9692     |   0.0 | 63.84
+Neigh   | 5.0597     | 5.0597     | 5.0597     |   0.0 | 36.02
+Comm    | 0.011499   | 0.011499   | 0.011499   |   0.0 |  0.08
+Output  | 0.00029457 | 0.00029457 | 0.00029457 |   0.0 |  0.00
+Modify  | 0.003605   | 0.003605   | 0.003605   |   0.0 |  0.03
+Other   |            | 0.00456    |            |       |  0.03
+
+Nlocal:          48800 ave       48800 max       48800 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          88087 ave       88087 max       88087 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    4.20495e+07 ave 4.20495e+07 max 4.20495e+07 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 42049538
+Ave neighs/atom = 861.67086
+Neighbor list builds = 6
+Dangerous builds = 3
+Total wall time: 0:00:30
+
+Script done on 2026-04-21 14:24:05-04:00 [COMMAND_EXIT_CODE="0"]

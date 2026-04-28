@@ -1,0 +1,82 @@
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+# LAMMPS Input Script: Melting of Bulk Ni Sample
+
+# Initialization
+units           metal
+boundary        p p p
+atom_style      atomic
+
+# System Construction
+lattice         fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region          box block 0 10 0 10 0 10
+create_box      1 box
+Created orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 box
+Created 4000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  create_atoms CPU = 0.001 seconds
+
+# Potential
+
+pair_style zero 10.0
+pair_coeff * *
+mass 1 27
+
+# Miscellaneous
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+# Initial velocities
+velocity        all create 600.0 12345 mom yes rot yes dist gaussian
+
+# Production Run
+fix             1 all npt temp 300.0 2500.0 100.0 iso 0.0 0.0 1000.0
+timestep        1.0
+run 10
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair zero, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 10.96 | 10.96 | 10.96 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+         0   600            0              0              310.14679      7595.5356      43614.208    
+        10   602.00878      0              0              311.18515      7618.679       43627.295    
+Loop time of 0.426285 on 1 procs for 10 steps with 4000 atoms
+
+Performance: 2026.813 ns/day, 0.012 hours/ns, 23.458 timesteps/s, 93.834 katom-step/s
+99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.00051081 | 0.00051081 | 0.00051081 |   0.0 |  0.12
+Neigh   | 0.42082    | 0.42082    | 0.42082    |   0.0 | 98.72
+Comm    | 0.0032501  | 0.0032501  | 0.0032501  |   0.0 |  0.76
+Output  | 6.5093e-05 | 6.5093e-05 | 6.5093e-05 |   0.0 |  0.02
+Modify  | 0.0011411  | 0.0011411  | 0.0011411  |   0.0 |  0.27
+Other   |            | 0.0004939  |            |       |  0.12
+
+Nlocal:           4000 ave        4000 max        4000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          15005 ave       15005 max       15005 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.32652e+06 ave 1.32652e+06 max 1.32652e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1326518
+Ave neighs/atom = 331.6295
+Neighbor list builds = 10
+Dangerous builds = 10
+Total wall time: 0:00:00

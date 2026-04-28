@@ -1,0 +1,52 @@
+units metal
+dimension 3
+boundary p p m
+atom_style atomic
+run_style verlet
+variable potfile string ../../../potentials/prompt1.potential
+variable nx equal 20
+variable ny equal 20
+variable nzp equal 20
+variable nzt equal 40
+variable gap equal 15.0
+variable dt equal 0.001
+variable eqsteps equal 100000
+variable prodsteps equal 100000
+variable T0 equal 300.0
+variable tdamp equal 0.1
+variable vzimpact equal 20.0
+lattice bcc ${aNb} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+variable Lx equal v_nx*v_aNb
+variable Ly equal v_ny*v_aNb
+variable Lp equal v_nzp*v_aNb
+variable Lt equal v_nzt*v_aNb
+variable ztlo equal v_Lp+v_gap
+variable zthi equal v_ztlo+v_Lt
+region whole block 0.0 ${Lx} 0.0 ${Ly} 0.0 ${zthi} units box
+create_box 1 whole
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+mass 1 ${massNb}
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+region projectile block 0.0 ${Lx} 0.0 ${Ly} 0.0 ${Lp} units box
+region target block 0.0 ${Lx} 0.0 ${Ly} ${ztlo} ${zthi} units box
+create_atoms 1 region projectile
+create_atoms 1 region target
+group projectile region projectile
+group target region target
+timestep ${dt}
+velocity all create ${T0} 4928459 mom yes rot no dist gaussian
+thermo 1000
+thermo_style custom step time atoms temp pe ke etotal pxx pyy pzz lx ly lz
+dump traj all custom 1000 nb_spall.lammpstrj id type x y z vx vy vz
+dump_modify traj sort id
+fix eq all nvt temp ${T0} ${T0} ${tdamp}
+run 10
+velocity target zero linear
+velocity projectile zero linear
+velocity projectile set NULL NULL ${vzimpact} sum yes units box
+reset_timestep 0
+fix prod all nve
+run 10
+write_data nb_spall_final.data

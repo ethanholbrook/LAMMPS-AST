@@ -1,0 +1,50 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+variable a equal 3.303
+variable gap equal 15.0
+variable eps equal 1.0e-6
+variable nx equal 20.0
+variable ny equal 20.0
+variable nz_projectile equal 20.0
+variable nz_target equal 40.0
+variable lx equal v_nx*v_a
+variable ly equal v_ny*v_a
+variable z_projectile_hi equal v_nz_projectile*v_a
+variable z_target_hi equal (v_nz_projectile+v_nz_target)*v_a
+variable z_box_hi equal v_z_target_hi+v_gap
+variable z_projectile_him equal v_z_projectile_hi-v_eps
+variable z_target_him equal v_z_target_hi-v_eps
+variable timestep_size equal 0.001
+variable equilibration_time equal 100.0
+variable equilibration_steps equal ceil(v_equilibration_time/v_timestep_size)
+variable production_time equal 100.0
+variable production_steps equal ceil(v_production_time/v_timestep_size)
+variable temperature equal 300.0
+variable tdamp equal 0.1
+variable impact_velocity equal 20.0
+region box block 0 ${lx} 0 ${ly} 0 ${z_box_hi} units box
+create_box 1 box
+mass 1 92.90638
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region projectile0 block 0 ${lx} 0 ${ly} 0 ${z_projectile_him} units box
+region target0 block 0 ${lx} 0 ${ly} ${z_projectile_him} ${z_target_him} units box
+create_atoms 1 region projectile0
+group projectile region projectile0
+create_atoms 1 region target0
+group target region target0
+pair_style eam/fs
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep ${timestep_size}
+thermo 1000
+thermo_style custom step time temp pe ke etotal press pxx pyy pzz vol
+thermo_modify flush yes
+velocity all create ${temperature} 12345 mom yes rot yes dist gaussian units box
+fix equilibration all nvt temp ${temperature} ${temperature} ${tdamp}
+run 10
+velocity projectile set NULL NULL ${impact_velocity} sum yes units box
+fix production all nve
+run 10

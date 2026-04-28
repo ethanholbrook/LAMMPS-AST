@@ -1,0 +1,17 @@
+Script started on 2026-04-21 13:07:22-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+newton on
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+timestep 0.001
+thermo 100
+thermo_style custom step temp pe ke etotal press vol
+ERROR: Thermo_style command before simulation box is defined (src/src/output.cpp:899)
+Last command: thermo_style custom step temp pe ke etotal press vol
+
+Script done on 2026-04-21 13:07:25-04:00 [COMMAND_EXIT_CODE="1"]

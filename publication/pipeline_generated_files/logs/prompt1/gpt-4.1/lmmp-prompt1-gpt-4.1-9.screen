@@ -1,0 +1,28 @@
+Script started on 2026-04-21 14:18:15-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units           metal
+
+atom_style      atomic
+
+boundary        p p p
+
+lattice         fcc 4.05
+Lattice spacing in x,y,z = 4.05 4.05 4.05
+region          box block 0 5 0 5 0 5
+create_box      1 box
+Created orthogonal box = (0 0 0) to (20.25 20.25 20.25)
+  1 by 1 by 1 MPI processor grid
+create_atoms    1 box
+Created 500 atoms
+  using lattice units in orthogonal box = (0 0 0) to (20.25 20.25 20.25)
+  create_atoms CPU = 0.000 seconds
+
+mass            1 26.9815
+
+pair_style      eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+ERROR: Incorrect args for pair coefficients (src/src/MANYBODY/pair_eam.cpp:387)
+Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+
+Script done on 2026-04-21 14:18:18-04:00 [COMMAND_EXIT_CODE="1"]

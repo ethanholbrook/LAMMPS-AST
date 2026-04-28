@@ -1,0 +1,40 @@
+Script started on 2026-04-28 18:05:01-04:00 [TERM="xterm-256color" TTY="/dev/pts/53" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:2707774] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
+LAMMPS (29 Aug 2024)
+  using 1 OpenMP thread(s) per MPI task
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+timestep 0.001
+lattice fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+region unitcell block 0 1 0 1 0 1 units lattice
+create_box 1 unitcell
+Created orthogonal box = (0 0 0) to (3.52 3.52 3.52)
+  1 by 1 by 1 MPI processor grid
+create_atoms 1 box
+Created 4 atoms
+  using lattice units in orthogonal box = (0 0 0) to (3.52 3.52 3.52)
+  create_atoms CPU = 0.000 seconds
+replicate 10 10 10
+Replication is creating a 10x10x10 = 1000 times larger system...
+  orthogonal box = (0 0 0) to (35.2 35.2 35.2)
+  1 by 1 by 1 MPI processor grid
+  4000 atoms
+  replicate CPU = 0.001 seconds
+mass 1 58.6934
+pair_style eam
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential
+ERROR on proc 0: Not a valid integer number: 'Conversion' (src/src/MANYBODY/pair_eam.cpp:521)
+Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 1.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+
+Script done on 2026-04-28 18:05:01-04:00 [COMMAND_EXIT_CODE="1"]

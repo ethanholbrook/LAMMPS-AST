@@ -1,0 +1,60 @@
+units metal
+dimension 3
+boundary p p s
+atom_style atomic
+newton on
+
+variable a equal 3.3008
+variable gap equal 15.0
+variable nx equal 20
+variable ny equal 20
+variable nzp equal 20
+variable nzt equal 40
+variable Lx equal v_nx*v_a
+variable Ly equal v_ny*v_a
+variable Lp equal v_nzp*v_a
+variable Lt equal v_nzt*v_a
+variable ztlo equal v_Lp+v_gap
+variable Lz equal v_Lp+v_gap+v_Lt
+variable dt equal 0.001
+variable teq equal 100.0
+variable nequil equal v_teq/v_dt
+variable tdamp equal 0.1
+variable impactvz equal 20.0
+variable nprod equal 0
+
+lattice bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region whole block 0 ${Lx} 0 ${Ly} 0 ${Lz} units box
+create_box 1 whole
+
+region projectile_region block 0 ${Lx} 0 ${Ly} 0 ${Lp} units box
+create_atoms 1 region projectile_region
+group projectile region projectile_region
+
+region target_initial_region block 0 ${Lx} 0 ${Ly} 0 ${Lt} units box
+create_atoms 1 region target_initial_region
+group target subtract all projectile
+displace_atoms target move 0.0 0.0 ${ztlo} units box
+
+mass 1 92.90638
+pair_style eam/alloy
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+
+timestep ${dt}
+thermo 1000
+thermo_style custom step time temp pe ke etotal press vol
+
+velocity all create 300.0 12345 mom yes rot no dist gaussian
+
+fix equilibration all nvt temp 300.0 300.0 ${tdamp}
+run ${nequil}
+unfix equilibration
+
+reset_timestep 0
+velocity projectile set NULL NULL ${impactvz} units box sum yes
+
+fix production all nve
+run ${nprod}

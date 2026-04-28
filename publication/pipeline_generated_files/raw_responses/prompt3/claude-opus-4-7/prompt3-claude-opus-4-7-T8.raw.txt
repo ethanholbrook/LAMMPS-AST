@@ -1,0 +1,38 @@
+units metal
+dimension 3
+boundary p p f
+atom_style atomic
+
+lattice bcc 3.3008
+region box block 0 20 0 20 0 43
+create_box 1 box
+
+region projectile block 0 20 0 20 0 20
+create_atoms 1 region projectile
+
+region target block 0 20 0 20 20.454545 40.454545
+create_atoms 1 region target
+
+mass 1 92.90638
+
+pair_style eam/fs
+pair_coeff * * ../../../potentials/prompt1.potential Nb
+
+group projectile region projectile
+group target region target
+
+velocity all create 300.0 12345 mom yes rot yes dist gaussian
+
+timestep 0.001
+
+fix 1 all nvt temp 300.0 300.0 0.1
+thermo 100
+thermo_style custom step temp pe ke etotal press
+run 100000
+unfix 1
+
+velocity projectile set 0.0 0.0 -20.0 sum yes units box
+
+fix 2 all nve
+dump 1 all custom 1000 dump.spall.lammpstrj id type x y z vx vy vz
+run 100000

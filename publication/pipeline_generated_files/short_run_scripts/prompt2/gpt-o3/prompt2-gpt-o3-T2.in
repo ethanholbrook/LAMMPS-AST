@@ -1,0 +1,19 @@
+units metal
+dimension 3
+boundary p p p
+atom_style atomic
+lattice fcc 1.0
+region box block 0 1 0 1 0 1 units lattice
+create_box 1 box
+create_atoms 1 box
+replicate 10 10 10
+mass 1 58.6934
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+pair_style eam/alloy
+pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+velocity all create 600.0 12345 mom yes rot no dist gaussian
+fix 1 all npt temp 300.0 2500.0 0.1 iso 1.01325 1.01325 1.0
+thermo 1000
+thermo_style custom step temp press pe ke etotal
+run 10
