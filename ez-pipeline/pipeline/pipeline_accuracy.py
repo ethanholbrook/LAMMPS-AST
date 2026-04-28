@@ -684,23 +684,25 @@ def compute_accuracy_metrics(accuracy_df: pd.DataFrame) -> dict[str, int]:
     parser_to_failure = total_scripts - parser_to_execution - int((accuracy_df["sanitized"] != True).sum())
 
     execution_to_accuracy = vc_get(accuracy_df["run"], True)
-    execution_to_pairstylecheck = 0
-    for row in accuracy_df["run"]:
-        if row != True and row != "not parsed":
-            if ast.literal_eval(row)[1].startswith("Last command:"):
-                execution_to_pairstylecheck += 1
 
     if "pair_run" in accuracy_df.columns:
-        execution_to_accuracy_after_pairstyle = vc_get(accuracy_df["pair_run"], True)
-        pair_df = accuracy_df[accuracy_df["pair_run"] == True].copy()
+        # Mirror the execution notebook semantics:
+        # every parsed execution failure enters the pair-style-zero stage and is
+        # recorded in pair_run as True / False / retry-error-string, while rows
+        # that never enter that stage remain "n/a".
+        pair_run = accuracy_df["pair_run"]
+        execution_to_pairstylecheck = int((pair_run != "n/a").sum())
+        execution_to_accuracy_after_pairstyle = vc_get(pair_run, True)
+        pair_df = accuracy_df[pair_run == True].copy()
     else:
+        execution_to_pairstylecheck = 0
         execution_to_accuracy_after_pairstyle = 0
         pair_df = accuracy_df.iloc[0:0].copy()
 
     execution_to_failure = (
         total_scripts
         - execution_to_accuracy
-        - execution_to_accuracy_after_pairstyle
+        - execution_to_pairstylecheck
         - parser_to_failure
     )
 

@@ -89,22 +89,50 @@ SYSTEM_PROMPT = (
 )
 
 
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.4")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.5")
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-7")
-TRIALS = int(os.getenv("LAMMPS_PIPELINE_TRIALS", "1"))
+TRIALS = int(os.getenv("LAMMPS_PIPELINE_TRIALS", "10"))
 
-
-MODELS = {
-    OPENAI_MODEL: {
+# List out models you wish to either generate or evaluate. 
+MODELS = {OPENAI_MODEL: {
         "provider": "openai",
         "display_name": OPENAI_MODEL,
-        "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
-    },
-    ANTHROPIC_MODEL: {
-        "provider": "anthropic",
-        "display_name": ANTHROPIC_MODEL,
-    },
-}
+        "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "medium"),
+    },} 
+
+# MODELS = {
+#     # OPENAI_MODEL: {
+#     #     "provider": "openai",
+#     #     "display_name": OPENAI_MODEL,
+#     #     "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
+#     # },
+#     # ANTHROPIC_MODEL: {
+#     #     "provider": "anthropic",
+#     #     "display_name": ANTHROPIC_MODEL,
+#     # },
+#     "gpt-4.1": {
+#         "provider": "openai",
+#         "display_name": "gpt-4.1",
+#     },
+#     "gpt-4o": {
+#         "provider": "openai",
+#         "display_name": "gpt-4o",
+#     },
+#     "gpt-5": {
+#         "provider": "openai",
+#         "display_name": "gpt-5",
+#         "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
+#     },
+#     "gpt-o3": {
+#         "provider": "openai",
+#         "display_name": "gpt-o3",
+#         "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
+#     },
+#     "claude-4-opus-20250514": {
+#         "provider": "anthropic",
+#         "display_name": "claude-4-opus-20250514",
+#     },
+# }
 
 
 PROMPT_MODEL_MAP = {
@@ -113,8 +141,8 @@ PROMPT_MODEL_MAP = {
 }
 
 
-GENERATED_SCRIPTS_DIR = SCRATCH_DIR / "generated_scripts"
-PIPELINE_GENERATED_FILES_DIR = SCRATCH_DIR / "pipeline_generated_files"
+GENERATED_SCRIPTS_DIR = PUBLICATION_DIR / "generated_scripts"
+PIPELINE_GENERATED_FILES_DIR = PUBLICATION_DIR / "pipeline_generated_files"
 RAW_RESPONSES_DIR = PIPELINE_GENERATED_FILES_DIR / "raw_responses"
 SANITIZED_SCRIPTS_DIR = PIPELINE_GENERATED_FILES_DIR / "sanitized_scripts"
 ASTS_DIR = PIPELINE_GENERATED_FILES_DIR / "asts"
@@ -123,13 +151,14 @@ LOGS_DIR = PIPELINE_GENERATED_FILES_DIR / "logs"
 PAIR_CHANGE_DIR = PIPELINE_GENERATED_FILES_DIR / "pair_change"
 PAIR_CHANGE_LOGS_DIR = PIPELINE_GENERATED_FILES_DIR / "pair_change_logs"
 ERRORS_DIR = PIPELINE_GENERATED_FILES_DIR / "errors"
+LAMMPS_GENERATED_FILES_DIR = PIPELINE_GENERATED_FILES_DIR / "lammps_generated_files"
 
-DATA_DIR = SCRATCH_DIR / "data"
+DATA_DIR = PIPELINE_GENERATED_FILES_DIR / "data"
 PARSING_DF_PATH = DATA_DIR / "parsing_df.pkl"
 FINAL_PAIR_DF_PATH = DATA_DIR / "final_pair_df.pkl"
 ACCURACY_DF_PATH = DATA_DIR / "accuracy_df_trees.pkl"
 
-RESULTS_DIR = SCRATCH_DIR / "results"
+RESULTS_DIR = PUBLICATION_DIR / "results"
 SUMMARY_CSV_PATH = RESULTS_DIR / "summary_table.csv"
 SUMMARY_MD_PATH = RESULTS_DIR / "summary_table.md"
 SANKEY_HTML_PATH = RESULTS_DIR / "final_sankey.html"
@@ -146,7 +175,12 @@ DEFAULT_LAMMPS_EXECUTABLE = os.getenv(
 
 MODEL_DISPLAY = {
     OPENAI_MODEL: f"OpenAI {OPENAI_MODEL}",
-    ANTHROPIC_MODEL: "Anthropic Claude Opus 4.7",
+    # ANTHROPIC_MODEL: "Anthropic Claude Opus 4.7",
+    # "gpt-4.1": "OpenAI GPT-4.1",
+    # "gpt-4o": "OpenAI GPT-4o",
+    # "gpt-5": "OpenAI GPT-5",
+    # "gpt-o3": "OpenAI o3",
+    # "claude-4-opus-20250514": "Anthropic Claude 4 Opus",
 }
 
 

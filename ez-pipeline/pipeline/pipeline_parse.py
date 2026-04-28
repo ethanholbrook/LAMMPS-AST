@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import pickle
-import re
 import sys
 
 import pandas as pd
@@ -14,20 +13,7 @@ from pipeline_common import append_stage_error, build_trial_dataframe, ensure_di
 if str(cfg.REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(cfg.REPO_ROOT))
 
-from lammps_ast import parse_to_AST  # noqa: E402
-from pipeline_sanitizer import sanitize_script
-
-
-def find_unresolved_variables(script: str) -> list[str]:
-    unresolved: set[str] = set()
-
-    for match in re.findall(r"\${([a-zA-Z_]\w*)}", script):
-        unresolved.add(f"${{{match}}}")
-
-    for match in re.findall(r"\bv_([a-zA-Z_]\w*)\b", script):
-        unresolved.add(f"v_{match}")
-
-    return sorted(unresolved)
+from lammps_ast import find_unresolved_variables, parse_to_AST, sanitize  # noqa: E402
 
 
 def parse_and_save_results() -> pd.DataFrame:
@@ -49,7 +35,7 @@ def parse_and_save_results() -> pd.DataFrame:
                     raise FileNotFoundError(f"Missing generated script: {script_path}")
 
                 source = script_path.read_text(encoding="utf-8")
-                sanitized = sanitize_script(source)
+                sanitized = sanitize(source)
 
                 sanitized_path = cfg.SANITIZED_SCRIPTS_DIR / prompt_name / model_name / script_path.name
                 sanitized_path.parent.mkdir(parents=True, exist_ok=True)

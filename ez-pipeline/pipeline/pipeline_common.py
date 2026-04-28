@@ -21,6 +21,7 @@ def ensure_directories() -> None:
         cfg.PAIR_CHANGE_DIR,
         cfg.PAIR_CHANGE_LOGS_DIR,
         cfg.ERRORS_DIR,
+        cfg.LAMMPS_GENERATED_FILES_DIR,
     ]:
         path.mkdir(parents=True, exist_ok=True)
 

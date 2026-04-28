@@ -1,7 +1,8 @@
 from __future__ import annotations
-
 import ast
+import shlex
 import re
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -10,6 +11,16 @@ import pandas as pd
 
 import pipeline_config as cfg
 from pipeline_common import append_stage_error, ensure_directories, format_counts, print_model_lines, print_sample_status, reset_stage_error_log
+
+
+LAMMPS_OUTPUT_GLOB_PATTERNS = (
+    "*.lammpstrj",
+    "*.dump",
+    "*.data",
+    "log.*",
+    "*.restart",
+    "*.restart.*",
+)
 
 
 def discover_lammps_executable() -> str:
@@ -63,18 +74,54 @@ def modify_for_short_runs() -> None:
 
 
 def run_lammps(lmp_exec: str, input_file: Path, log_file: Path) -> None:
+    screen_file = log_file.with_suffix(".screen")
+    child_cmd = (
+        f"{shlex.quote(lmp_exec)} -nonbuf -echo both "
+        f"-in {shlex.quote(str(input_file))} -log {shlex.quote(str(log_file))}"
+    )
     shell_cmd = (
         "module load lammps/20240829 >/dev/null 2>&1 && "
-        f"{lmp_exec} -in {str(input_file)!r} -log {str(log_file)!r}"
+        f"script -q -e -f -c {shlex.quote(child_cmd)} {shlex.quote(str(screen_file))}"
     )
     result = subprocess.run(
         ["bash", "-lc", shell_cmd],
         capture_output=True,
         text=True,
+        cwd=str(cfg.PIPELINE_DIR),
     )
     if result.returncode != 0:
-        err_msg = extract_lammps_error_lines(log_file=log_file, stdout=result.stdout, stderr=result.stderr)
+        err_msg = extract_lammps_error_lines(
+            log_file=log_file,
+            screen_file=screen_file,
+            stdout=result.stdout,
+            stderr=result.stderr,
+        )
         raise RuntimeError(err_msg)
+
+
+def sweep_lammps_generated_files() -> list[tuple[Path, Path]]:
+    moved_files: list[tuple[Path, Path]] = []
+    seen_sources: set[Path] = set()
+
+    for pattern in LAMMPS_OUTPUT_GLOB_PATTERNS:
+        for source_path in cfg.PIPELINE_DIR.rglob(pattern):
+            if not source_path.is_file():
+                continue
+            if source_path in seen_sources:
+                continue
+
+            seen_sources.add(source_path)
+            relative_path = source_path.relative_to(cfg.PIPELINE_DIR)
+            destination_path = cfg.LAMMPS_GENERATED_FILES_DIR / relative_path
+            destination_path.parent.mkdir(parents=True, exist_ok=True)
+
+            if destination_path.exists():
+                destination_path.unlink()
+
+            shutil.move(str(source_path), str(destination_path))
+            moved_files.append((source_path, destination_path))
+
+    return sorted(moved_files, key=lambda pair: str(pair[0]))
 
 
 def _filter_mpi_warning_lines(lines: Iterable[str]) -> list[str]:
@@ -90,23 +137,103 @@ def _filter_mpi_warning_lines(lines: Iterable[str]) -> list[str]:
     return filtered
 
 
-def extract_lammps_error_lines(log_file: Path, stdout: str, stderr: str) -> list[str]:
+def _filter_terminal_wrapper_lines(lines: Iterable[str]) -> list[str]:
+    filtered: list[str] = []
+    skip_phrases = (
+        "script started on",
+        "script done on",
+        "mpi_abort was invoked on rank",
+        "note: invoking mpi_abort causes open mpi to kill all mpi processes.",
+        "you may or may not see output from other processes",
+        "mpirun detected that one or more processes exited",
+        "primary job terminated normally, but",
+        "an error occurred in mpi_init",
+        "local abort before mpi_init completed",
+    )
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        lowered = stripped.lower()
+        if stripped.startswith("-") and len(stripped) >= 10:
+            continue
+        if any(phrase in lowered for phrase in skip_phrases):
+            continue
+        filtered.append(stripped)
+    return filtered
+
+
+def _extract_structured_lammps_error(lines: list[str]) -> list[str]:
+    for idx in range(len(lines) - 1, -1, -1):
+        line = lines[idx]
+        if line.startswith("ERROR"):
+            selected = [line]
+            if idx + 1 < len(lines) and lines[idx + 1].startswith("Last command:"):
+                selected.append(lines[idx + 1])
+            return selected
+
+    for idx in range(len(lines) - 1, -1, -1):
+        line = lines[idx]
+        if line.startswith("Last command:"):
+            start = max(0, idx - 1)
+            return lines[start : idx + 1]
+
+    return []
+
+
+def _prepare_candidate_lines(lines: Iterable[str]) -> list[str]:
+    return _filter_terminal_wrapper_lines(_filter_mpi_warning_lines(lines))
+
+
+def _extract_last_command_from_run_value(run_value: object) -> str:
+    if isinstance(run_value, list):
+        error_lines = run_value
+    elif isinstance(run_value, str):
+        try:
+            parsed_value = ast.literal_eval(run_value)
+        except (SyntaxError, ValueError):
+            parsed_value = run_value
+        error_lines = parsed_value if isinstance(parsed_value, list) else [str(parsed_value)]
+    else:
+        error_lines = [str(run_value)]
+
+    for line in error_lines:
+        if isinstance(line, str) and line.startswith("Last command:"):
+            return line
+    return ""
+
+
+def extract_lammps_error_lines(log_file: Path, screen_file: Path, stdout: str, stderr: str) -> list[str]:
+    if screen_file.exists():
+        screen_lines = _prepare_candidate_lines(screen_file.read_text(encoding="utf-8", errors="replace").splitlines())
+        selected = _extract_structured_lammps_error(screen_lines)
+        if selected:
+            return selected
+        if screen_lines:
+            return screen_lines[-2:]
+
+    stderr_lines = _prepare_candidate_lines(stderr.splitlines())
+    selected = _extract_structured_lammps_error(stderr_lines)
+    if selected:
+        return selected
+
+    stdout_lines = _prepare_candidate_lines(stdout.splitlines())
+    selected = _extract_structured_lammps_error(stdout_lines)
+    if selected:
+        return selected
+
     if log_file.exists():
-        log_lines = _filter_mpi_warning_lines(log_file.read_text(encoding="utf-8", errors="replace").splitlines())
-        error_idx = next((idx for idx, line in enumerate(log_lines) if line.startswith("ERROR")), None)
-        if error_idx is not None:
-            selected = [log_lines[error_idx]]
-            if error_idx + 1 < len(log_lines) and log_lines[error_idx + 1].startswith("Last command:"):
-                selected.append(log_lines[error_idx + 1])
+        log_lines = _prepare_candidate_lines(log_file.read_text(encoding="utf-8", errors="replace").splitlines())
+        selected = _extract_structured_lammps_error(log_lines)
+        if selected:
             return selected
         if log_lines:
             return log_lines[-2:]
 
-    stderr_lines = _filter_mpi_warning_lines(stderr.splitlines())
     if stderr_lines:
         return stderr_lines[-2:]
 
-    stdout_lines = _filter_mpi_warning_lines(stdout.splitlines())
     if stdout_lines:
         return stdout_lines[-2:]
 
@@ -186,8 +313,8 @@ def pair_style_change(run_df: pd.DataFrame, lmp_exec: str) -> pd.DataFrame:
                 )
                 run_value = df.loc[mask, "run"].iloc[0]
                 if run_value != True and run_value != "not parsed":
-                    error_lines = ast.literal_eval(run_value)
-                    if error_lines[1].startswith("Last command: pair"):
+                    last_command_line = _extract_last_command_from_run_value(run_value)
+                    if last_command_line.startswith("Last command: pair"):
                         script_name = f"{prompt_name}-{model_name}-T{trial}.in"
                         input_path = cfg.SHORT_RUN_SCRIPTS_DIR / prompt_name / model_name / script_name
                         out_path = out_dir / script_name
@@ -217,7 +344,12 @@ def run_execution_stage() -> pd.DataFrame:
     lmp_exec = discover_lammps_executable()
     run_df = do_runs(parsing_df, lmp_exec=lmp_exec)
     pair_df = pair_style_change(run_df, lmp_exec=lmp_exec)
+    moved_files = sweep_lammps_generated_files()
     pair_df.to_pickle(cfg.FINAL_PAIR_DF_PATH)
+    if moved_files:
+        print(
+            f"Swept {len(moved_files)} LAMMPS-generated files to {cfg.LAMMPS_GENERATED_FILES_DIR}."
+        )
     return pair_df
 
 
