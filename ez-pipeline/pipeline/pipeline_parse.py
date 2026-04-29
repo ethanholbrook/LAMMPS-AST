@@ -10,8 +10,8 @@ import pipeline_config as cfg
 from pipeline_common import append_stage_error, build_trial_dataframe, ensure_directories, format_counts, print_model_lines, print_sample_status, reset_stage_error_log
 
 
-if str(cfg.REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(cfg.REPO_ROOT))
+if str(cfg.EVAL_ROOT) not in sys.path:
+    sys.path.insert(0, str(cfg.EVAL_ROOT))
 
 from lammps_ast import find_unresolved_variables, parse_to_AST, sanitize  # noqa: E402
 
@@ -44,7 +44,7 @@ def parse_and_save_results() -> pd.DataFrame:
                 ast_obj, errors = parse_to_AST(sanitized, lint=True, max_errors=10)
                 if ast_obj is not None and len(errors) == 0:
                     parsed_result: object = True
-                    flag = True
+                    sanitized_flag = True
                     ast_path = cfg.ASTS_DIR / prompt_name / model_name / script_path.with_suffix(".ast.pkl").name
                     ast_path.parent.mkdir(parents=True, exist_ok=True)
                     with ast_path.open("wb") as handle:
@@ -56,24 +56,24 @@ def parse_and_save_results() -> pd.DataFrame:
                     first = errors[0] if errors else None
                     if first is not None and first.text is not None:
                         tokens = first.text.split()
-                        flag = not any(token.startswith(("v_", "$")) for token in tokens)
-                        if not flag:
+                        sanitized_flag = not any(token.startswith(("v_", "$")) for token in tokens)
+                        if not sanitized_flag:
                             unresolved = find_unresolved_variables(sanitized)
                             parsed_result = "n/a"
                             unresolved_text = ", ".join(unresolved) if unresolved else "unknown"
-                            detail = f"sanitized={flag}, parsed={parsed_result}, unresolved={unresolved_text}"
+                            detail = f"sanitized={sanitized_flag}, parsed={parsed_result}, unresolved={unresolved_text}"
                         else:
-                            detail = f"sanitized={flag}, parsed={parsed_result}"
+                            detail = f"sanitized={sanitized_flag}, parsed={parsed_result}"
                     else:
-                        flag = False
+                        sanitized_flag = False
                         parsed_result = "n/a"
                         unresolved = find_unresolved_variables(sanitized)
                         unresolved_text = ", ".join(unresolved) if unresolved else "unknown"
-                        detail = f"sanitized={flag}, parsed={parsed_result}, unresolved={unresolved_text}"
+                        detail = f"sanitized={sanitized_flag}, parsed={parsed_result}, unresolved={unresolved_text}"
                     append_stage_error("parse", prompt_name, model_name, trial, detail)
                     print_sample_status("Parse", prompt_name, model_name, trial, "FAIL", detail)
 
-                df.loc[key, "sanitized"] = flag
+                df.loc[key, "sanitized"] = sanitized_flag
                 df.loc[key, "parsed"] = parsed_result
 
     output_df = df.reset_index()
