@@ -39,28 +39,36 @@ def discover_lammps_executable() -> str:
     raise FileNotFoundError("Could not resolve a working LAMMPS executable.")
 
 
-def modify_run_lines(file_path: Path, output_path: Path, prompt_name: str) -> None:
-    lines = file_path.read_text(encoding="utf-8").splitlines(True)
-    modified_lines: list[str] = []
-
+def _reduce_run_steps(lines: list[str]) -> list[str]:
+    modified: list[str] = []
     for line in lines:
-        stripped_line = line.strip()
-        if re.match(r"^run\b", stripped_line):
+        if re.match(r"^run\b", line.strip()):
             words = line.split()
             if len(words) > 1:
                 words[1] = "10"
                 line = " ".join(words) + "\n"
+        modified.append(line)
+    return modified
 
-        if stripped_line.startswith("pair_coeff"):
+
+def _patch_pair_coeff_path(lines: list[str], prompt_name: str) -> list[str]:
+    modified: list[str] = []
+    for line in lines:
+        if line.strip().startswith("pair_coeff"):
             words = line.split()
             if len(words) > 3:
                 words[3] = str(cfg.POTENTIALS_DIR / f"{prompt_name}.potential")
                 line = " ".join(words) + "\n"
+        modified.append(line)
+    return modified
 
-        modified_lines.append(line)
 
+def modify_run_lines(file_path: Path, output_path: Path, prompt_name: str) -> None:
+    lines = file_path.read_text(encoding="utf-8").splitlines(True)
+    lines = _reduce_run_steps(lines)
+    lines = _patch_pair_coeff_path(lines, prompt_name)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text("".join(modified_lines), encoding="utf-8")
+    output_path.write_text("".join(lines), encoding="utf-8")
 
 
 def modify_for_short_runs() -> None:

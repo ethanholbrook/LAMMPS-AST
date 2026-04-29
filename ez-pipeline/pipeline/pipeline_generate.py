@@ -10,13 +10,17 @@ from pipeline_common import build_trial_dataframe, ensure_directories, format_co
 
 def extract_lammps_script(response_text: str) -> str:
     code_blocks = re.findall(r"```(?:lammps|bash|[\w]*)?\n(.*?)\n```", response_text, re.DOTALL)
+    
+    # Code Block Extraction: Fenced Code
     if code_blocks:
         return code_blocks[0].strip()
 
+    # Code Block Extraction: Delimiter-Based
     match = re.search(r"[-=]{10,}\n(.*?)\n[-=]{10,}", response_text, re.DOTALL)
     if match:
         return match.group(1).strip()
 
+    # Code Block Extraction: Line-Based Heuristics
     lines = response_text.splitlines()
     lammps_lines = []
     for line in lines:
@@ -31,6 +35,7 @@ def extract_lammps_script(response_text: str) -> str:
     if lammps_lines:
         return "\n".join(lammps_lines)
 
+    # Code Block Extraction: Fallback to Full Response
     stripped = response_text.strip()
     if stripped:
         return stripped

@@ -84,7 +84,7 @@ def run_selected_stages(
 
 
 def cli_full_pipeline() -> None:
-    parser = argparse.ArgumentParser(description="Run the full Codex scratch evaluation pipeline.")
+    parser = argparse.ArgumentParser(description="Run the full evaluation pipeline.")
     parser.add_argument("--skip-generation", action="store_true", help="Assume generated scripts already exist.")
     parser.add_argument("--force-generate", action="store_true", help="Regenerate scripts even if outputs already exist.")
     args = parser.parse_args()

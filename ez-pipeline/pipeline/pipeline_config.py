@@ -9,8 +9,7 @@ from dotenv import load_dotenv
 PIPELINE_DIR = Path(__file__).resolve().parent
 SCRATCH_DIR = PIPELINE_DIR.parent
 EVAL_ROOT = SCRATCH_DIR.parent
-REPO_ROOT = EVAL_ROOT
-PUBLICATION_DIR = REPO_ROOT / "publication"
+PUBLICATION_DIR = EVAL_ROOT / "publication"
 
 load_dotenv(SCRATCH_DIR / ".env")
 
@@ -172,17 +171,7 @@ DEFAULT_LAMMPS_EXECUTABLE = os.getenv(
     "/apps/spack/gilbreth-r9/apps/lammps/20240829-gcc-11.5.0-bsocngl/bin/lmp",
 )
 
-
-MODEL_DISPLAY = {
-    OPENAI_MODEL: f"OpenAI {OPENAI_MODEL}",
-    # ANTHROPIC_MODEL: "Anthropic Claude Opus 4.7",
-    # "gpt-4.1": "OpenAI GPT-4.1",
-    # "gpt-4o": "OpenAI GPT-4o",
-    # "gpt-5": "OpenAI GPT-5",
-    # "gpt-o3": "OpenAI o3",
-    # "claude-4-opus-20250514": "Anthropic Claude 4 Opus",
-}
-
+MODEL_DISPLAY = {name: meta["display_name"] for name, meta in MODELS.items()}
 
 STAGE_ORDER = [
     "generate",
