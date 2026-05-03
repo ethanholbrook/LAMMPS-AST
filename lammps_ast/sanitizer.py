@@ -1,7 +1,53 @@
 
 import re
 import math
+import random
 import simpleeval
+
+
+def _lammps_sign(x):
+    return 1.0 if x >= 0 else -1.0
+
+
+def _lammps_random(lo, hi, seed):
+    return random.Random(int(seed)).uniform(lo, hi)
+
+
+def _lammps_normal(mu, sigma, seed):
+    return random.Random(int(seed)).gauss(mu, sigma)
+
+
+def _lammps_ternary(condition, if_true, if_false):
+    return if_true if condition else if_false
+
+
+SIMPLE_EVAL_NAMES = {
+    "pi": math.pi,
+    "PI": math.pi,
+}
+
+
+SIMPLE_EVAL_FUNCTIONS = {
+    "sqrt": math.sqrt,
+    "exp": math.exp,
+    "ln": math.log,
+    "log": math.log10,
+    "abs": abs,
+    "sign": _lammps_sign,
+    "sin": math.sin,
+    "cos": math.cos,
+    "tan": math.tan,
+    "asin": math.asin,
+    "acos": math.acos,
+    "atan": math.atan,
+    "atan2": math.atan2,
+    "random": _lammps_random,
+    "normal": _lammps_normal,
+    "ceil": math.ceil,
+    "floor": math.floor,
+    "round": round,
+    "ternary": _lammps_ternary,
+}
 
 
 def find_unresolved_variables(script):
@@ -66,7 +112,7 @@ def parse_variable_line(line):
 def process_and_evaluate_variables(script):
     """Replaces variables (`${var}` and `v_var`) while ensuring dependencies are handled iteratively."""
     script_lines = script.splitlines()
-    var_dict, variable_definitions, processed_lines = {}, {}, []
+    var_dict, variable_definitions = {}, {}
 
     # Extract variable definitions
     for line in script_lines:
@@ -74,8 +120,6 @@ def process_and_evaluate_variables(script):
             var_name, expr = parse_variable_line(line)
             if var_name and expr:
                 variable_definitions[var_name] = expr
-        else:
-            processed_lines.append(line)
 
     # Extract dependencies between variables
     dependency_graph = {}
@@ -91,10 +135,14 @@ def process_and_evaluate_variables(script):
             # Only evaluate if all dependencies are resolved
             if dependency_graph[var_name].issubset(resolved_vars):
                 expr = re.sub(r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}', lambda m: str(var_dict.get(m.group(1) or m.group(2), f'v_{m.group(1) or m.group(2)}')), expr)
-                expr = expr.replace('^', '**').replace('sqrt(', 'math.sqrt(')
+                expr = expr.replace('^', '**')
 
                 try:
-                    result = simpleeval.simple_eval(expr, names={"pi": math.pi}, functions={"sqrt": math.sqrt,"ceil": math.ceil,"floor":math.floor,'exp':math.exp})
+                    result = simpleeval.simple_eval(
+                        expr,
+                        names=SIMPLE_EVAL_NAMES,
+                        functions=SIMPLE_EVAL_FUNCTIONS,
+                    )
                     if isinstance(result, float) and result.is_integer():
                         result = int(result)
                     var_dict[var_name] = str(result)
@@ -107,9 +155,20 @@ def process_and_evaluate_variables(script):
         if not progress_made:
             break  # Prevent infinite loops
 
-    # Replace variables in the script
+    # Replace variables in the script, preserving unresolved runtime variable lines.
     new_lines = []
-    for line in processed_lines:
+    for line in script_lines:
+        if line.startswith('variable'):
+            var_name, expr = parse_variable_line(line)
+            if var_name and expr:
+                if var_name in variable_definitions:
+                    line = re.sub(
+                        r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}',
+                        lambda m: str(var_dict.get(m.group(1) or m.group(2), f'v_{m.group(1) or m.group(2)}')),
+                        line,
+                    )
+                    new_lines.append(line)
+                continue
         line = re.sub(r'v_([a-zA-Z_]\w*)|\${([a-zA-Z_]\w*)}', lambda m: str(var_dict.get(m.group(1) or m.group(2), f'v_{m.group(1) or m.group(2)}')), line)
         new_lines.append(line)
 
@@ -122,7 +181,11 @@ def evaluate_expressions(script):
     def evaluate_token(token):
         if arithmetic_pattern.fullmatch(token):  # Check if the token is a pure expression
             try:
-                value = simpleeval.simple_eval(token.replace('^', '**'), names={"pi": math.pi}, functions={"sqrt": math.sqrt})
+                value = simpleeval.simple_eval(
+                    token.replace('^', '**'),
+                    names=SIMPLE_EVAL_NAMES,
+                    functions=SIMPLE_EVAL_FUNCTIONS,
+                )
                 if isinstance(value, float) and value.is_integer():
                     value = int(value)
                 return str(value)
@@ -149,7 +212,11 @@ def evaluate_lammps_arithmetic(script):
     def repl(match: re.Match) -> str:
         expr = match.group(1).replace("^", "**")
         try:
-            value = simpleeval.simple_eval(expr, names={"pi": math.pi}, functions={"sqrt": math.sqrt})
+            value = simpleeval.simple_eval(
+                expr,
+                names=SIMPLE_EVAL_NAMES,
+                functions=SIMPLE_EVAL_FUNCTIONS,
+            )
             if isinstance(value, float) and value.is_integer():
                 value = int(value)
             return str(value)
