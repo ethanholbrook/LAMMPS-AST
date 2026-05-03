@@ -87,28 +87,33 @@ SYSTEM_PROMPT = (
     "- Do not include explanations, metadata, or commentary. Only output the final script."
 )
 
+TRIALS = int(os.getenv("LAMMPS_PIPELINE_TRIALS", "10"))
+
+# List out models you wish to either generate or evaluate.
+# Optional per-model key:
+#   "delimiter": regex pattern used to extract the script from the raw model
+#   response, similar in spirit to specifying a delimiter in pandas readers.
+#   If omitted, generation falls back to the default generic delimiter pattern
+#   in pipeline_generate.py. If provided and extraction fails, generation will
+#   raise a clear delimiter error instead of guessing.
 
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.5")
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-7")
-TRIALS = int(os.getenv("LAMMPS_PIPELINE_TRIALS", "10"))
+# If models are added in .env file, this section wil pull them, otherwise it 
+# will default to the models listed below.
+# MODELS = {OPENAI_MODEL: {
+#         "provider": "openai",
+#         "display_name": OPENAI_MODEL,
+#         "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
+#     },
+#     ANTHROPIC_MODEL: {
+#         "provider": "anthropic",
+#         "display_name": ANTHROPIC_MODEL,
+#     },
+# } 
 
-# List out models you wish to either generate or evaluate. 
-MODELS = {OPENAI_MODEL: {
-        "provider": "openai",
-        "display_name": OPENAI_MODEL,
-        "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "medium"),
-    },} 
-
-MODELS = {
-    # OPENAI_MODEL: {
-    #     "provider": "openai",
-    #     "display_name": OPENAI_MODEL,
-    #     "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
-    # },
-    # ANTHROPIC_MODEL: {
-    #     "provider": "anthropic",
-    #     "display_name": ANTHROPIC_MODEL,
-    # },
+# Models used in publication. Edit as needed. 
+MODELS = { 
     "gpt-4.1": {
         "provider": "openai",
         "display_name": "gpt-4.1",

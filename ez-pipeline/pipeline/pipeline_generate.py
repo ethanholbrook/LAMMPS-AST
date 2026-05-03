@@ -8,7 +8,10 @@ import pipeline_config as cfg
 from pipeline_common import build_trial_dataframe, ensure_directories, format_counts, print_model_lines, print_sample_status, append_stage_error, reset_stage_error_log
 
 
-def extract_lammps_script(response_text: str) -> str:
+DEFAULT_DELIMITER_PATTERN = r"[-=]{10,}"
+
+
+def extract_lammps_script(response_text: str, delimiter: str | None = None) -> str:
     code_blocks = re.findall(r"```(?:lammps|bash|[\w]*)?\n(.*?)\n```", response_text, re.DOTALL)
     
     # Code Block Extraction: Fenced Code
@@ -16,24 +19,15 @@ def extract_lammps_script(response_text: str) -> str:
         return code_blocks[0].strip()
 
     # Code Block Extraction: Delimiter-Based
-    match = re.search(r"[-=]{10,}\n(.*?)\n[-=]{10,}", response_text, re.DOTALL)
+    delimiter_pattern = delimiter or DEFAULT_DELIMITER_PATTERN
+    match = re.search(rf"{delimiter_pattern}\n(.*?)\n{delimiter_pattern}", response_text, re.DOTALL)
     if match:
         return match.group(1).strip()
-
-    # Code Block Extraction: Line-Based Heuristics
-    lines = response_text.splitlines()
-    lammps_lines = []
-    for line in lines:
-        if re.match(
-            r"^\s*(units|atom_style|lattice|region|create|mass|pair_style|pair_coeff|"
-            r"velocity|fix|run|write_|boundary|read_data|replicate|timestep|thermo|thermo_style|"
-            r"dimension|box|neighbor|neigh_modify|minimize|dump|compute|variable|group|reset_timestep|"
-            r"create_box|create_atoms|change_box|delete_atoms|velocity)",
-            line,
-        ):
-            lammps_lines.append(line)
-    if lammps_lines:
-        return "\n".join(lammps_lines)
+    if delimiter is not None:
+        raise ValueError(
+            "Explicit delimiter extraction failed. "
+            "Provide a delimiter description/pattern that matches the model output exactly."
+        )
 
     # Code Block Extraction: Fallback to Full Response
     stripped = response_text.strip()
@@ -43,7 +37,13 @@ def extract_lammps_script(response_text: str) -> str:
     raise ValueError("No LAMMPS script found in model response.")
 
 
-def write_script_file(prompt_name: str, model_name: str, trial: int, response_text: str) -> Path:
+def write_script_file(
+    prompt_name: str,
+    model_name: str,
+    trial: int,
+    response_text: str,
+    delimiter: str | None = None,
+) -> Path:
     raw_dir = cfg.RAW_RESPONSES_DIR / prompt_name / model_name
     raw_dir.mkdir(parents=True, exist_ok=True)
     raw_path = raw_dir / f"{prompt_name}-{model_name}-T{trial}.raw.txt"
@@ -52,7 +52,7 @@ def write_script_file(prompt_name: str, model_name: str, trial: int, response_te
     output_dir = cfg.GENERATED_SCRIPTS_DIR / prompt_name / model_name
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"{prompt_name}-{model_name}-T{trial}.in"
-    output_path.write_text(extract_lammps_script(response_text) + "\n", encoding="utf-8")
+    output_path.write_text(extract_lammps_script(response_text, delimiter=delimiter) + "\n", encoding="utf-8")
     return output_path
 
 
@@ -127,7 +127,16 @@ def generate_scripts(force: bool = False) -> list[Path]:
                     else:
                         raise ValueError(f"Unsupported provider: {model_meta['provider']}")
 
-                    written_paths.append(write_script_file(prompt_name, model_name, trial, response_text))
+                    delimiter = model_meta.get("delimiter")
+                    written_paths.append(
+                        write_script_file(
+                            prompt_name,
+                            model_name,
+                            trial,
+                            response_text,
+                            delimiter=delimiter,
+                        )
+                    )
                     print_sample_status("Generate", prompt_name, model_name, trial, "OK")
                 except Exception as exc:
                     append_stage_error("generate", prompt_name, model_name, trial, str(exc))
