@@ -43,6 +43,7 @@ def parse_and_save_results() -> pd.DataFrame:
 
                 ast_obj, errors = parse_to_AST(sanitized, lint=True, max_errors=10)
                 if ast_obj is not None and len(errors) == 0:
+                    # Parse success: sanitization succeeded and an AST was produced.
                     parsed_result: object = True
                     sanitized_flag = True
                     ast_path = cfg.ASTS_DIR / prompt_name / model_name / script_path.with_suffix(".ast.pkl").name
@@ -52,24 +53,18 @@ def parse_and_save_results() -> pd.DataFrame:
                     df.loc[key, "ast_path"] = str(ast_path)
                     print_sample_status("Parse", prompt_name, model_name, trial, "OK")
                 else:
-                    parsed_result = json.dumps([err.__dict__ for err in errors])
-                    first = errors[0] if errors else None
-                    if first is not None and first.text is not None:
-                        tokens = first.text.split()
-                        sanitized_flag = not any(token.startswith(("v_", "$")) for token in tokens)
-                        if not sanitized_flag:
-                            unresolved = find_unresolved_variables(sanitized)
-                            parsed_result = "n/a"
-                            unresolved_text = ", ".join(unresolved) if unresolved else "unknown"
-                            detail = f"sanitized={sanitized_flag}, parsed={parsed_result}, unresolved={unresolved_text}"
-                        else:
-                            detail = f"sanitized={sanitized_flag}, parsed={parsed_result}"
-                    else:
+                    unresolved = find_unresolved_variables(sanitized)
+                    if unresolved:
+                        # Sanitization failure: unresolved placeholders remain, so parsing is not meaningful.
                         sanitized_flag = False
                         parsed_result = "n/a"
-                        unresolved = find_unresolved_variables(sanitized)
-                        unresolved_text = ", ".join(unresolved) if unresolved else "unknown"
+                        unresolved_text = ", ".join(unresolved)
                         detail = f"sanitized={sanitized_flag}, parsed={parsed_result}, unresolved={unresolved_text}"
+                    else:
+                        # Parse failure after successful sanitization: record parser errors for debugging.
+                        sanitized_flag = True
+                        parsed_result = json.dumps([err.__dict__ for err in errors])
+                        detail = f"sanitized={sanitized_flag}, parsed={parsed_result}"
                     append_stage_error("parse", prompt_name, model_name, trial, detail)
                     print_sample_status("Parse", prompt_name, model_name, trial, "FAIL", detail)
 
