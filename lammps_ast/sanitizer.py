@@ -149,8 +149,13 @@ def process_and_evaluate_variables(script):
                     resolved_vars.add(var_name)
                     del variable_definitions[var_name]
                     progress_made = True
-                except (NameError, SyntaxError, TypeError, simpleeval.NameNotDefined):
-                    continue  # Skip if an undefined variable is encountered
+                except (
+                    NameError,
+                    SyntaxError,
+                    TypeError,
+                    simpleeval.InvalidExpression,
+                ):
+                    continue  # Preserve runtime/non-simple expressions instead of failing sanitization
 
         if not progress_made:
             break  # Prevent infinite loops
