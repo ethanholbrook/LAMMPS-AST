@@ -99,39 +99,53 @@ MODELS = {OPENAI_MODEL: {
         "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "medium"),
     },} 
 
-# MODELS = {
-#     # OPENAI_MODEL: {
-#     #     "provider": "openai",
-#     #     "display_name": OPENAI_MODEL,
-#     #     "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
-#     # },
-#     # ANTHROPIC_MODEL: {
-#     #     "provider": "anthropic",
-#     #     "display_name": ANTHROPIC_MODEL,
-#     # },
-#     "gpt-4.1": {
-#         "provider": "openai",
-#         "display_name": "gpt-4.1",
-#     },
-#     "gpt-4o": {
-#         "provider": "openai",
-#         "display_name": "gpt-4o",
-#     },
-#     "gpt-5": {
-#         "provider": "openai",
-#         "display_name": "gpt-5",
-#         "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
-#     },
-#     "gpt-o3": {
-#         "provider": "openai",
-#         "display_name": "gpt-o3",
-#         "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
-#     },
-#     "claude-4-opus-20250514": {
-#         "provider": "anthropic",
-#         "display_name": "claude-4-opus-20250514",
-#     },
-# }
+MODELS = {
+    # OPENAI_MODEL: {
+    #     "provider": "openai",
+    #     "display_name": OPENAI_MODEL,
+    #     "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
+    # },
+    # ANTHROPIC_MODEL: {
+    #     "provider": "anthropic",
+    #     "display_name": ANTHROPIC_MODEL,
+    # },
+    "gpt-4.1": {
+        "provider": "openai",
+        "display_name": "gpt-4.1",
+    },
+    "gpt-4o": {
+        "provider": "openai",
+        "display_name": "gpt-4o",
+    },
+    "gpt-5": {
+        "provider": "openai",
+        "display_name": "gpt-5",
+        "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "medium"),
+    },
+    "gpt-o3": {
+        "provider": "openai",
+        "display_name": "gpt-o3",
+        "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "medium"),
+    },
+    "claude-4-opus-20250514": {
+        "provider": "anthropic",
+        "display_name": "claude-4-opus-20250514",
+    },
+        "gpt-5.4": {
+        "provider": "openai",
+        "display_name": "gpt-5.4",
+        "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "high"),
+    },
+    "claude-opus-4-7": {
+        "provider": "anthropic",
+        "display_name": "claude-opus-4-7",
+    },
+        "gpt-5.5": {
+        "provider": "openai",
+        "display_name": "gpt-5.5",
+        "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "medium"),
+    },
+}
 
 
 PROMPT_MODEL_MAP = {
