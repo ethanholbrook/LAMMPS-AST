@@ -1,7 +1,0 @@
-parse errors
-prompt2	gpt-5.4	T0	sanitized=True, parsed=[{"line": 18, "column": 29, "token": "Token('VAR_NAME', 'cTemp')", "text": "compute cPress all pressure cTemp"}]
-prompt3	gpt-5.4	T0	sanitized=True, parsed=[{"line": 31, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 units box"}]
-prompt3	gpt-5.4	T2	sanitized=False, parsed=n/a, unresolved=v_Lp, v_Lx, v_Ly, v_aNb, v_massNb, v_zthi, v_ztlo
-prompt3	gpt-5.4	T4	sanitized=True, parsed=[{"line": 18, "column": 14, "token": "Token('ID', 'id')", "text": "group target id 1:v_ntarget"}, {"line": 31, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 units box"}]
-prompt3	gpt-5.4	T6	sanitized=True, parsed=[{"line": 21, "column": 28, "token": "Token('VAR_NAME', '/com')", "text": "compute ttarget target temp/com"}, {"line": 22, "column": 36, "token": "Token('VAR_NAME', '/com')", "text": "compute tprojectile projectile temp/com"}, {"line": 30, "column": 37, "token": "Token('VELOCITY_VALUE', 'c_ttarget ')", "text": "thermo_style custom step time atoms c_ttarget c_tprojectile pe ke etotal lx ly lz"}]
-prompt3	gpt-5.4	T9	sanitized=True, parsed=[{"line": 30, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 20 units box"}]
