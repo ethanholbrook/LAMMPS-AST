@@ -570,6 +570,7 @@ def accuracy_from_ast_row_prompt3(
     box_bounds = None
     target_bounds = None
     projectile_bounds = None
+    block_regions: dict[str, tuple[float, float, float, float, float, float]] = {}
     if "region" in cmd_map:
         for region in cmd_map["region"]:
             try:
@@ -583,6 +584,7 @@ def accuracy_from_ast_row_prompt3(
                         float(region[7]),
                         float(region[8]),
                     )
+                    block_regions[name] = bounds
                     if name == "box":
                         box_bounds = bounds
                     elif name == "target":
@@ -591,6 +593,15 @@ def accuracy_from_ast_row_prompt3(
                         projectile_bounds = bounds
             except Exception:
                 issues.append("size_parse")
+
+    if box_bounds is None and "create_box" in cmd_map and len(cmd_map["create_box"]) >= 1:
+        try:
+            create_box_cmd = cmd_map["create_box"][0]
+            if len(create_box_cmd) >= 3:
+                create_box_region = create_box_cmd[2].lower()
+                box_bounds = block_regions.get(create_box_region)
+        except Exception:
+            issues.append("box_region_parse")
 
     if box_bounds is None:
         issues.append("box_region_missing")
