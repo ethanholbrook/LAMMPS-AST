@@ -27,8 +27,13 @@ def discover_lammps_executable() -> str:
     if cfg.DEFAULT_LAMMPS_EXECUTABLE and Path(cfg.DEFAULT_LAMMPS_EXECUTABLE).exists():
         return cfg.DEFAULT_LAMMPS_EXECUTABLE
 
+    if not cfg.USE_LAMMPS_MODULE_LOAD:
+        raise FileNotFoundError(
+            "DEFAULT_LAMMPS_EXECUTABLE does not exist and USE_LAMMPS_MODULE_LOAD is disabled."
+        )
+
     result = subprocess.run(
-        ["bash", "-lc", "module load lammps/20240829 >/dev/null 2>&1 && which lmp"],
+        ["bash", "-lc", f"{cfg.LAMMPS_MODULE_LOAD} && which lmp"],
         capture_output=True,
         text=True,
         check=False,
@@ -87,10 +92,13 @@ def run_lammps(lmp_exec: str, input_file: Path, log_file: Path) -> None:
         f"{shlex.quote(lmp_exec)} -nonbuf -echo both "
         f"-in {shlex.quote(str(input_file))} -log {shlex.quote(str(log_file))}"
     )
-    shell_cmd = (
-        "module load lammps/20240829 >/dev/null 2>&1 && "
-        f"script -q -e -f -c {shlex.quote(child_cmd)} {shlex.quote(str(screen_file))}"
-    )
+    if cfg.USE_LAMMPS_MODULE_LOAD:
+        shell_cmd = (
+            f"{cfg.LAMMPS_MODULE_LOAD} && "
+            f"script -q -e -f -c {shlex.quote(child_cmd)} {shlex.quote(str(screen_file))}"
+        )
+    else:
+        shell_cmd = f"script -q -e -f -c {shlex.quote(child_cmd)} {shlex.quote(str(screen_file))}"
     result = subprocess.run(
         ["bash", "-lc", shell_cmd],
         capture_output=True,

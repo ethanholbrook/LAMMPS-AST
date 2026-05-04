@@ -190,6 +190,13 @@ DEFAULT_LAMMPS_EXECUTABLE = os.getenv(
     "/apps/spack/gilbreth-r9/apps/lammps/20240829-gcc-11.5.0-bsocngl/bin/lmp",
 )
 
+# Execution environment for LAMMPS runs.
+# Set `USE_LAMMPS_MODULE_LOAD=0` to skip the module wrapper on local machines.
+# `LAMMPS_MODULE_LOAD` is used by the pipeline when it needs to resolve or run
+# the executable through the cluster module system rather than a direct path.
+USE_LAMMPS_MODULE_LOAD = os.getenv("USE_LAMMPS_MODULE_LOAD", "1").strip().lower() not in {"0", "false", "no"}
+LAMMPS_MODULE_LOAD = os.getenv("LAMMPS_MODULE_LOAD", "module load lammps/20240829 >/dev/null 2>&1")
+
 MODEL_DISPLAY = {name: meta["display_name"] for name, meta in MODELS.items()}
 
 STAGE_ORDER = [
