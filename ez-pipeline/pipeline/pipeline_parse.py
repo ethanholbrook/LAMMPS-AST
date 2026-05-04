@@ -41,7 +41,7 @@ def parse_and_save_results() -> pd.DataFrame:
                 sanitized_path.parent.mkdir(parents=True, exist_ok=True)
                 sanitized_path.write_text(sanitized, encoding="utf-8")
 
-                ast_obj, errors = parse_to_AST(sanitized, lint=True, max_errors=10)
+                ast_obj, errors = parse_to_AST(sanitized, lint=True, max_errors=10, lammps_version=cfg.LAMMPS_GRAMMAR_VERSION)
                 if ast_obj is not None and len(errors) == 0:
                     # Parse success: sanitization succeeded and an AST was produced.
                     parsed_result: object = True

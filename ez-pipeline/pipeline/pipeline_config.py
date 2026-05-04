@@ -185,6 +185,8 @@ SANKEY_PNG_PATH = RESULTS_DIR / "final_sankey.png"
 POTENTIALS_DIR = PUBLICATION_DIR / "potentials"
 
 
+LAMMPS_GRAMMAR_VERSION = os.getenv("LAMMPS_GRAMMAR_VERSION") or None
+
 DEFAULT_LAMMPS_EXECUTABLE = os.getenv(
     "LAMMPS_EXECUTABLE",
     "/apps/spack/gilbreth-r9/apps/lammps/20240829-gcc-11.5.0-bsocngl/bin/lmp",
