@@ -294,7 +294,7 @@ def modify_pair_style(file_path: Path, output_path: Path) -> None:
         if stripped_line.startswith("pair"):
             if stripped_line.startswith("pair_style"):
                 line = "\n"
-            else:
+            else: # we are using aluminum mass in every case - this is a quick test just for running - will be unphysical
                 line = "pair_style zero 10.0\npair_coeff * *\nmass 1 27\n"
         modified_lines.append(line)
 
