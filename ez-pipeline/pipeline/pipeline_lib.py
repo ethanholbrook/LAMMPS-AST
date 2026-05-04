@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import argparse
-
 import pipeline_config as cfg
 from pipeline_accuracy import (
     accuracy_from_ast_row_prompt1,
@@ -81,16 +79,3 @@ def run_selected_stages(
     for stage in normalized:
         print(f"\n=== Running stage: {stage} ===")
         stage_functions[stage]()
-
-
-def cli_full_pipeline() -> None:
-    parser = argparse.ArgumentParser(description="Run the full evaluation pipeline.")
-    parser.add_argument("--skip-generation", action="store_true", help="Assume generated scripts already exist.")
-    parser.add_argument("--force-generate", action="store_true", help="Regenerate scripts even if outputs already exist.")
-    args = parser.parse_args()
-
-    run_selected_stages(
-        ["all"],
-        skip_generation=args.skip_generation,
-        force_generate=args.force_generate,
-    )
