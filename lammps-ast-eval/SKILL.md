@@ -50,10 +50,13 @@ mkdir -p tests/<script_stem>_eval
 ```bash
 python <skill_dir>/scripts/sanitize_and_parse.py tests/<script_stem>_eval/<script_stem>.in \
   --session-log tests/<script_stem>_eval/<script_stem>.session.jsonl \
-  --prompt-file tests/<script_stem>_eval/<script_stem>_prompt.txt
+  --prompt-file tests/<script_stem>_eval/<script_stem>_prompt.txt \
+  --lammps-version 20240829
 ```
 
 The `--prompt-file` flag is optional but recommended when a method description was provided — it embeds the description in the session log and report for full provenance. Omit it if no description is available.
+
+The `--lammps-version` flag selects which LAMMPS grammar to parse against (e.g. `20240829`). Omit it to use the latest available. To list installed versions: `python -c "from lammps_ast import list_grammar_versions; print(list_grammar_versions())"`. The resolved version is recorded in the output JSON as `lammps_version`.
 
 The output is JSON. Read the fields:
 - `sanitized: false, sanitize_error: ...` → normalization raised an exception; see `sanitize_error`

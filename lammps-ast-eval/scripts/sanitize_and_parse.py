@@ -73,13 +73,20 @@ def ensure_dependency():
     sys.exit(2)
 
 
-def run(script_path: Path, output_dir: Optional[Path], session_log: Optional[Path]):
+def run(script_path: Path, output_dir: Optional[Path], session_log: Optional[Path], lammps_version: Optional[str] = None):
     from lammps_ast.sanitizer import sanitize
     from lammps_ast.parser import parse_to_AST
     try:
-        from lammps_ast import find_unresolved_variables as _find_unresolved
+        from lammps_ast import find_unresolved_variables as _find_unresolved, list_grammar_versions as _list_versions
     except ImportError:
         _find_unresolved = None
+        _list_versions = None
+
+    # Resolve None → actual version string so logs record what was used
+    if lammps_version is None and _list_versions is not None:
+        versions = _list_versions()
+        if versions:
+            lammps_version = versions[-1]
 
     raw = script_path.read_text()
 
@@ -106,7 +113,7 @@ def run(script_path: Path, output_dir: Optional[Path], session_log: Optional[Pat
     # lint=True is available in newer versions of lammps-ast; fall back gracefully.
     # The older PyPI version always prints to stdout on failure, so we suppress it.
     try:
-        tree, errors = parse_to_AST(sanitized_text, lint=True)
+        tree, errors = parse_to_AST(sanitized_text, lint=True, lammps_version=lammps_version)
         if errors and not isinstance(errors, list):
             errors = [errors]
     except TypeError:
@@ -144,7 +151,8 @@ def run(script_path: Path, output_dir: Optional[Path], session_log: Optional[Pat
         "sanitized": len(unresolved) == 0,
         "parsed": parsed,
         "errors": error_list,
-        "sanitized_script": sanitized_text
+        "sanitized_script": sanitized_text,
+        "lammps_version": lammps_version,
     }
     if unresolved:
         result["unresolved_variables"] = unresolved
@@ -188,6 +196,8 @@ def main():
                         help="Text file containing the method description / user prompt")
     parser.add_argument("--prompt", type=str, default=None,
                         help="Method description / user prompt (inline string)")
+    parser.add_argument("--lammps-version", type=str, default=None,
+                        help="LAMMPS grammar version to use (e.g. '20240829'). Defaults to latest available.")
     args = parser.parse_args()
 
     if not args.script.exists():
@@ -207,7 +217,7 @@ def main():
             log_prompt(args.session_log, prompt_text)
 
     ensure_dependency()
-    run(args.script, args.output_dir, args.session_log)
+    run(args.script, args.output_dir, args.session_log, lammps_version=args.lammps_version)
 
 
 if __name__ == "__main__":
