@@ -1,29 +1,55 @@
-import os
-from lark import Lark
-from colorama import Fore, Style
-from .transformer import RemoveNewlines
-from .error_handler import missing_arg_error_handler
-from importlib.resources import files
-
-#####################
-# Get the current working directory (useful in Jupyter/IPython)
-current_dir = os.getcwd()
-
-# Move to the correct path assuming we are inside LAMMPS-AST or a subdirectory
-repo_root = os.path.abspath(os.path.join(current_dir, ".."))  # Go one level up
-
-# Ensure the grammar file exists before loading
-try: 
-    GRAMMAR_PATH = files("lammps_ast.grammar").joinpath("lammps_grammar.lark")
-    with open(GRAMMAR_PATH, "r") as f:
-        LAMMPS_GRAMMAR = f.read()
-except FileNotFoundError:
-    raise FileNotFoundError(f"Critical error: Grammar file not found at {GRAMMAR_PATH}")
-
-# Initialize the parser using the built-in grammar
-parser = Lark(LAMMPS_GRAMMAR, parser="lalr", keep_all_tokens=True)
+from __future__ import annotations
 
 from dataclasses import dataclass
+from importlib.resources import files
+
+from colorama import Fore, Style
+from lark import Lark
+
+from .transformer import RemoveNewlines
+from .error_handler import missing_arg_error_handler
+
+
+_GRAMMAR_DIR = files("lammps_ast.grammar")
+_parser_cache: dict[str, Lark] = {}
+
+
+def list_grammar_versions() -> list[str]:
+    """Return sorted list of available LAMMPS grammar versions."""
+    versions = []
+    for entry in _GRAMMAR_DIR.iterdir():
+        name = entry.name
+        if name.startswith("lammps_grammar_") and name.endswith(".lark"):
+            versions.append(name[len("lammps_grammar_"):-len(".lark")])
+    return sorted(versions)
+
+
+def _get_parser(version: str | None) -> Lark:
+    if version is None:
+        available = list_grammar_versions()
+        if not available:
+            raise FileNotFoundError("No grammar files found in lammps_ast.grammar.")
+        version = available[-1]
+
+    if version in _parser_cache:
+        return _parser_cache[version]
+
+    grammar_file = f"lammps_grammar_{version}.lark"
+    try:
+        path = _GRAMMAR_DIR.joinpath(grammar_file)
+        with open(path) as f:
+            grammar_text = f.read()
+    except FileNotFoundError:
+        available = list_grammar_versions()
+        raise FileNotFoundError(
+            f"Grammar version '{version}' not found. "
+            f"Available versions: {available}"
+        )
+
+    lark_parser = Lark(grammar_text, parser="lalr", keep_all_tokens=True)
+    _parser_cache[version] = lark_parser
+    return lark_parser
+
 
 @dataclass
 class ParseErrorInfo:
@@ -31,9 +57,15 @@ class ParseErrorInfo:
     column: int
     token: str
     text: str
-    
-def parse_to_AST(sanitized_script, *, lint=False, max_errors=10, verbose=False):
+
+
+def parse_to_AST(sanitized_script, *, lint=False, max_errors=10, verbose=False, lammps_version=None):
     """
+    Parse a sanitized LAMMPS script and return (tree, errors).
+
+    lammps_version: LAMMPS release date string (e.g. '20240829'). Defaults to
+                    the latest available grammar. Pass None to use the latest.
+
     If lint=False (default):
         returns (parse_tree, None) on success
         returns (None, err) on failure
@@ -43,7 +75,8 @@ def parse_to_AST(sanitized_script, *, lint=False, max_errors=10, verbose=False):
         - parse_tree_or_None is a valid tree only if parsing eventually succeeds
         - errors contains up to max_errors items
     """
-    # --- Parser-only mode (your current behavior, but optionally quiet) ---
+    parser = _get_parser(lammps_version)
+
     if not lint:
         try:
             parse_tree = parser.parse(sanitized_script)
@@ -57,15 +90,14 @@ def parse_to_AST(sanitized_script, *, lint=False, max_errors=10, verbose=False):
                     Previous token: {e.token_history}""")
             return None, e
 
-    # --- Linter mode (collect multiple errors) ---
-    lines = sanitized_script.splitlines(True)  # preserve newlines
+    lines = sanitized_script.splitlines(True)
     errors = []
 
     for _ in range(max_errors):
         try:
             parse_tree = parser.parse("".join(lines))
             parse_tree = RemoveNewlines().transform(parse_tree)
-            return parse_tree, errors  # success with collected errors (possibly empty)
+            return parse_tree, errors
         except Exception as e:
             line_idx = e.line - 1
             bad_line = lines[line_idx].rstrip("\n") if 0 <= line_idx < len(lines) else ""
@@ -85,18 +117,12 @@ def parse_to_AST(sanitized_script, *, lint=False, max_errors=10, verbose=False):
                     Previous token: {getattr(e,'token_history',None)}
                     Line: {bad_line}""")
 
-            # Prevent infinite loops / out-of-range
             if not (0 <= line_idx < len(lines)):
                 break
 
-            # Neutralize the offending line but keep line numbering
-            newline = "\n" if lines[line_idx].endswith("\n") else ""
             lines[line_idx] = "\n" if lines[line_idx].endswith("\n") else ""
 
-            # If we keep hitting the same spot, stop
             if len(errors) >= 2 and errors[-1].line == errors[-2].line and errors[-1].column == errors[-2].column:
                 break
 
     return None, errors
-
-
