@@ -33,6 +33,8 @@ All pipeline scripts are in the `scripts/` directory of this skill. Reference th
 
 ## Workflow: single script
 
+**Pipeline order is mandatory.** The skill must run Step 1, then Step 2, then Step 3, in that order. Steps may be iterated (re-run after fixes), but no step may be skipped. The only permitted exception is Step 2 when no LAMMPS executable can be found after exhausting the lookup procedure described in that step — in which case the skill must record the unavailability in the session log and proceed to Step 3, not silently omit the stage.
+
 **Before running the pipeline, make a reasonable attempt at a correct script — get the physics and structure right, but don't agonize over exact syntax. The pipeline will catch precise errors; trust it to do that work.**
 
 Before running any pipeline step:
@@ -68,12 +70,7 @@ The output is JSON. Read the fields:
 
 ### Step 2 — Execute (requires LAMMPS)
 
-Only attempt this step if one of the following is true:
-- The user explicitly asked to run or execute the script.
-- The script passed Step 1 and the user's goal is to get it working end-to-end.
-- `LAMMPS_EXE` is already set in the environment.
-
-Do **not** ask the user for an executable path unprompted. If Step 1 already revealed errors, report those and stop — execution testing adds nothing until the script parses cleanly. If Step 1 passed and execution testing would be useful, note at the end of your response that it is available if the user provides a LAMMPS executable path.
+This step is **mandatory** once Step 1 passes (`parsed: true`). Do not skip it. Step 1 must pass first — if it has not, return to Step 1 and iterate; do not jump ahead.
 
 To locate the executable:
 ```bash
@@ -87,6 +84,8 @@ module spider lammps          # list available LAMMPS versions
 module load lammps/<version>  # load the chosen version
 which lmp                     # should now resolve
 ```
+
+Before running, check whether the script references an external potential file (look for a `pair_coeff` line with a file path). If one is found, ask the user to provide it and place it in the eval directory (`tests/<script_stem>_eval/`) before proceeding — LAMMPS is run from that directory, so relative paths in the script resolve there.
 
 Once the executable is found or the module is loaded, run with:
 ```bash
