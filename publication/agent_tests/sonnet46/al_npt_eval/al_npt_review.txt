@@ -1,0 +1,13 @@
+Domain review against method description:
+
+- Units: metal units correct. Timestep 0.001 ps (1 fs) is appropriate for Al. Pressure 1.01325 bar = 1 atm in metal units. Temperature 300 K. All consistent with description.
+- Geometry: region block 0 5 0 5 0 5 in FCC lattice units gives 5x5x5 supercell = 125 unit cells x 4 atoms = 500 atoms. Matches description.
+- Boundary conditions: p p p (fully periodic) is correct for bulk NPT equilibration.
+- Potential: eam/alloy pair_style with prompt1.potential (Al) correctly implements the Ercolessi-Adams EAM potential referenced in the description.
+- Thermostat: Nose-Hoover via fix npt, Tdamp=0.1 ps. Matches described 0.1 ps relaxation timescale.
+- Barostat: Nose-Hoover via fix npt, Pdamp=1.0 ps. Matches described 1 ps relaxation timescale.
+- Pressure coupling: iso (isotropic). Description says "1 atm" without specifying anisotropic — isotropic is appropriate for FCC bulk equilibration.
+- Run length: 500000 steps x 0.001 ps/step = 500 ps. Matches description.
+- Lattice parameter: 4.05 Angstrom is close to the experimental Al value (4.049 Angstrom) and is consistent with Ercolessi-Adams parameterization.
+
+No issues found. The script faithfully implements the described NPT equilibration.

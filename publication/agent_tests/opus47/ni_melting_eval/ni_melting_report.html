@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAMMPS Eval Report — ni_melting.in</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+    font-size: 14px; line-height: 1.65; color: #1a1a1a; background: #fff;
+    max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 0;
+}
+.page-header { margin-bottom: 1.5rem; }
+h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.2rem; }
+h2 {
+    font-size: 1rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #6b7280;
+    margin: 2rem 0 0.85rem;
+    border-bottom: 1px solid #e5e7eb; padding-bottom: 0.3rem;
+}
+h3 { font-size: 0.95rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+h4 { font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; }
+.meta { color: #6b7280; font-size: 0.8rem; margin-bottom: 0.5rem; }
+.meta span { margin-right: 1.75rem; }
+.outcome { font-size: 0.95rem; font-weight: 600; margin: 0.75rem 0 0; }
+.badge {
+    display: inline-block; padding: 0.15rem 0.55rem;
+    border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+    vertical-align: middle; white-space: nowrap;
+}
+.badge.pass  { background: #dcfce7; color: #166534; }
+.badge.fail  { background: #fee2e2; color: #991b1b; }
+.badge.warn  { background: #fef9c3; color: #854d0e; }
+.badge.skip  { background: #f3f4f6; color: #6b7280; }
+/* Three-column layout */
+.columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+}
+.col-left { min-width: 0; }
+.col-mid { min-width: 0; }
+.col-right { min-width: 0; }
+.script-panel {
+    position: sticky;
+    top: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+.script-panel-header {
+    padding: 0.5rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #6b7280;
+}
+.script-panel pre {
+    margin: 0; border: none; border-radius: 0;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    font-size: 0.75rem;
+}
+.review-panel {
+    border: 1px solid #e5e7eb; border-radius: 0.5rem;
+    margin-top: 1rem; overflow: hidden;
+}
+.review-panel-header {
+    padding: 0.5rem 1rem;
+    background: #fffbeb;
+    border-bottom: 1px solid #fde68a;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #92400e;
+}
+.review-panel-body {
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem; line-height: 1.6; color: #374151;
+    white-space: pre-wrap; word-break: break-word;
+}
+.round {
+    border: 1px solid #e5e7eb; border-radius: 0.5rem;
+    padding: 1rem 1.25rem; margin-bottom: 1rem;
+}
+.round-header {
+    display: flex; align-items: center; gap: 0.65rem;
+    margin-bottom: 0.85rem; flex-wrap: wrap;
+}
+.round-header h3 { margin: 0; flex-shrink: 0; }
+.stage {
+    margin-bottom: 0.75rem; padding: 0.6rem 0.85rem;
+    border-left: 3px solid #e5e7eb; border-radius: 0 0.25rem 0.25rem 0;
+    background: #fafafa;
+}
+.stage:last-child { margin-bottom: 0; }
+.stage.pass { border-color: #86efac; background: #f0fdf4; }
+.stage.fail { border-color: #fca5a5; background: #fff1f2; }
+.stage.skip { border-color: #d1d5db; }
+.stage p { margin-top: 0.35rem; font-size: 0.85rem; color: #374151; }
+ul { margin: 0.4rem 0 0.2rem 1.1rem; }
+li { margin-bottom: 0.25rem; font-size: 0.85rem; }
+code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 0.82em; background: #f1f5f9;
+    padding: 0.1em 0.4em; border-radius: 3px;
+}
+pre {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 0.78rem; background: #f8fafc; color: #1e293b;
+    border: 1px solid #e2e8f0; border-radius: 0.375rem;
+    padding: 1rem 1.1rem; overflow-x: auto;
+    white-space: pre-wrap; word-break: break-word;
+    line-height: 1.5;
+}
+pre.log { font-size: 0.72rem; color: #64748b; margin-top: 0.5rem; }
+.diff { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.75rem;
+         border: 1px solid #e2e8f0; border-radius: 0.375rem; overflow-x: auto;
+         margin-top: 0; line-height: 1.5; }
+.changes {
+    border: 1px solid #bfdbfe; border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem; margin-bottom: 1rem; background: #eff6ff;
+}
+.changes-header {
+    display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.5rem;
+}
+.changes-header h3 { margin: 0; color: #1d4ed8; font-size: 0.875rem; }
+.diff table { border-collapse: collapse; width: 100%; }
+.diff td { padding: 0 0.6rem; white-space: pre; vertical-align: top; }
+.diff td:first-child { color: #9ca3af; user-select: none; text-align: right;
+                       border-right: 1px solid #e2e8f0; min-width: 2.5rem; padding-right: 0.4rem; }
+.diff tr.add td { background: #f0fdf4; }
+.diff tr.add td:last-child { color: #166534; }
+.diff tr.rem td { background: #fff1f2; }
+.diff tr.rem td:last-child { color: #991b1b; }
+.diff tr.hdr td { background: #f1f5f9; color: #64748b; font-style: italic; }
+blockquote {
+    border-left: 3px solid #d1d5db; margin: 0.5rem 0;
+    padding: 0.4rem 1rem; color: #374151;
+    font-size: 0.875rem; background: #f9fafb;
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+footer {
+    margin-top: 3rem; padding: 1rem 0;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.72rem; color: #9ca3af;
+}
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+    .columns { grid-template-columns: 1fr; }
+    .script-panel { position: static; }
+    .script-panel pre { max-height: 60vh; }
+}
+@media print {
+    body { padding: 1rem; max-width: 100%; }
+    .columns { grid-template-columns: 1fr 1fr 1fr; }
+    .script-panel { position: static; }
+    .round { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <h1>LAMMPS Script Evaluation Report</h1>
+  <div class="meta">
+    <span><strong>Script:</strong> ni_melting.in</span>
+    <span><strong>Date:</strong> 2026-05-05 09:17</span>
+    <span><strong>Repair rounds:</strong> 1</span>
+  </div>
+  <p class="outcome">Final outcome: <span class="badge pass">✓ Passed</span></p>
+  
+<h2>Method Description</h2>
+<blockquote>We characterized the melting of a bulk Ni sample using molecular dynamics with LAMMPS. The initial condition was obtained by replicating the Ni unit cell 10 times in each direction. Initial velocities were drawn from the Maxwell-Boltzmann distribution at 600 K. The system was heated from 300 K to 2500 K continuously, at a rate of 10 K per ps under isothermal and isobaric conditions at 1 atm. Interactions were described using an embedded atom model developed by Mishin et al. in 1999 [1] obtained from OpenKIM.org. [1] EAM potential (LAMMPS cubic hermite tabulation) for Ni developed by Mishin et al. (1999) v005. OpenKIM; 2018. doi:10.25950/a88dfc37.</blockquote>
+</div>
+<div class="columns">
+  <div class="col-left">
+    <h2>Evaluation History</h2>
+    <div class="round">
+<div class="round-header">
+<h3>Round 1</h3>
+<span class="badge pass">Parse ✓</span>
+<span class="badge pass">Execute ✓</span>
+<span style="font-size:0.75rem;color:#9ca3af;margin-left:auto">09:17:47</span>
+</div>
+<div class="stage pass">
+<h4>Normalization &amp; Parse <span class="badge pass">✓ Passed</span></h4>
+<p>Script parsed successfully.</p>
+</div>
+<div class="stage pass">
+<h4>Execution <span class="badge pass">✓ Passed</span></h4>
+<p>Script ran successfully (10-step run).</p>
+</div>
+</div>
+  </div>
+  <div class="col-mid">
+    <div class="script-panel">
+  <div class="script-panel-header">Final Script (Normalized)</div>
+  <pre>units metal
+atom_style atomic
+boundary p p p
+lattice fcc 3.52
+region box block 0 1 0 1 0 1
+create_box 1 box
+create_atoms 1 box
+replicate 10 10 10
+mass 1 58.6934
+pair_style eam/alloy
+pair_coeff * * Ni_Mishin_1999.eam.alloy Ni
+velocity all create 600 482793 mom yes rot yes dist gaussian
+timestep 0.001
+fix 1 all npt temp 300 2500 0.1 iso 1 1 1
+thermo 1000
+thermo_style custom step time temp press vol pe ke etotal density
+run 220000</pre>
+</div>
+  </div>
+  <div class="col-right">
+    <div class="review-panel">
+  <div class="review-panel-header">Domain Review</div>
+  <div class="review-panel-body">Domain review against the method description:
+
+[NOTE] Initial-velocity temperature mismatch is intrinsic to the prompt: velocities are seeded at 600 K while the NPT thermostat is ramped from 300 K to 2500 K. The script reproduces this exactly. The thermostat will rapidly damp the kinetic temperature toward 300 K within a few T-damp times (0.1 ps), so the practical effect is small, but the discrepancy was carried through verbatim from the description.
+
+[NOTE] Units and quantities are consistent with metal units: lattice parameter 3.52 A (FCC Ni), mass 58.6934 g/mol, pressure 1.0 bar (1 atm = 1.01325 bar; 0.3% off, acceptable), timestep 0.001 ps = 1 fs.
+
+[NOTE] Heating schedule: 300 K -&gt; 2500 K at 10 K/ps gives 220 ps total. With dt = 0.001 ps that is exactly 220,000 steps, matching the 'run 220000' line.
+
+[NOTE] Geometry: lattice fcc with region 0-1 + replicate 10 10 10 yields 10x10x10 conventional FCC cells = 4000 atoms (4 atoms/cell), matching 'replicating the Ni unit cell 10 times in each direction'. Periodic boundaries on all faces are correct for a bulk sample.
+
+[NOTE] Potential: the Mishin 1999 Ni EAM file shipped as prompt2.potential is in setfl format ('1 Ni' header line), so pair_style eam/alloy with one element label 'Ni' is correct. The OpenKIM 'cubic hermite tabulation' refers to the same setfl-format file used here.
+
+[NOTE] NPT damping constants (Tdamp = 0.1 ps, Pdamp = 1.0 ps) are physically reasonable for metal units.
+
+No physical correctness warnings. The script faithfully reproduces the described protocol.</div>
+</div>
+  </div>
+</div>
+<footer>
+  Generated by <strong>lammps-ast-eval</strong> &middot;
+  <a href="https://arxiv.org/abs/2603.20630">Holbrook, Verduzco &amp; Strachan, arXiv:2603.20630</a>
+</footer>
+</body>
+</html>

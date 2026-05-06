@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAMMPS Eval Report — nb_spall.in</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+    font-size: 14px; line-height: 1.65; color: #1a1a1a; background: #fff;
+    max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 0;
+}
+.page-header { margin-bottom: 1.5rem; }
+h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.2rem; }
+h2 {
+    font-size: 1rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #6b7280;
+    margin: 2rem 0 0.85rem;
+    border-bottom: 1px solid #e5e7eb; padding-bottom: 0.3rem;
+}
+h3 { font-size: 0.95rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+h4 { font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; }
+.meta { color: #6b7280; font-size: 0.8rem; margin-bottom: 0.5rem; }
+.meta span { margin-right: 1.75rem; }
+.outcome { font-size: 0.95rem; font-weight: 600; margin: 0.75rem 0 0; }
+.badge {
+    display: inline-block; padding: 0.15rem 0.55rem;
+    border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+    vertical-align: middle; white-space: nowrap;
+}
+.badge.pass  { background: #dcfce7; color: #166534; }
+.badge.fail  { background: #fee2e2; color: #991b1b; }
+.badge.warn  { background: #fef9c3; color: #854d0e; }
+.badge.skip  { background: #f3f4f6; color: #6b7280; }
+/* Three-column layout */
+.columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+}
+.col-left { min-width: 0; }
+.col-mid { min-width: 0; }
+.col-right { min-width: 0; }
+.script-panel {
+    position: sticky;
+    top: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+.script-panel-header {
+    padding: 0.5rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #6b7280;
+}
+.script-panel pre {
+    margin: 0; border: none; border-radius: 0;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    font-size: 0.75rem;
+}
+.review-panel {
+    border: 1px solid #e5e7eb; border-radius: 0.5rem;
+    margin-top: 1rem; overflow: hidden;
+}
+.review-panel-header {
+    padding: 0.5rem 1rem;
+    background: #fffbeb;
+    border-bottom: 1px solid #fde68a;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #92400e;
+}
+.review-panel-body {
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem; line-height: 1.6; color: #374151;
+    white-space: pre-wrap; word-break: break-word;
+}
+.round {
+    border: 1px solid #e5e7eb; border-radius: 0.5rem;
+    padding: 1rem 1.25rem; margin-bottom: 1rem;
+}
+.round-header {
+    display: flex; align-items: center; gap: 0.65rem;
+    margin-bottom: 0.85rem; flex-wrap: wrap;
+}
+.round-header h3 { margin: 0; flex-shrink: 0; }
+.stage {
+    margin-bottom: 0.75rem; padding: 0.6rem 0.85rem;
+    border-left: 3px solid #e5e7eb; border-radius: 0 0.25rem 0.25rem 0;
+    background: #fafafa;
+}
+.stage:last-child { margin-bottom: 0; }
+.stage.pass { border-color: #86efac; background: #f0fdf4; }
+.stage.fail { border-color: #fca5a5; background: #fff1f2; }
+.stage.skip { border-color: #d1d5db; }
+.stage p { margin-top: 0.35rem; font-size: 0.85rem; color: #374151; }
+ul { margin: 0.4rem 0 0.2rem 1.1rem; }
+li { margin-bottom: 0.25rem; font-size: 0.85rem; }
+code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 0.82em; background: #f1f5f9;
+    padding: 0.1em 0.4em; border-radius: 3px;
+}
+pre {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 0.78rem; background: #f8fafc; color: #1e293b;
+    border: 1px solid #e2e8f0; border-radius: 0.375rem;
+    padding: 1rem 1.1rem; overflow-x: auto;
+    white-space: pre-wrap; word-break: break-word;
+    line-height: 1.5;
+}
+pre.log { font-size: 0.72rem; color: #64748b; margin-top: 0.5rem; }
+.diff { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.75rem;
+         border: 1px solid #e2e8f0; border-radius: 0.375rem; overflow-x: auto;
+         margin-top: 0; line-height: 1.5; }
+.changes {
+    border: 1px solid #bfdbfe; border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem; margin-bottom: 1rem; background: #eff6ff;
+}
+.changes-header {
+    display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.5rem;
+}
+.changes-header h3 { margin: 0; color: #1d4ed8; font-size: 0.875rem; }
+.diff table { border-collapse: collapse; width: 100%; }
+.diff td { padding: 0 0.6rem; white-space: pre; vertical-align: top; }
+.diff td:first-child { color: #9ca3af; user-select: none; text-align: right;
+                       border-right: 1px solid #e2e8f0; min-width: 2.5rem; padding-right: 0.4rem; }
+.diff tr.add td { background: #f0fdf4; }
+.diff tr.add td:last-child { color: #166534; }
+.diff tr.rem td { background: #fff1f2; }
+.diff tr.rem td:last-child { color: #991b1b; }
+.diff tr.hdr td { background: #f1f5f9; color: #64748b; font-style: italic; }
+blockquote {
+    border-left: 3px solid #d1d5db; margin: 0.5rem 0;
+    padding: 0.4rem 1rem; color: #374151;
+    font-size: 0.875rem; background: #f9fafb;
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+footer {
+    margin-top: 3rem; padding: 1rem 0;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.72rem; color: #9ca3af;
+}
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+    .columns { grid-template-columns: 1fr; }
+    .script-panel { position: static; }
+    .script-panel pre { max-height: 60vh; }
+}
+@media print {
+    body { padding: 1rem; max-width: 100%; }
+    .columns { grid-template-columns: 1fr 1fr 1fr; }
+    .script-panel { position: static; }
+    .round { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <h1>LAMMPS Script Evaluation Report</h1>
+  <div class="meta">
+    <span><strong>Script:</strong> nb_spall.in</span>
+    <span><strong>Date:</strong> 2026-05-06 15:53</span>
+    <span><strong>Repair rounds:</strong> 1</span>
+  </div>
+  <p class="outcome">Final outcome: <span class="badge pass">✓ Passed</span></p>
+  
+<h2>Method Description</h2>
+<blockquote>We simulate spall failure on Nb single crystals using high-velocity impact simulations using molecular dynamics (MD) with the LAMMPS code. We simulate the impact of a projectile on a target with a relative velocity of 2 km/s. The projectile is obtained by replicating the Nb BCC unit cell 20 times along the [100], [010], and [001]; the target is longer along the shock direction and is obtained by replicating the BCC unit cell 20 times along [100] and [010] and 40 times along [001]. We apply periodic boundary conditions along the directions normal to the impact direction, [001], and free boundaries along [001]. A gap of 1.5 nm initially separates the target and projectile. The system is equilibrated at 300 K for 100 ps using isothermal, isochoric MD. An impact velocity of 2 km/s is added to the thermal velocities to all the atoms in the projectile along [001] in the direction of the target. Adiabatic MD is used to simulate the impact and subsequent expansion. All atomic interactions are described using an EAM potential developed by Fellinger et al. [1] and downloaded from OpenKIM [2]. [1] Fellinger MR, Park H, Wilkins JW. Force-matched embedded-atom method potential for niobium. Physical Review B. 2010Apr;81(14):144119. doi:10.1103/PhysRevB.81.144119 [2] https://doi.org/10.25950/befb2eea.</blockquote>
+</div>
+<div class="columns">
+  <div class="col-left">
+    <h2>Evaluation History</h2>
+    <div class="round">
+<div class="round-header">
+<h3>Round 1</h3>
+<span class="badge pass">Parse ✓</span>
+<span class="badge pass">Execute ✓</span>
+<span style="font-size:0.75rem;color:#9ca3af;margin-left:auto">15:53:50</span>
+</div>
+<div class="stage pass">
+<h4>Normalization &amp; Parse <span class="badge pass">✓ Passed</span></h4>
+<p>Script parsed successfully.</p>
+</div>
+<div class="stage pass">
+<h4>Execution <span class="badge pass">✓ Passed</span></h4>
+<p>Script ran successfully (10-step run).</p>
+</div>
+</div>
+  </div>
+  <div class="col-mid">
+    <div class="script-panel">
+  <div class="script-panel-header">Final Script (Normalized)</div>
+  <pre>units metal
+atom_style atomic
+boundary p p s
+lattice bcc 3.3008
+region simbox block 0 66.016 0 66.016 0 213.048
+create_box 1 simbox
+region proj_reg block 0 66.016 0 66.016 0 66.016
+region targ_reg block 0 66.016 0 66.016 81.016 213.048
+create_atoms 1 region proj_reg
+create_atoms 1 region targ_reg
+group projectile region proj_reg
+group target region targ_reg
+mass 1 92.906
+pair_style eam/alloy
+pair_coeff * * prompt3.potential Nb
+timestep 0.001
+thermo 1000
+thermo_style custom step temp pe ke etotal press vol
+velocity all create 300 12345 mom yes rot yes
+fix equil all nvt temp 300 300 0.1
+dump equil all custom 10000 dump.equil.lammpstrj id type x y z vx vy vz
+run 100000
+unfix equil
+undump equil
+velocity projectile set NULL NULL 20 sum yes
+fix impact all nve
+dump spall all custom 1000 dump.spall.lammpstrj id type x y z vx vy vz
+run 50000</pre>
+</div>
+  </div>
+  <div class="col-right">
+    <div class="review-panel">
+  <div class="review-panel-header">Domain Review</div>
+  <div class="review-panel-body">Domain review for nb_spall.in against the provided method description.
+
+Units and velocity: Metal units are used throughout. The impact velocity of 2 km/s is correctly converted to 20 Å/ps (1 Å/ps = 100 m/s). The timestep of 0.001 ps (1 fs) is standard for Nb EAM simulations. Temperature in K and thermostat damping of 0.1 ps are both physically reasonable.
+
+Geometry: The projectile is 20x20x20 BCC unit cells (66.016 x 66.016 x 66.016 Å) and the target is 20x20x40 cells (66.016 x 66.016 x 132.032 Å), matching the description. The projectile is placed at z = 0 to 66.016 Å and the target region begins at z = 81.016 Å (66.016 + 15 Å gap).
+[NOTE] The requested gap of 1.5 nm (15 Å) is set between region boundaries, not atom surfaces. Because 15 Å is not a multiple of the Nb lattice parameter (3.3008 Å), the actual closest inter-surface atom distance is approximately 16.5 Å (~1.65 nm). This is a minor discrepancy inherent to lattice-aligned region boundaries; the physics is not materially affected.
+
+Boundary conditions: boundary p p s (periodic in x and y, shrink-wrap in z) correctly implements the described setup: periodic normal to the shock direction, free along [001].
+[NOTE] Shrink-wrap in z means the box z-extent adjusts to atom positions during NVT equilibration, making it not strictly isochoric. For solid Nb at 300 K, surface relaxation is negligible, so this has no practical effect on the equilibration.
+
+Potential: eam/alloy with prompt3.potential for Nb is correct. The potential file header confirms it is the Fellinger et al. Phys. Rev. B 81, 144119 (2010) force-matched EAM for niobium in DYNAMO setfl (eam/alloy) format, consistent with the OpenKIM reference in the description.
+
+Equilibration: NVT at 300 K for 100,000 steps x 0.001 ps = 100 ps, matching the description. Thermostat damping of 0.1 ps is appropriate for metal EAM.
+
+Impact velocity: velocity projectile set NULL NULL 20.0 sum yes correctly adds 20 Å/ps in the +z direction (toward the target) to existing thermal velocities of the projectile atoms only, consistent with the description.
+
+Impact run: NVE (adiabatic) with no thermostat or barostat, consistent with "adiabatic MD".
+[NOTE] The impact simulation is run for 50,000 steps (50 ps). The method description does not specify a post-impact run duration; 50 ps may capture initial shock propagation and spallation, but full spall and fragment separation can require 100+ ps depending on sample size.</div>
+</div>
+  </div>
+</div>
+<footer>
+  Generated by <strong>lammps-ast-eval</strong> &middot;
+  <a href="https://arxiv.org/abs/2603.20630">Holbrook, Verduzco &amp; Strachan, arXiv:2603.20630</a>
+</footer>
+</body>
+</html>

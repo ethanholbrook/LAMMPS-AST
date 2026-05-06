@@ -22,3 +22,7 @@ pip-wheel-metadata/
 # Testing
 examiner.ipynb
 tests/
+
+# macOS
+.DS_Store
+**/.DS_Store

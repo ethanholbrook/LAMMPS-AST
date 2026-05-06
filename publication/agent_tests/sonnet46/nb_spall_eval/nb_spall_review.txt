@@ -1,0 +1,18 @@
+Domain review for nb_spall.in against the provided method description.
+
+Units and velocity: Metal units are used throughout. The impact velocity of 2 km/s is correctly converted to 20 Å/ps (1 Å/ps = 100 m/s). The timestep of 0.001 ps (1 fs) is standard for Nb EAM simulations. Temperature in K and thermostat damping of 0.1 ps are both physically reasonable.
+
+Geometry: The projectile is 20x20x20 BCC unit cells (66.016 x 66.016 x 66.016 Å) and the target is 20x20x40 cells (66.016 x 66.016 x 132.032 Å), matching the description. The projectile is placed at z = 0 to 66.016 Å and the target region begins at z = 81.016 Å (66.016 + 15 Å gap).
+[NOTE] The requested gap of 1.5 nm (15 Å) is set between region boundaries, not atom surfaces. Because 15 Å is not a multiple of the Nb lattice parameter (3.3008 Å), the actual closest inter-surface atom distance is approximately 16.5 Å (~1.65 nm). This is a minor discrepancy inherent to lattice-aligned region boundaries; the physics is not materially affected.
+
+Boundary conditions: boundary p p s (periodic in x and y, shrink-wrap in z) correctly implements the described setup: periodic normal to the shock direction, free along [001].
+[NOTE] Shrink-wrap in z means the box z-extent adjusts to atom positions during NVT equilibration, making it not strictly isochoric. For solid Nb at 300 K, surface relaxation is negligible, so this has no practical effect on the equilibration.
+
+Potential: eam/alloy with prompt3.potential for Nb is correct. The potential file header confirms it is the Fellinger et al. Phys. Rev. B 81, 144119 (2010) force-matched EAM for niobium in DYNAMO setfl (eam/alloy) format, consistent with the OpenKIM reference in the description.
+
+Equilibration: NVT at 300 K for 100,000 steps x 0.001 ps = 100 ps, matching the description. Thermostat damping of 0.1 ps is appropriate for metal EAM.
+
+Impact velocity: velocity projectile set NULL NULL 20.0 sum yes correctly adds 20 Å/ps in the +z direction (toward the target) to existing thermal velocities of the projectile atoms only, consistent with the description.
+
+Impact run: NVE (adiabatic) with no thermostat or barostat, consistent with "adiabatic MD".
+[NOTE] The impact simulation is run for 50,000 steps (50 ps). The method description does not specify a post-impact run duration; 50 ps may capture initial shock propagation and spallation, but full spall and fragment separation can require 100+ ps depending on sample size.

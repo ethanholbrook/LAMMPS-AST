@@ -1,0 +1,177 @@
+LAMMPS (22 Jul 2025)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread.
+  using 1 OpenMP thread(s) per MPI task
+# Nb BCC spall simulation
+# Projectile (20x20x20 cells) impacts target (20x20x40 cells) at 2 km/s along [001]
+# Fellinger et al. EAM potential (Phys. Rev. B 81, 144119, 2010) from OpenKIM
+
+units metal
+atom_style atomic
+boundary p p s
+
+# Nb BCC lattice parameter for Fellinger potential (Angstroms)
+variable a equal 3.3008
+# Gap between projectile and target surfaces (1.5 nm = 15 Angstroms)
+variable gap equal 15.0
+
+# Derived box dimensions
+variable lx equal 20*${a}
+variable lx equal 20*3.3008
+variable ly equal 20*${a}
+variable ly equal 20*3.3008
+variable proj_lz equal 20*${a}
+variable proj_lz equal 20*3.3008
+variable targ_lz equal 40*${a}
+variable targ_lz equal 40*3.3008
+variable targ_zlo equal ${proj_lz}+${gap}
+variable targ_zlo equal 66.016+${gap}
+variable targ_zlo equal 66.016+15
+variable targ_zhi equal ${proj_lz}+${gap}+${targ_lz}
+variable targ_zhi equal 66.016+${gap}+${targ_lz}
+variable targ_zhi equal 66.016+15+${targ_lz}
+variable targ_zhi equal 66.016+15+132.032
+
+lattice bcc ${a}
+lattice bcc 3.3008
+Lattice spacing in x,y,z = 3.3008 3.3008 3.3008
+
+region simbox block 0 ${lx} 0 ${ly} 0 ${targ_zhi}
+region simbox block 0 66.016 0 ${ly} 0 ${targ_zhi}
+region simbox block 0 66.016 0 66.016 0 ${targ_zhi}
+region simbox block 0 66.016 0 66.016 0 213.048
+create_box 1 simbox
+Created orthogonal box = (0 0 0) to (217.90561 217.90561 703.22884)
+  1 by 1 by 1 MPI processor grid
+
+# Projectile: z = 0 to proj_lz
+region proj_reg block 0 ${lx} 0 ${ly} 0 ${proj_lz}
+region proj_reg block 0 66.016 0 ${ly} 0 ${proj_lz}
+region proj_reg block 0 66.016 0 66.016 0 ${proj_lz}
+region proj_reg block 0 66.016 0 66.016 0 66.016
+# Target: z = targ_zlo to targ_zhi (gap separates from projectile)
+region targ_reg block 0 ${lx} 0 ${ly} ${targ_zlo} ${targ_zhi}
+region targ_reg block 0 66.016 0 ${ly} ${targ_zlo} ${targ_zhi}
+region targ_reg block 0 66.016 0 66.016 ${targ_zlo} ${targ_zhi}
+region targ_reg block 0 66.016 0 66.016 81.016 ${targ_zhi}
+region targ_reg block 0 66.016 0 66.016 81.016 213.048
+
+create_atoms 1 region proj_reg
+Created 588259 atoms
+  using lattice units in orthogonal box = (0 0 -0.070322884) to (217.90561 217.90561 703.29916)
+  create_atoms CPU = 0.030 seconds
+create_atoms 1 region targ_reg
+Created 1167540 atoms
+  using lattice units in orthogonal box = (0 0 -0.070322884) to (217.90561 217.90561 703.29916)
+  create_atoms CPU = 0.057 seconds
+
+group projectile region proj_reg
+588259 atoms in group projectile
+group target region targ_reg
+1167540 atoms in group target
+
+mass 1 92.906
+
+pair_style eam/alloy
+pair_coeff * * prompt3.potential Nb
+
+timestep 0.001
+
+thermo 1000
+thermo_style custom step temp pe ke etotal press vol
+
+# --- Equilibration: NVT at 300 K for 100 ps ---
+velocity all create 300.0 12345 mom yes rot yes
+
+fix equil all nvt temp 300.0 300.0 0.1
+
+dump equil all custom 10000 dump.equil.lammpstrj id type x y z vx vy vz
+
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 65 65 209
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+WARNING: A per-atom density exceeded rhomax of EAM potential table - a linear extrapolation to the energy was made (src/MANYBODY/pair_eam.cpp:335)
+Per MPI rank memory allocation (min/avg/max) = 602 | 602 | 602 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press          Volume    
+         0   300           -420313.42      68086.411     -352227.01      151776.14      33390469     
+        10   34813.462     -9796223.3      7901078.9     -1895144.4      1106857.7      33416154     
+Loop time of 6.4168 on 1 procs for 10 steps with 1755799 atoms
+
+Performance: 0.135 ns/day, 178.244 hours/ns, 1.558 timesteps/s, 2.736 Matom-step/s
+97.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 4.6135     | 4.6135     | 4.6135     |   0.0 | 71.90
+Neigh   | 1.5296     | 1.5296     | 1.5296     |   0.0 | 23.84
+Comm    | 0.057976   | 0.057976   | 0.057976   |   0.0 |  0.90
+Output  | 0.0016527  | 0.0016527  | 0.0016527  |   0.0 |  0.03
+Modify  | 0.17935    | 0.17935    | 0.17935    |   0.0 |  2.80
+Other   |            | 0.03477    |            |       |  0.54
+
+Nlocal:     1.7558e+06 ave  1.7558e+06 max  1.7558e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:         274872 ave      274872 max      274872 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    5.72362e+07 ave 5.72362e+07 max 5.72362e+07 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 57236159
+Ave neighs/atom = 32.598355
+Neighbor list builds = 2
+Dangerous builds = 0
+
+unfix equil
+undump equil
+
+# --- Impact: add 2 km/s (= 20 Ang/ps) to projectile along +z ---
+velocity projectile set NULL NULL 20.0 sum yes
+
+# Adiabatic (NVE) impact and spall simulation
+fix impact all nve
+
+dump spall all custom 1000 dump.spall.lammpstrj id type x y z vx vy vz
+
+run 10
+WARNING: A per-atom density exceeded rhomax of EAM potential table - a linear extrapolation to the energy was made (src/MANYBODY/pair_eam.cpp:335)
+Per MPI rank memory allocation (min/avg/max) = 603.6 | 603.6 | 603.6 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press          Volume    
+        10   89203.039     -9796223.3      20245049       10448826       1500303.8      33441055     
+        20   82504.99      -8313300.3      18724896       10411595       1622862.1      33628605     
+Loop time of 7.68571 on 1 procs for 10 steps with 1755799 atoms
+
+Performance: 0.112 ns/day, 213.492 hours/ns, 1.301 timesteps/s, 2.284 Matom-step/s
+98.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.0712     | 5.0712     | 5.0712     |   0.0 | 65.98
+Neigh   | 2.4119     | 2.4119     | 2.4119     |   0.0 | 31.38
+Comm    | 0.065556   | 0.065556   | 0.065556   |   0.0 |  0.85
+Output  | 0.0017629  | 0.0017629  | 0.0017629  |   0.0 |  0.02
+Modify  | 0.095417   | 0.095417   | 0.095417   |   0.0 |  1.24
+Other   |            | 0.03988    |            |       |  0.52
+
+Nlocal:     1.7558e+06 ave  1.7558e+06 max  1.7558e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:         267862 ave      267862 max      267862 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    5.70958e+07 ave 5.70958e+07 max 5.70958e+07 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 57095781
+Ave neighs/atom = 32.518404
+Neighbor list builds = 3
+Dangerous builds = 0
+Total wall time: 0:00:18
