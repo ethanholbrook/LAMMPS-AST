@@ -18,3 +18,7 @@ venv/
 
 # Other metadata
 pip-wheel-metadata/
+
+# Testing
+examiner.ipynb
+tests/

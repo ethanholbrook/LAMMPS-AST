@@ -3,3 +3,4 @@ anthropic
 pandas
 plotly
 kaleido
+python-dotenv
