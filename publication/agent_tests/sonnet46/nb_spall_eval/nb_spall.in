@@ -1,0 +1,68 @@
+# Nb BCC spall simulation
+# Projectile (20x20x20 cells) impacts target (20x20x40 cells) at 2 km/s along [001]
+# Fellinger et al. EAM potential (Phys. Rev. B 81, 144119, 2010) from OpenKIM
+
+units metal
+atom_style atomic
+boundary p p s
+
+# Nb BCC lattice parameter for Fellinger potential (Angstroms)
+variable a equal 3.3008
+# Gap between projectile and target surfaces (1.5 nm = 15 Angstroms)
+variable gap equal 15.0
+
+# Derived box dimensions
+variable lx equal 20*${a}
+variable ly equal 20*${a}
+variable proj_lz equal 20*${a}
+variable targ_lz equal 40*${a}
+variable targ_zlo equal ${proj_lz}+${gap}
+variable targ_zhi equal ${proj_lz}+${gap}+${targ_lz}
+
+lattice bcc ${a}
+
+region simbox block 0 ${lx} 0 ${ly} 0 ${targ_zhi}
+create_box 1 simbox
+
+# Projectile: z = 0 to proj_lz
+region proj_reg block 0 ${lx} 0 ${ly} 0 ${proj_lz}
+# Target: z = targ_zlo to targ_zhi (gap separates from projectile)
+region targ_reg block 0 ${lx} 0 ${ly} ${targ_zlo} ${targ_zhi}
+
+create_atoms 1 region proj_reg
+create_atoms 1 region targ_reg
+
+group projectile region proj_reg
+group target region targ_reg
+
+mass 1 92.906
+
+pair_style eam/alloy
+pair_coeff * * prompt3.potential Nb
+
+timestep 0.001
+
+thermo 1000
+thermo_style custom step temp pe ke etotal press vol
+
+# --- Equilibration: NVT at 300 K for 100 ps ---
+velocity all create 300.0 12345 mom yes rot yes
+
+fix equil all nvt temp 300.0 300.0 0.1
+
+dump equil all custom 10000 dump.equil.lammpstrj id type x y z vx vy vz
+
+run 100000
+
+unfix equil
+undump equil
+
+# --- Impact: add 2 km/s (= 20 Ang/ps) to projectile along +z ---
+velocity projectile set NULL NULL 20.0 sum yes
+
+# Adiabatic (NVE) impact and spall simulation
+fix impact all nve
+
+dump spall all custom 1000 dump.spall.lammpstrj id type x y z vx vy vz
+
+run 50000

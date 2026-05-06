@@ -1,0 +1,149 @@
+LAMMPS (22 Jul 2025)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread.
+  using 1 OpenMP thread(s) per MPI task
+# Spall failure of Nb single crystal under 2 km/s impact
+# EAM (Fellinger et al., PRB 2010), metal units
+
+units           metal
+atom_style      atomic
+boundary        p p s
+
+# Lattice parameter for BCC Nb (Fellinger potential)
+variable        a       equal 3.3079
+variable        gap     equal 15.0          # 1.5 nm gap, in Angstroms
+variable        gap_lat equal ${gap}/${a}   # gap in lattice units
+variable        gap_lat equal 15/${a}   
+variable        gap_lat equal 15/3.3079   
+
+lattice         bcc ${a} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+lattice         bcc 3.3079 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+Lattice spacing in x,y,z = 3.3079 3.3079 3.3079
+
+# Simulation box: x,y = 20 lattice units (periodic);
+# z extended with vacuum so free surfaces don't poke out during shock
+region          simbox block 0 20 0 20 -10 80 units lattice
+create_box      1 simbox
+Created orthogonal box = (0 0 -33.079) to (66.158 66.158 264.632)
+  1 by 1 by 1 MPI processor grid
+
+# Target: 20 x 20 x 40 BCC cells along [001]
+region          rtarget block 0 20 0 20 0 40 units lattice
+create_atoms    1 region rtarget
+Created 32400 atoms
+  using lattice units in orthogonal box = (0 0 -33.108771) to (66.158 66.158 264.66177)
+  create_atoms CPU = 0.001 seconds
+
+# Projectile: 20 x 20 x 20 BCC cells, separated from target by gap (1.5 nm)
+variable        pzlo equal 40+${gap_lat}
+variable        pzlo equal 40+4.53459899029596
+variable        pzhi equal ${pzlo}+20
+variable        pzhi equal 44.534598990296+20
+region          rproj block 0 20 0 20 ${pzlo} ${pzhi} units lattice
+region          rproj block 0 20 0 20 44.534598990296 ${pzhi} units lattice
+region          rproj block 0 20 0 20 44.534598990296 64.534598990296 units lattice
+create_atoms    1 region rproj
+Created 16000 atoms
+  using lattice units in orthogonal box = (0 0 -33.108771) to (66.158 66.158 264.66177)
+  create_atoms CPU = 0.001 seconds
+
+mass            1 92.90638
+
+group           target region rtarget
+32400 atoms in group target
+group           proj   region rproj
+16000 atoms in group proj
+
+pair_style      eam/alloy
+pair_coeff      * * prompt3.potential Nb
+
+# ---- Equilibration: NVT at 300 K for 100 ps (dt = 1 fs) ----
+velocity        all create 300.0 12345 mom yes rot yes dist gaussian
+
+timestep        0.001
+fix             nvt_eq all nvt temp 300.0 300.0 0.1
+thermo          1000
+thermo_style    custom step temp pe ke etotal press
+run 10
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 6.75
+  ghost atom cutoff = 6.75
+  binsize = 3.375, bins = 20 20 89
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press     
+         0   300           -340505.13      1876.8185     -338628.31     -2895.2421    
+        10   281.87127     -340391.51      1763.4041     -338628.1      -2202.193     
+Loop time of 0.124636 on 1 procs for 10 steps with 48400 atoms
+
+Performance: 6.932 ns/day, 3.462 hours/ns, 80.233 timesteps/s, 3.883 Matom-step/s
+98.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.11845    | 0.11845    | 0.11845    |   0.0 | 95.04
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00097837 | 0.00097837 | 0.00097837 |   0.0 |  0.78
+Output  | 5.2167e-05 | 5.2167e-05 | 5.2167e-05 |   0.0 |  0.04
+Modify  | 0.0045136  | 0.0045136  | 0.0045136  |   0.0 |  3.62
+Other   |            | 0.0006425  |            |       |  0.52
+
+Nlocal:          48400 ave       48400 max       48400 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24285 ave       24285 max       24285 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:      1.512e+06 ave   1.512e+06 max   1.512e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1512000
+Ave neighs/atom = 31.239669
+Neighbor list builds = 0
+Dangerous builds = 0
+unfix           nvt_eq
+
+# ---- Apply impact velocity: 2 km/s = 20 Angstrom/ps in -z toward target ----
+velocity        proj set 0.0 0.0 -20.0 sum yes units box
+
+# ---- Adiabatic impact: NVE ----
+fix             nve_imp all nve
+thermo          100
+thermo_style    custom step temp pe ke etotal press
+run 10
+Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press     
+        10   5204.2267     -340391.51      32557.963     -307833.54      32997.263    
+        20   5155.9815     -340089.62      32256.139     -307833.48      34751.6      
+Loop time of 0.146521 on 1 procs for 10 steps with 48400 atoms
+
+Performance: 5.897 ns/day, 4.070 hours/ns, 68.250 timesteps/s, 3.303 Matom-step/s
+98.1% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.14232    | 0.14232    | 0.14232    |   0.0 | 97.13
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00097012 | 0.00097012 | 0.00097012 |   0.0 |  0.66
+Output  | 5.1375e-05 | 5.1375e-05 | 5.1375e-05 |   0.0 |  0.04
+Modify  | 0.0025774  | 0.0025774  | 0.0025774  |   0.0 |  1.76
+Other   |            | 0.0006052  |            |       |  0.41
+
+Nlocal:          48400 ave       48400 max       48400 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          24285 ave       24285 max       24285 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:      1.512e+06 ave   1.512e+06 max   1.512e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1512000
+Ave neighs/atom = 31.239669
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:00

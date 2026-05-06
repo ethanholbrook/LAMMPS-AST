@@ -18,3 +18,7 @@ venv/
 
 # Other metadata
 pip-wheel-metadata/
+
+# macOS
+.DS_Store
+**/.DS_Store
