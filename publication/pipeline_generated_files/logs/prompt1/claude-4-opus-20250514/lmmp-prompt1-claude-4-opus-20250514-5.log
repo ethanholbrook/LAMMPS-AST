@@ -21,7 +21,7 @@ mass 1 26.9815
 
 # Potential
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 # Miscellaneous
 timestep 0.001
@@ -48,20 +48,20 @@ Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
    Step          Temp          Press          PotEng         KinEng         TotEng    
          0   300           -8008.0096     -1679.6369      19.350244     -1660.2867    
         10   258.69217     -6849.4429     -1676.985       16.685855     -1660.2991    
-Loop time of 0.00327988 on 1 procs for 10 steps with 500 atoms
+Loop time of 0.00314835 on 1 procs for 10 steps with 500 atoms
 
-Performance: 263.425 ns/day, 0.091 hours/ns, 3048.896 timesteps/s, 1.524 Matom-step/s
-98.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 274.429 ns/day, 0.087 hours/ns, 3176.267 timesteps/s, 1.588 Matom-step/s
+99.0% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.0030286  | 0.0030286  | 0.0030286  |   0.0 | 92.34
+Pair    | 0.0029141  | 0.0029141  | 0.0029141  |   0.0 | 92.56
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 5.8693e-05 | 5.8693e-05 | 5.8693e-05 |   0.0 |  1.79
-Output  | 1.2844e-05 | 1.2844e-05 | 1.2844e-05 |   0.0 |  0.39
-Modify  | 0.00015756 | 0.00015756 | 0.00015756 |   0.0 |  4.80
-Other   |            | 2.214e-05  |            |       |  0.68
+Comm    | 5.7879e-05 | 5.7879e-05 | 5.7879e-05 |   0.0 |  1.84
+Output  | 1.0049e-05 | 1.0049e-05 | 1.0049e-05 |   0.0 |  0.32
+Modify  | 0.00014833 | 0.00014833 | 0.00014833 |   0.0 |  4.71
+Other   |            | 1.8e-05    |            |       |  0.57
 
 Nlocal:            500 ave         500 max         500 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

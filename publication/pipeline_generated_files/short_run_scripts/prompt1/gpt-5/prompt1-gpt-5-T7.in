@@ -11,7 +11,7 @@ mass 1 26.9815385
 replicate 5 5 5
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 velocity all create 300.0 12345 mom yes rot no dist gaussian
 timestep 0.005

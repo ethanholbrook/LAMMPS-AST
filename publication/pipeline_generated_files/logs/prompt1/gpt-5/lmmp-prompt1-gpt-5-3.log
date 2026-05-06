@@ -22,7 +22,7 @@ Created 500 atoms
 mass 1 26.9815385
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 reset_timestep 0
 velocity all create 300.0 12345 mom yes rot no dist gaussian
@@ -47,20 +47,20 @@ Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
    Step          Temp          Press          PotEng         KinEng         TotEng         Volume           Lx             Ly             Lz      
          0   300           -8008.0096     -1679.6369      19.350244     -1660.2867      8303.7656      20.25          20.25          20.25        
         10   256.98738     -6878.2465     -1676.8749      16.575894     -1660.299       8299.8738      20.246836      20.246836      20.246836    
-Loop time of 0.00323071 on 1 procs for 10 steps with 500 atoms
+Loop time of 0.00325817 on 1 procs for 10 steps with 500 atoms
 
-Performance: 267.433 ns/day, 0.090 hours/ns, 3095.295 timesteps/s, 1.548 Matom-step/s
-94.6% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 265.180 ns/day, 0.091 hours/ns, 3069.209 timesteps/s, 1.535 Matom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.0030005  | 0.0030005  | 0.0030005  |   0.0 | 92.87
+Pair    | 0.0030205  | 0.0030205  | 0.0030205  |   0.0 | 92.71
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 5.872e-05  | 5.872e-05  | 5.872e-05  |   0.0 |  1.82
-Output  | 1.2413e-05 | 1.2413e-05 | 1.2413e-05 |   0.0 |  0.38
-Modify  | 0.000141   | 0.000141   | 0.000141   |   0.0 |  4.36
-Other   |            | 1.809e-05  |            |       |  0.56
+Comm    | 5.9711e-05 | 5.9711e-05 | 5.9711e-05 |   0.0 |  1.83
+Output  | 1.2524e-05 | 1.2524e-05 | 1.2524e-05 |   0.0 |  0.38
+Modify  | 0.00014547 | 0.00014547 | 0.00014547 |   0.0 |  4.46
+Other   |            | 1.992e-05  |            |       |  0.61
 
 Nlocal:            500 ave         500 max         500 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

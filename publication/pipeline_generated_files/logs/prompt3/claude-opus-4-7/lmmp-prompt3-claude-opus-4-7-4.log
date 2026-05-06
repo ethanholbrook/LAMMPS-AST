@@ -23,7 +23,7 @@ Created 32400 atoms
 mass 1 92.90638
 mass 2 92.90638
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 velocity all create 300.0 12345 dist gaussian
 fix 1 all nvt temp 300.0 300.0 0.1
 timestep 0.001
@@ -46,20 +46,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
    Step          Temp          PotEng         KinEng         TotEng         Press     
          0   300           -343342.53      1892.3297     -341450.2       6953.1891    
         10   281.42468     -343225.15      1775.161      -341449.98      7795.415     
-Loop time of 0.202664 on 1 procs for 10 steps with 48800 atoms
+Loop time of 0.198737 on 1 procs for 10 steps with 48800 atoms
 
-Performance: 4.263 ns/day, 5.630 hours/ns, 49.343 timesteps/s, 2.408 Matom-step/s
-99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 4.347 ns/day, 5.520 hours/ns, 50.318 timesteps/s, 2.456 Matom-step/s
+99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.19414    | 0.19414    | 0.19414    |   0.0 | 95.80
+Pair    | 0.19045    | 0.19045    | 0.19045    |   0.0 | 95.83
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0011857  | 0.0011857  | 0.0011857  |   0.0 |  0.59
-Output  | 0.00019705 | 0.00019705 | 0.00019705 |   0.0 |  0.10
-Modify  | 0.0061067  | 0.0061067  | 0.0061067  |   0.0 |  3.01
-Other   |            | 0.00103    |            |       |  0.51
+Comm    | 0.0012012  | 0.0012012  | 0.0012012  |   0.0 |  0.60
+Output  | 0.00020184 | 0.00020184 | 0.00020184 |   0.0 |  0.10
+Modify  | 0.0059408  | 0.0059408  | 0.0059408  |   0.0 |  2.99
+Other   |            | 0.0009453  |            |       |  0.48
 
 Nlocal:          48800 ave       48800 max       48800 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -84,20 +84,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.51 | 21.51 | 21.51 Mbytes
    Step          Temp          PotEng         KinEng         TotEng         Press     
         10   5069.2052     -343225.15      31975.359     -311249.79      43365.746    
         20   4691.0575     -342284.85      29590.092     -312694.76      47885.54     
-Loop time of 0.250494 on 1 procs for 10 steps with 48800 atoms
+Loop time of 0.245123 on 1 procs for 10 steps with 48800 atoms
 
-Performance: 3.449 ns/day, 6.958 hours/ns, 39.921 timesteps/s, 1.948 Matom-step/s
-99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 3.525 ns/day, 6.809 hours/ns, 40.796 timesteps/s, 1.991 Matom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.23899    | 0.23899    | 0.23899    |   0.0 | 95.41
+Pair    | 0.23386    | 0.23386    | 0.23386    |   0.0 | 95.41
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0011916  | 0.0011916  | 0.0011916  |   0.0 |  0.48
-Output  | 0.00020296 | 0.00020296 | 0.00020296 |   0.0 |  0.08
-Modify  | 0.0090584  | 0.0090584  | 0.0090584  |   0.0 |  3.62
-Other   |            | 0.001051   |            |       |  0.42
+Comm    | 0.0012449  | 0.0012449  | 0.0012449  |   0.0 |  0.51
+Output  | 0.00022612 | 0.00022612 | 0.00022612 |   0.0 |  0.09
+Modify  | 0.0088006  | 0.0088006  | 0.0088006  |   0.0 |  3.59
+Other   |            | 0.0009912  |            |       |  0.40
 
 Nlocal:          48800 ave       48800 max       48800 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

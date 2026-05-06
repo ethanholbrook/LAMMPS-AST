@@ -1,4 +1,5 @@
-Script started on 2026-04-21 14:18:57-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+Script started on 2026-05-05 12:53:07-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1603424] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 units metal
@@ -25,7 +26,7 @@ Replication is creating a 5x5x5 = 125 times larger system...
   replicate CPU = 0.000 seconds
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
@@ -58,20 +59,20 @@ Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
    Step          Temp          Press          PotEng         KinEng         TotEng         Volume    
          0   300           -8008.0096     -1679.6369      19.350244     -1660.2867      8303.7656    
         10   109.51715      1170.6156     -1666.8899      7.0639449     -1659.826       8247.5201    
-Loop time of 0.00339782 on 1 procs for 10 steps with 500 atoms
+Loop time of 0.00337279 on 1 procs for 10 steps with 500 atoms
 
-Performance: 1271.404 ns/day, 0.019 hours/ns, 2943.065 timesteps/s, 1.472 Matom-step/s
-99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 1280.838 ns/day, 0.019 hours/ns, 2964.902 timesteps/s, 1.482 Matom-step/s
+98.7% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.0031699  | 0.0031699  | 0.0031699  |   0.0 | 93.29
+Pair    | 0.0031451  | 0.0031451  | 0.0031451  |   0.0 | 93.25
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 5.7418e-05 | 5.7418e-05 | 5.7418e-05 |   0.0 |  1.69
-Output  | 1.1031e-05 | 1.1031e-05 | 1.1031e-05 |   0.0 |  0.32
-Modify  | 0.00014115 | 0.00014115 | 0.00014115 |   0.0 |  4.15
-Other   |            | 1.831e-05  |            |       |  0.54
+Comm    | 5.6834e-05 | 5.6834e-05 | 5.6834e-05 |   0.0 |  1.69
+Output  | 1.1131e-05 | 1.1131e-05 | 1.1131e-05 |   0.0 |  0.33
+Modify  | 0.00014052 | 0.00014052 | 0.00014052 |   0.0 |  4.17
+Other   |            | 1.925e-05  |            |       |  0.57
 
 Nlocal:            500 ave         500 max         500 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -87,4 +88,4 @@ Dangerous builds = 0
 unfix 1
 Total wall time: 0:00:00
 
-Script done on 2026-04-21 14:19:00-04:00 [COMMAND_EXIT_CODE="0"]
+Script done on 2026-05-05 12:53:08-04:00 [COMMAND_EXIT_CODE="0"]

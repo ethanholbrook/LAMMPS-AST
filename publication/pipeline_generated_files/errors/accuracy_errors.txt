@@ -1,17 +1,159 @@
 accuracy errors
+prompt1	gpt-4.1	T0	PSZ, pair_style inaccurate
+prompt1	gpt-4.1	T8	PSZ, pair_style inaccurate
+prompt1	gpt-4.1	T9	PSZ, pair_style inaccurate
+prompt1	gpt-4o	T2	PSZ, pair_style inaccurate
+prompt1	gpt-4o	T3	PSZ, pair_style inaccurate
+prompt1	gpt-4o	T5	PSZ, pair_style inaccurate
+prompt1	gpt-5	T1	lattice_param inaccurate, lost atoms, run inaccurate, timestep inaccurate
+prompt1	gpt-5	T2	run inaccurate, timestep inaccurate
+prompt1	gpt-5	T7	run inaccurate, timestep inaccurate
+prompt1	gpt-5	T9	bad thermo order
+prompt1	gpt-o3	T2	no AST generated
+prompt1	gpt-o3	T3	no AST generated
+prompt1	gpt-o3	T5	lattice_param inaccurate, lost atoms
+prompt1	gpt-o3	T6	no AST generated
+prompt1	gpt-o3	T8	no AST generated
+prompt1	gpt-o3	T9	lattice_param inaccurate, lost atoms
+prompt1	claude-4-opus-20250514	T6	pressure_end, pressure_start
+prompt1	gpt-5.4	T0	unknown error
+prompt1	gpt-5.4	T2	unknown error
+prompt1	gpt-5.4	T5	unknown error
+prompt1	gpt-5.4	T7	unknown error
+prompt1	gpt-5.4	T8	unknown error
+prompt2	gpt-4.1	T0	PSZ, pair_style inaccurate, pressure_damp, temp_damp
+prompt2	gpt-4.1	T1	PSZ, heating_rate, pair_style inaccurate, run num inaccurate, sim time inaccurate
+prompt2	gpt-4.1	T2	heating_rate, run num inaccurate, sim time inaccurate, temp_damp
+prompt2	gpt-4.1	T3	no AST generated
+prompt2	gpt-4.1	T4	PSZ, heating_rate, pair_style inaccurate, run num inaccurate, sim time inaccurate
+prompt2	gpt-4.1	T5	PSZ, pair_style inaccurate
+prompt2	gpt-4.1	T6	PSZ, heating_rate, pair_style inaccurate, pressure_damp, run num inaccurate, sim time inaccurate, temp_damp
+prompt2	gpt-4.1	T7	PSZ, heating_rate, pair_style inaccurate, pressure_damp, run num inaccurate, sim time inaccurate, temp_damp
+prompt2	gpt-4.1	T8	PSZ, heating_rate, pair_style inaccurate, pressure_damp, run num inaccurate, sim time inaccurate, temp_damp
+prompt2	gpt-4.1	T9	PSZ, heating_rate, pair_style inaccurate, pressure_damp, run num inaccurate, sim time inaccurate, temp_damp
+prompt2	gpt-4o	T0	PSZ, heating_rate, pair_style inaccurate, run num inaccurate, sim time inaccurate, size
+prompt2	gpt-4o	T1	heating_rate, pressure_damp, pressure_end, pressure_start, run num inaccurate, sim time inaccurate, temp_damp, timestep inaccurate, unknown error
+prompt2	gpt-4o	T2	no AST generated
+prompt2	gpt-4o	T3	PSZ, pair_style inaccurate, temp_damp
+prompt2	gpt-4o	T4	PSZ, pair_style inaccurate, pressure_damp, temp_damp
+prompt2	gpt-4o	T5	PSZ, heating_rate, pair_style inaccurate, run num inaccurate, sim time inaccurate
+prompt2	gpt-4o	T6	PSZ, heating_rate, pair_style inaccurate, pressure_damp, pressure_end, pressure_start, run num inaccurate, sim time inaccurate, size, temp_damp
+prompt2	gpt-4o	T7	pressure_damp, temp_damp
+prompt2	gpt-4o	T8	no AST generated
+prompt2	gpt-4o	T9	no AST generated
+prompt2	gpt-5	T1	no AST generated
+prompt2	gpt-5	T2	no AST generated
+prompt2	gpt-5	T5	no AST generated
+prompt2	gpt-5	T6	PSZ, pair_style inaccurate
+prompt2	gpt-5	T7	PSZ, pair_style inaccurate
+prompt2	gpt-5	T8	lattice_param inaccurate, lost atoms, pair_style inaccurate
+prompt2	gpt-5	T9	PSZ, pair_style inaccurate
+prompt2	gpt-o3	T0	lattice_param inaccurate, lost atoms
+prompt2	gpt-o3	T1	no AST generated
+prompt2	gpt-o3	T2	lattice_param inaccurate, lost atoms
+prompt2	gpt-o3	T4	pressure_damp, temp_damp
+prompt2	gpt-o3	T6	no AST generated
+prompt2	gpt-o3	T9	lattice_param inaccurate, pair_style inaccurate, pressure_damp, temp_damp
+prompt2	claude-4-opus-20250514	T0	PSZ, pair_style inaccurate
+prompt2	claude-4-opus-20250514	T1	PSZ, pair_style inaccurate
+prompt2	claude-4-opus-20250514	T2	PSZ, pair_style inaccurate
+prompt2	claude-4-opus-20250514	T3	PSZ, pair_style inaccurate
+prompt2	claude-4-opus-20250514	T4	PSZ, heating_rate, pair_style inaccurate, run num inaccurate, sim time inaccurate
+prompt2	claude-4-opus-20250514	T5	PSZ, heating_rate, pair_style inaccurate, run num inaccurate, sim time inaccurate
+prompt2	claude-4-opus-20250514	T6	PSZ, pair_style inaccurate
+prompt2	claude-4-opus-20250514	T7	PSZ, pair_style inaccurate
+prompt2	claude-4-opus-20250514	T8	PSZ, pair_style inaccurate
+prompt2	claude-4-opus-20250514	T9	PSZ, pair_style inaccurate
+prompt2	gpt-5.4	T0	no AST generated
+prompt2	gpt-5.4	T1	unknown error
+prompt2	gpt-5.4	T2	unknown error
+prompt2	gpt-5.4	T4	unknown error
+prompt2	gpt-5.4	T6	unknown error
+prompt2	gpt-5.4	T7	unknown error
+prompt2	gpt-5.4	T8	unknown error
+prompt2	gpt-5.4	T9	unknown error
 prompt2	gpt-5.5	T1	PSZ, pair_style inaccurate
 prompt2	gpt-5.5	T2	PSZ, pair_style inaccurate
 prompt2	gpt-5.5	T3	PSZ, pair_style inaccurate
 prompt2	gpt-5.5	T5	no AST generated
 prompt2	gpt-5.5	T8	PSZ, pair_style inaccurate
 prompt2	gpt-5.5	T9	PSZ, pair_style inaccurate
+prompt3	gpt-4.1	T0	no AST generated
+prompt3	gpt-4.1	T1	box_region_missing, fixed bounds, gap_size, nvt fix missing, pair_style inaccurate, projectile_region_size, v_set_direction, v_set_speed
+prompt3	gpt-4.1	T2	PSZ, box_region_size, fixed bounds, pair_style inaccurate, projectile_region_missing, target_region_missing, v_set_direction, v_set_speed
+prompt3	gpt-4.1	T3	no AST generated
+prompt3	gpt-4.1	T4	box_region_missing, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_speed
+prompt3	gpt-4.1	T5	PSZ, box_region_missing, fixed bounds, gap_size, nvt fix missing, pair_style inaccurate, projectile_region_size, target_region_size, v_set_direction, v_set_speed
+prompt3	gpt-4.1	T6	box_region_missing, fixed bounds, gap_size, not 2 runs, nvt fix missing, pair_style inaccurate, projectile_region_size, target_region_size, v_set_speed
+prompt3	gpt-4.1	T7	no AST generated
+prompt3	gpt-4.1	T8	no AST generated
+prompt3	gpt-4.1	T9	no AST generated
+prompt3	gpt-4o	T0	box_region_size, fixed bounds, gap_size, projectile_region_size, run num inaccurate, sim time1 inaccurate, target_region_size, unknown error, v_set_direction, v_set_speed
+prompt3	gpt-4o	T1	box_region_missing, fixed bounds, pair_style inaccurate, projectile_region_missing, target_region_missing, v_set_speed
+prompt3	gpt-4o	T2	no AST generated
+prompt3	gpt-4o	T3	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, run num inaccurate, sim time1 inaccurate, target_region_size, v_set_speed
+prompt3	gpt-4o	T4	box_region_missing, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, run num inaccurate, sim time1 inaccurate, target_region_size, unknown error, v_set_direction, v_set_speed
+prompt3	gpt-4o	T5	box_region_missing, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, run num inaccurate, sim time1 inaccurate, target_region_size, unknown error, v_set_speed
+prompt3	gpt-4o	T6	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, run num inaccurate, sim time1 inaccurate, target_region_size, v_set_speed
+prompt3	gpt-4o	T7	no AST generated
+prompt3	gpt-4o	T8	no AST generated
+prompt3	gpt-4o	T9	no AST generated
+prompt3	gpt-5	T0	no AST generated
+prompt3	gpt-5	T1	no AST generated
+prompt3	gpt-5	T2	no AST generated
+prompt3	gpt-5	T4	no AST generated
+prompt3	gpt-5	T5	no AST generated
+prompt3	gpt-5	T6	no AST generated
+prompt3	gpt-5	T7	no AST generated
+prompt3	gpt-5	T8	no AST generated
+prompt3	gpt-5	T9	no AST generated
+prompt3	gpt-o3	T0	no AST generated
+prompt3	gpt-o3	T1	no AST generated
+prompt3	gpt-o3	T2	fixed bounds, gap_size, lattice_param inaccurate, pair_style inaccurate, projectile_region_size, target_region_size, v_set_direction
+prompt3	gpt-o3	T3	lattice_param inaccurate
+prompt3	gpt-o3	T4	no AST generated
+prompt3	gpt-o3	T5	fixed bounds, gap_size, lattice_param inaccurate, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	gpt-o3	T6	no AST generated
+prompt3	gpt-o3	T7	no AST generated
+prompt3	gpt-o3	T8	no AST generated
+prompt3	gpt-o3	T9	no AST generated
+prompt3	claude-4-opus-20250514	T0	box_region_size, extra_vel, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-4-opus-20250514	T1	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-4-opus-20250514	T2	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-4-opus-20250514	T3	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-4-opus-20250514	T4	box_region_size, extra_vel, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-4-opus-20250514	T5	box_region_size, extra_vel, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-4-opus-20250514	T6	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction, v_set_speed
+prompt3	claude-4-opus-20250514	T7	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction, v_set_speed
+prompt3	claude-4-opus-20250514	T8	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-4-opus-20250514	T9	no AST generated
+prompt3	gpt-5.4	T0	no AST generated
+prompt3	gpt-5.4	T1	box_region_size, fixed bounds, projectile_region_missing, target_region_missing
+prompt3	gpt-5.4	T2	no AST generated
+prompt3	gpt-5.4	T3	box_region_size, other bounds, projectile_region_missing, target_region_missing, unknown error
+prompt3	gpt-5.4	T4	no AST generated
+prompt3	gpt-5.4	T5	box_region_size, extra_vel, other bounds, pair_style inaccurate, projectile_region_missing, target_region_size, unknown error
+prompt3	gpt-5.4	T6	no AST generated
+prompt3	gpt-5.4	T7	box_region_size, extra_vel, other bounds, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.4	T8	box_region_size, other bounds, pair_style inaccurate, projectile_region_size, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.4	T9	no AST generated
+prompt3	claude-opus-4-7	T0	box_region_size, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, v_set_direction, velocity_temp inaccurate
+prompt3	claude-opus-4-7	T1	box_region_size, gap_size, projectile_region_size, target_region_size
+prompt3	claude-opus-4-7	T2	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, unknown error
+prompt3	claude-opus-4-7	T3	box_region_size, gap_size, projectile_region_size, target_region_size
+prompt3	claude-opus-4-7	T4	box_region_size, gap_size, projectile_region_size, target_region_size
+prompt3	claude-opus-4-7	T5	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction
+prompt3	claude-opus-4-7	T6	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error
+prompt3	claude-opus-4-7	T7	box_region_size, fixed bounds, gap_size, projectile_region_size, target_region_size, unknown error, v_set_direction, velocity_temp inaccurate
+prompt3	claude-opus-4-7	T8	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, unknown error
+prompt3	claude-opus-4-7	T9	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size, unknown error, v_set_direction
 prompt3	gpt-5.5	T0	box_region_size, extra_vel, pair_style inaccurate, projectile_region_missing, target_region_missing
-prompt3	gpt-5.5	T1	box_region_missing, pair_style inaccurate, projectile_region_missing, target_region_missing
+prompt3	gpt-5.5	T1	box_region_size, pair_style inaccurate, projectile_region_missing, target_region_missing
 prompt3	gpt-5.5	T2	box_region_size, projectile_region_missing, target_region_missing, unknown error, v_set_direction
 prompt3	gpt-5.5	T3	box_region_size, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error, v_set_direction
-prompt3	gpt-5.5	T4	box_region_missing, projectile_region_missing, target_region_missing, unknown error, v_set_direction
+prompt3	gpt-5.5	T4	box_region_size, projectile_region_missing, target_region_missing, unknown error, v_set_direction
 prompt3	gpt-5.5	T5	no AST generated
-prompt3	gpt-5.5	T6	box_region_missing, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size
+prompt3	gpt-5.5	T6	box_region_size, fixed bounds, gap_size, pair_style inaccurate, projectile_region_size, target_region_size
 prompt3	gpt-5.5	T7	extra_vel, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error, v_set_direction
 prompt3	gpt-5.5	T8	box_region_size, pair_style inaccurate, projectile_region_missing, target_region_missing, v_set_direction
-prompt3	gpt-5.5	T9	box_region_missing, pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error
+prompt3	gpt-5.5	T9	pair_style inaccurate, projectile_region_missing, target_region_missing, unknown error

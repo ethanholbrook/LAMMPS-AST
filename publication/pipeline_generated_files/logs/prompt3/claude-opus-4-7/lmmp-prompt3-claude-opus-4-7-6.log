@@ -21,7 +21,7 @@ Created 32400 atoms
   using lattice units in orthogonal box = (0 0 -181.94) to (66.16 66.16 66.16)
   create_atoms CPU = 0.004 seconds
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 mass 1 92.90638
 mass 2 92.90638
 velocity all create 300.0 12345 mom yes rot yes dist gaussian
@@ -50,20 +50,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.52 | 21.52 | 21.52 Mbytes
    Step          Temp          PotEng         KinEng         TotEng         Press     
          0   300           -340504.86      1876.8185     -338628.04     -2605.0023    
         10   281.87559     -340391.26      1763.4311     -338627.83     -2012.0031    
-Loop time of 0.197047 on 1 procs for 10 steps with 48400 atoms
+Loop time of 0.210915 on 1 procs for 10 steps with 48400 atoms
 
-Performance: 4.385 ns/day, 5.474 hours/ns, 50.749 timesteps/s, 2.456 Matom-step/s
-99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 4.096 ns/day, 5.859 hours/ns, 47.413 timesteps/s, 2.295 Matom-step/s
+98.9% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.18891    | 0.18891    | 0.18891    |   0.0 | 95.87
+Pair    | 0.20226    | 0.20226    | 0.20226    |   0.0 | 95.90
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0011484  | 0.0011484  | 0.0011484  |   0.0 |  0.58
-Output  | 0.00018397 | 0.00018397 | 0.00018397 |   0.0 |  0.09
-Modify  | 0.0058231  | 0.0058231  | 0.0058231  |   0.0 |  2.96
-Other   |            | 0.000983   |            |       |  0.50
+Comm    | 0.0012447  | 0.0012447  | 0.0012447  |   0.0 |  0.59
+Output  | 0.00019802 | 0.00019802 | 0.00019802 |   0.0 |  0.09
+Modify  | 0.006145   | 0.006145   | 0.006145   |   0.0 |  2.91
+Other   |            | 0.001065   |            |       |  0.51
 
 Nlocal:          48400 ave       48400 max       48400 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

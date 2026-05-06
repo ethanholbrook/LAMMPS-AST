@@ -16,7 +16,7 @@ Created 4000 atoms
   create_atoms CPU = 0.001 seconds
 mass 1 58.6934
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes
 timestep 0.001
@@ -51,20 +51,20 @@ Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
    Step          Time           Temp          Press          PotEng         KinEng         TotEng         Volume        Density    
          0   0              600            7594.6671     -17800          310.14679     -17489.853      43614.208      8.9411451    
         10   0.01           505.92314      14571.95      -17750.459      261.5174      -17488.942      43629.466      8.9380182    
-Loop time of 0.061318 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.0621798 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 14.090 ns/day, 1.703 hours/ns, 163.084 timesteps/s, 652.337 katom-step/s
-99.0% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 13.895 ns/day, 1.727 hours/ns, 160.824 timesteps/s, 643.296 katom-step/s
+99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.059875   | 0.059875   | 0.059875   |   0.0 | 97.65
+Pair    | 0.060671   | 0.060671   | 0.060671   |   0.0 | 97.57
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0002503  | 0.0002503  | 0.0002503  |   0.0 |  0.41
-Output  | 4.3362e-05 | 4.3362e-05 | 4.3362e-05 |   0.0 |  0.07
-Modify  | 0.0010432  | 0.0010432  | 0.0010432  |   0.0 |  1.70
-Other   |            | 0.0001059  |            |       |  0.17
+Comm    | 0.00026567 | 0.00026567 | 0.00026567 |   0.0 |  0.43
+Output  | 4.5115e-05 | 4.5115e-05 | 4.5115e-05 |   0.0 |  0.07
+Modify  | 0.0010783  | 0.0010783  | 0.0010783  |   0.0 |  1.73
+Other   |            | 0.0001195  |            |       |  0.19
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

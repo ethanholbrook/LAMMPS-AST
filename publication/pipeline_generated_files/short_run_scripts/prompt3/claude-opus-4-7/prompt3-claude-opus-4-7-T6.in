@@ -10,7 +10,7 @@ create_box 2 simbox
 create_atoms 1 region projectile
 create_atoms 2 region target
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 mass 1 92.90638
 mass 2 92.90638
 velocity all create 300.0 12345 mom yes rot yes dist gaussian

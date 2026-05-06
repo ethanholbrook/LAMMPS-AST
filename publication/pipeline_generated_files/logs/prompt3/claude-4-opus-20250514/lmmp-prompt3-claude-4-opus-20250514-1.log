@@ -27,7 +27,7 @@ Created 0 atoms
 
 # Potential
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 # Miscellaneous
 timestep 0.001
@@ -54,20 +54,20 @@ Per MPI rank memory allocation (min/avg/max) = 8.263 | 8.263 | 8.263 Mbytes
    Step          Temp          PotEng         KinEng         TotEng         Press          Volume    
          0   300           -112108.08      620.40992     -111487.67      4244.535       287705.14    
         10   282.07291     -112070.94      583.33611     -111487.6       5113.4052      287705.14    
-Loop time of 0.0759939 on 1 procs for 10 steps with 16000 atoms
+Loop time of 0.0779098 on 1 procs for 10 steps with 16000 atoms
 
-Performance: 11.369 ns/day, 2.111 hours/ns, 131.589 timesteps/s, 2.105 Matom-step/s
-97.8% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 11.090 ns/day, 2.164 hours/ns, 128.354 timesteps/s, 2.054 Matom-step/s
+98.1% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.073086   | 0.073086   | 0.073086   |   0.0 | 96.17
+Pair    | 0.075055   | 0.075055   | 0.075055   |   0.0 | 96.34
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00037748 | 0.00037748 | 0.00037748 |   0.0 |  0.50
-Output  | 8.2155e-05 | 8.2155e-05 | 8.2155e-05 |   0.0 |  0.11
-Modify  | 0.0021123  | 0.0021123  | 0.0021123  |   0.0 |  2.78
-Other   |            | 0.0003357  |            |       |  0.44
+Comm    | 0.00035875 | 0.00035875 | 0.00035875 |   0.0 |  0.46
+Output  | 7.434e-05  | 7.434e-05  | 7.434e-05  |   0.0 |  0.10
+Modify  | 0.0020579  | 0.0020579  | 0.0020579  |   0.0 |  2.64
+Other   |            | 0.000364   |            |       |  0.47
 
 Nlocal:          16000 ave       16000 max       16000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

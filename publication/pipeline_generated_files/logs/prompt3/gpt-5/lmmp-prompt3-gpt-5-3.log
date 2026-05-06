@@ -16,7 +16,7 @@ region target block 0 20 0 20 0 40 units lattice
 create_atoms 1 region target
 Created 32400 atoms
   using lattice units in orthogonal box = (0 0 -0.0213) to (66 66 213.0213)
-  create_atoms CPU = 0.004 seconds
+  create_atoms CPU = 0.003 seconds
 region projectile block 0 20 0 20 44.545454545 64.545454545 units lattice
 create_atoms 1 region projectile
 Created 16000 atoms
@@ -28,7 +28,7 @@ group projectile region projectile
 16000 atoms in group projectile
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
@@ -56,20 +56,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
    Step          Temp          PotEng         KinEng         TotEng         Press     
          0   300           -340504.05      1876.8185     -338627.23      7791.2377    
         10   281.28098     -340386.72      1759.7112     -338627.01      8619.1702    
-Loop time of 0.209205 on 1 procs for 10 steps with 48400 atoms
+Loop time of 0.213299 on 1 procs for 10 steps with 48400 atoms
 
-Performance: 4.130 ns/day, 5.811 hours/ns, 47.800 timesteps/s, 2.314 Matom-step/s
-99.0% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 4.051 ns/day, 5.925 hours/ns, 46.883 timesteps/s, 2.269 Matom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.20084    | 0.20084    | 0.20084    |   0.0 | 96.00
+Pair    | 0.20463    | 0.20463    | 0.20463    |   0.0 | 95.93
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0012124  | 0.0012124  | 0.0012124  |   0.0 |  0.58
-Output  | 0.00020179 | 0.00020179 | 0.00020179 |   0.0 |  0.10
-Modify  | 0.0059822  | 0.0059822  | 0.0059822  |   0.0 |  2.86
-Other   |            | 0.0009642  |            |       |  0.46
+Comm    | 0.001257   | 0.001257   | 0.001257   |   0.0 |  0.59
+Output  | 0.00020734 | 0.00020734 | 0.00020734 |   0.0 |  0.10
+Modify  | 0.0060403  | 0.0060403  | 0.0060403  |   0.0 |  2.83
+Other   |            | 0.001169   |            |       |  0.55
 
 Nlocal:          48400 ave       48400 max       48400 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -92,20 +92,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
    Step          Temp          PotEng         KinEng         TotEng         Press     
         10   53881.67      -340386.72      337087.05     -3299.6711      394696.21    
         20   53831.967     -340075.71      336776.11     -3299.6012      396794.36    
-Loop time of 0.252854 on 1 procs for 10 steps with 48400 atoms
+Loop time of 0.235734 on 1 procs for 10 steps with 48400 atoms
 
-Performance: 3.417 ns/day, 7.024 hours/ns, 39.548 timesteps/s, 1.914 Matom-step/s
-99.0% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 3.665 ns/day, 6.548 hours/ns, 42.421 timesteps/s, 2.053 Matom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.24735    | 0.24735    | 0.24735    |   0.0 | 97.82
+Pair    | 0.23066    | 0.23066    | 0.23066    |   0.0 | 97.85
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0013008  | 0.0013008  | 0.0013008  |   0.0 |  0.51
-Output  | 0.00022259 | 0.00022259 | 0.00022259 |   0.0 |  0.09
-Modify  | 0.0029679  | 0.0029679  | 0.0029679  |   0.0 |  1.17
-Other   |            | 0.001015   |            |       |  0.40
+Comm    | 0.001218   | 0.001218   | 0.001218   |   0.0 |  0.52
+Output  | 0.00020811 | 0.00020811 | 0.00020811 |   0.0 |  0.09
+Modify  | 0.0026716  | 0.0026716  | 0.0026716  |   0.0 |  1.13
+Other   |            | 0.0009804  |            |       |  0.42
 
 Nlocal:          48400 ave       48400 max       48400 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

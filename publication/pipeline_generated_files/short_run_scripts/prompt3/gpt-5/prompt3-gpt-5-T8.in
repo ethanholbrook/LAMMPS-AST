@@ -36,7 +36,7 @@ group projectile region proj
 group all union target projectile
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 mass 1 92.90638
 
 thermo 1000

@@ -29,7 +29,7 @@ group projectile region projectile
 
 label Potential
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 label Miscellaneous
 variable dt equal 0.005

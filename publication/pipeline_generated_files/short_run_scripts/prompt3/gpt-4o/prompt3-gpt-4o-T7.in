@@ -17,7 +17,7 @@ replicate       20 20 40 region target_box
 
 # Potential
 pair_style      eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 
 # Velocity and Temperature Setup
 velocity        all create 300.0 12345 mom yes rot no

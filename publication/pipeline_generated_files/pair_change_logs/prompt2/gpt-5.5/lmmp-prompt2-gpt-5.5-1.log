@@ -65,20 +65,20 @@ Per MPI rank memory allocation (min/avg/max) = 10.96 | 10.96 | 10.96 Mbytes
    Step          Time           Temp          Press          PotEng         KinEng         TotEng        Enthalpy        Volume           Lx             Ly             Lz          Density    
          0   0              600            7595.5356      0              310.14679      310.14679      516.91132      43614.208      35.2           35.2           35.2           4.1119216    
         10   0.01           602.0088       7618.6796      0              311.18516      311.18516      518.64194      43627.294      35.20352       35.20352       35.20352       4.1106883    
-Loop time of 0.00219191 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.00215581 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 394.177 ns/day, 0.061 hours/ns, 4562.233 timesteps/s, 18.249 Matom-step/s
-92.8% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 400.778 ns/day, 0.060 hours/ns, 4638.630 timesteps/s, 18.555 Matom-step/s
+95.0% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.00048369 | 0.00048369 | 0.00048369 |   0.0 | 22.07
+Pair    | 0.00048208 | 0.00048208 | 0.00048208 |   0.0 | 22.36
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00045075 | 0.00045075 | 0.00045075 |   0.0 | 20.56
-Output  | 5.2018e-05 | 5.2018e-05 | 5.2018e-05 |   0.0 |  2.37
-Modify  | 0.0011145  | 0.0011145  | 0.0011145  |   0.0 | 50.85
-Other   |            | 9.096e-05  |            |       |  4.15
+Comm    | 0.00044312 | 0.00044312 | 0.00044312 |   0.0 | 20.55
+Output  | 5.1306e-05 | 5.1306e-05 | 5.1306e-05 |   0.0 |  2.38
+Modify  | 0.001088   | 0.001088   | 0.001088   |   0.0 | 50.47
+Other   |            | 9.128e-05  |            |       |  4.23
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

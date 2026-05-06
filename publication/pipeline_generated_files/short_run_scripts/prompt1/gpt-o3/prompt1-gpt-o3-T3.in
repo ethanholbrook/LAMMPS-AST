@@ -14,7 +14,7 @@ velocity all create 300.0 12345 mom yes rot no dist gaussian
 
 Potential
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 Production Run
 thermo 1000

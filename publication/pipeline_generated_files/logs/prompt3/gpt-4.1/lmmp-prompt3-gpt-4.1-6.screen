@@ -1,4 +1,5 @@
-Script started on 2026-04-21 14:23:06-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+Script started on 2026-05-05 12:57:37-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1652446] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 # Initialization
@@ -19,16 +20,16 @@ Created orthogonal box = (0 0 0) to (217.8 217.8 658.35)
 create_atoms    1 region target
 Created 1154340 atoms
   using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
-  create_atoms CPU = 0.107 seconds
+  create_atoms CPU = 0.074 seconds
 create_atoms    1 region projectile
 Created 574992 atoms
   using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
-  create_atoms CPU = 0.059 seconds
+  create_atoms CPU = 0.044 seconds
 
 # Potential
 pair_style      eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 ERROR: Incorrect args for pair coefficients (src/src/MANYBODY/pair_eam.cpp:387)
-Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+Last command: pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
-Script done on 2026-04-21 14:23:08-04:00 [COMMAND_EXIT_CODE="1"]
+Script done on 2026-05-05 12:57:39-04:00 [COMMAND_EXIT_CODE="1"]

@@ -15,7 +15,7 @@ create_atoms 1 region target_block
 
 # Potential
 pair_style eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 # Initial Velocities
 velocity all create 300 12345 mom yes rot yes dist gaussian

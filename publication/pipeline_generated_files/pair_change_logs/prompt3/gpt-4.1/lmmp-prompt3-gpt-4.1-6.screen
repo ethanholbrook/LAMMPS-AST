@@ -1,4 +1,5 @@
-Script started on 2026-04-21 14:27:38-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+Script started on 2026-05-05 13:02:48-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1703981] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 # Initialization
@@ -19,11 +20,11 @@ Created orthogonal box = (0 0 0) to (217.8 217.8 658.35)
 create_atoms    1 region target
 Created 1154340 atoms
   using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
-  create_atoms CPU = 0.106 seconds
+  create_atoms CPU = 0.075 seconds
 create_atoms    1 region projectile
 Created 574992 atoms
   using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
-  create_atoms CPU = 0.057 seconds
+  create_atoms CPU = 0.045 seconds
 
 # Potential
 
@@ -66,4 +67,4 @@ Per MPI rank memory allocation (min/avg/max) = 1733 | 1733 | 1733 Mbytes
 ERROR: Lost atoms: original 1729332 current 1727178 (src/src/thermo.cpp:494)
 Last command: run 10
 
-Script done on 2026-04-21 14:28:59-04:00 [COMMAND_EXIT_CODE="1"]
+Script done on 2026-05-05 13:04:02-04:00 [COMMAND_EXIT_CODE="1"]

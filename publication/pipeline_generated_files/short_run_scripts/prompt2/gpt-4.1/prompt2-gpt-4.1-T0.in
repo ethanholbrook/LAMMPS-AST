@@ -11,7 +11,7 @@ create_atoms    1 box
 
 # Potential
 pair_style      eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 # Miscellaneous
 neighbor        2.0 bin

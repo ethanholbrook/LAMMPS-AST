@@ -15,5 +15,7 @@ timestep 0.001
 velocity all create 600 12345 mom yes rot yes dist gaussian
 thermo 1000
 thermo_style custom step temp press etotal pe ke vol
+variable runtime equal (2500 - 300)/10
+variable nsteps equal v_runtime/0.001
 fix 1 all npt temp 300 2500 1 iso 1 1 10
 run v_nsteps

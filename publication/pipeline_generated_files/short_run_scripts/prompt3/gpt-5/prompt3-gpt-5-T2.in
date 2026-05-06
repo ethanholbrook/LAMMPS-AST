@@ -38,7 +38,7 @@ group target region targ
 group all union projectile target
 
 pair_style eam/fs
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 variable vimp equal 20.0
 

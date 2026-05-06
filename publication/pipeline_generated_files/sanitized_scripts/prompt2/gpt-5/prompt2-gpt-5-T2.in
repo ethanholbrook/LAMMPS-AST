@@ -1,3 +1,5 @@
+variable total_ps equal (2500 - 300)/10
+variable nsteps equal ceil(v_total_ps/0.001)
 units metal
 dimension 3
 boundary p p p

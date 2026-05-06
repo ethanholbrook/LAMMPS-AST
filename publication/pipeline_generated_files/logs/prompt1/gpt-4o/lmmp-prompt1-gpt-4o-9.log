@@ -20,7 +20,7 @@ Created 500 atoms
 
 # Potential
 pair_style      eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 # NPT Ensemble
 timestep        0.001
@@ -45,20 +45,20 @@ Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
          0   0             -1679.6369      0             -1679.6369     -10497.041      8303.7656    
         10   4.7255991e-26 -1679.6701      0             -1679.6701     -10015.549      8298.575     
-Loop time of 0.00356146 on 1 procs for 10 steps with 500 atoms
+Loop time of 0.0031482 on 1 procs for 10 steps with 500 atoms
 
-Performance: 242.597 ns/day, 0.099 hours/ns, 2807.840 timesteps/s, 1.404 Matom-step/s
-99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 274.442 ns/day, 0.087 hours/ns, 3176.417 timesteps/s, 1.588 Matom-step/s
+96.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.0032816  | 0.0032816  | 0.0032816  |   0.0 | 92.14
+Pair    | 0.0029138  | 0.0029138  | 0.0029138  |   0.0 | 92.56
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 7.1742e-05 | 7.1742e-05 | 7.1742e-05 |   0.0 |  2.01
-Output  | 1.4187e-05 | 1.4187e-05 | 1.4187e-05 |   0.0 |  0.40
-Modify  | 0.00017211 | 0.00017211 | 0.00017211 |   0.0 |  4.83
-Other   |            | 2.183e-05  |            |       |  0.61
+Comm    | 5.5096e-05 | 5.5096e-05 | 5.5096e-05 |   0.0 |  1.75
+Output  | 1.1211e-05 | 1.1211e-05 | 1.1211e-05 |   0.0 |  0.36
+Modify  | 0.00014872 | 0.00014872 | 0.00014872 |   0.0 |  4.72
+Other   |            | 1.935e-05  |            |       |  0.61
 
 Nlocal:            500 ave         500 max         500 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

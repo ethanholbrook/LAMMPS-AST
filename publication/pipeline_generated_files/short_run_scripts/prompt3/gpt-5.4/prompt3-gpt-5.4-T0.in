@@ -34,7 +34,7 @@ create_atoms 1 region projectile_init
 group target region target
 group projectile region projectile_init
 pair_style eam/fs
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes
 timestep ${dt}

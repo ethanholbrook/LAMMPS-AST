@@ -18,7 +18,7 @@ mass            2 92.906
 
 # Potential
 pair_style      eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 
 # Equilibration
 velocity        all create 300.0 12345 mom yes rot yes

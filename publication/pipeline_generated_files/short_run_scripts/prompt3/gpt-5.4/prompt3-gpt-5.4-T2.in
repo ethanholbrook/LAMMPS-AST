@@ -25,7 +25,7 @@ variable zthi equal v_ztlo+v_Lt
 region whole block 0.0 ${Lx} 0.0 ${Ly} 0.0 ${zthi} units box
 create_box 1 whole
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 mass 1 ${massNb}
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes

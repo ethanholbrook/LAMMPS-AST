@@ -40,7 +40,7 @@ region target_initial block 0 66.016 0 66.016 66.016 198.048 units box
 create_atoms 1 region target_initial
 Created 32400 atoms
   using lattice units in orthogonal box = (0 0 -0.0213048) to (66.016 66.016 213.0693)
-  create_atoms CPU = 0.004 seconds
+  create_atoms CPU = 0.003 seconds
 group target region target_initial
 32400 atoms in group target
 region projectile_region block 0 ${xhi} 0 ${yhi} 0 ${projectile_zhi} units box
@@ -55,7 +55,7 @@ group projectile region projectile_region
 16800 atoms in group projectile
 mass 1 92.90638
 pair_style eam/fs
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes
 timestep ${dt}
@@ -88,20 +88,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
    Step          Time           Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz             Lx             Ly             Lz          Atoms   
          0   0              300           -nan            1892.3297     -nan           -nan           -nan           -nan           -nan            66.016         66.016         198.09061          48800 
         10   0.01          -nan            0             -nan           -nan           -nan           -nan           -nan           -nan            66.016         66.016         198.09061          48800 
-Loop time of 0.0660803 on 1 procs for 10 steps with 48800 atoms
+Loop time of 0.0643691 on 1 procs for 10 steps with 48800 atoms
 
-Performance: 13.075 ns/day, 1.836 hours/ns, 151.331 timesteps/s, 7.385 Matom-step/s
-99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 13.423 ns/day, 1.788 hours/ns, 155.354 timesteps/s, 7.581 Matom-step/s
+99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.05719    | 0.05719    | 0.05719    |   0.0 | 86.55
+Pair    | 0.055429   | 0.055429   | 0.055429   |   0.0 | 86.11
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0012551  | 0.0012551  | 0.0012551  |   0.0 |  1.90
-Output  | 0.00041578 | 0.00041578 | 0.00041578 |   0.0 |  0.63
-Modify  | 0.006117   | 0.006117   | 0.006117   |   0.0 |  9.26
-Other   |            | 0.001102   |            |       |  1.67
+Comm    | 0.0013156  | 0.0013156  | 0.0013156  |   0.0 |  2.04
+Output  | 0.00040653 | 0.00040653 | 0.00040653 |   0.0 |  0.63
+Modify  | 0.0060891  | 0.0060891  | 0.0060891  |   0.0 |  9.46
+Other   |            | 0.001129   |            |       |  1.75
 
 Nlocal:          48800 ave       48800 max       48800 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

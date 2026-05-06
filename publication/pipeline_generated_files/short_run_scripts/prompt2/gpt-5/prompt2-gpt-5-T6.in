@@ -15,7 +15,7 @@ replicate 10 10 10
 mass 1 58.6934
 
 pair_style eam
-pair_coeff 1 1 /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential
+pair_coeff 1 1 /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential
 
 thermo 1000
 thermo_style custom step temp press pe ke etotal vol

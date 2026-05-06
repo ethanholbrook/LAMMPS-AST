@@ -12,7 +12,7 @@ create_atoms    1 box
 
 # Potential
 pair_style      eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 # Initial Velocities
 velocity        all create 600.0 12345 mom yes dist gaussian

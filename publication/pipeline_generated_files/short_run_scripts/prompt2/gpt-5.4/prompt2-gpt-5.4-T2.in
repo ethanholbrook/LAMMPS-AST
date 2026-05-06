@@ -21,7 +21,7 @@ create_atoms 1 box
 replicate 10 10 10
 mass 1 58.6934
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 velocity all create ${tinit} 12345 mom yes rot no dist gaussian

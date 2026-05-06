@@ -58,20 +58,20 @@ Per MPI rank memory allocation (min/avg/max) = 54.13 | 54.13 | 54.13 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press     
          0   51333134       0              0              3.1583499e+08  3.9113464e+08
         10   3.6916935e-31  0              0              2.2713712e-30  2.812899e-30 
-Loop time of 0.00903613 on 1 procs for 10 steps with 47600 atoms
+Loop time of 0.00919534 on 1 procs for 10 steps with 47600 atoms
 
-Performance: 95.616 ns/day, 0.251 hours/ns, 1106.669 timesteps/s, 52.677 Matom-step/s
-99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 93.961 ns/day, 0.255 hours/ns, 1087.507 timesteps/s, 51.765 Matom-step/s
+99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.00023446 | 0.00023446 | 0.00023446 |   0.0 |  2.59
+Pair    | 0.00023492 | 0.00023492 | 0.00023492 |   0.0 |  2.55
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0017591  | 0.0017591  | 0.0017591  |   0.0 | 19.47
-Output  | 0.00018532 | 0.00018532 | 0.00018532 |   0.0 |  2.05
-Modify  | 0.0058418  | 0.0058418  | 0.0058418  |   0.0 | 64.65
-Other   |            | 0.001015   |            |       | 11.24
+Comm    | 0.0017619  | 0.0017619  | 0.0017619  |   0.0 | 19.16
+Output  | 0.00018146 | 0.00018146 | 0.00018146 |   0.0 |  1.97
+Modify  | 0.0059355  | 0.0059355  | 0.0059355  |   0.0 | 64.55
+Other   |            | 0.001082   |            |       | 11.76
 
 Nlocal:          47600 ave       47600 max       47600 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -94,20 +94,20 @@ Per MPI rank memory allocation (min/avg/max) = 54.16 | 54.16 | 54.16 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press     
         10   3.6916935e-31  0              0              2.2713712e-30  2.812899e-30 
         20   3.6916935e-31  0              0              2.2713712e-30  2.812899e-30 
-Loop time of 0.00618906 on 1 procs for 10 steps with 47600 atoms
+Loop time of 0.00594218 on 1 procs for 10 steps with 47600 atoms
 
-Performance: 139.601 ns/day, 0.172 hours/ns, 1615.754 timesteps/s, 76.910 Matom-step/s
-99.0% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 145.401 ns/day, 0.165 hours/ns, 1682.885 timesteps/s, 80.105 Matom-step/s
+99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.00023896 | 0.00023896 | 0.00023896 |   0.0 |  3.86
+Pair    | 0.00024626 | 0.00024626 | 0.00024626 |   0.0 |  4.14
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0018645  | 0.0018645  | 0.0018645  |   0.0 | 30.12
-Output  | 0.00018798 | 0.00018798 | 0.00018798 |   0.0 |  3.04
-Modify  | 0.0027958  | 0.0027958  | 0.0027958  |   0.0 | 45.17
-Other   |            | 0.001102   |            |       | 17.80
+Comm    | 0.0017688  | 0.0017688  | 0.0017688  |   0.0 | 29.77
+Output  | 0.00018213 | 0.00018213 | 0.00018213 |   0.0 |  3.07
+Modify  | 0.0027246  | 0.0027246  | 0.0027246  |   0.0 | 45.85
+Other   |            | 0.00102    |            |       | 17.17
 
 Nlocal:          47600 ave       47600 max       47600 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

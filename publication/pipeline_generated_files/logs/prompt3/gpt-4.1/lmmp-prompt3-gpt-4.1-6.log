@@ -18,14 +18,14 @@ Created orthogonal box = (0 0 0) to (217.8 217.8 658.35)
 create_atoms    1 region target
 Created 1154340 atoms
   using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
-  create_atoms CPU = 0.107 seconds
+  create_atoms CPU = 0.074 seconds
 create_atoms    1 region projectile
 Created 574992 atoms
   using lattice units in orthogonal box = (0 0 0) to (217.8 217.8 658.35)
-  create_atoms CPU = 0.059 seconds
+  create_atoms CPU = 0.044 seconds
 
 # Potential
 pair_style      eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 ERROR: Incorrect args for pair coefficients (src/src/MANYBODY/pair_eam.cpp:387)
-Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+Last command: pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb

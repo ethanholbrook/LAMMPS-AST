@@ -14,7 +14,7 @@ create_atoms 1 box
 mass 1 26.9815385
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 reset_timestep 0
 velocity all create 300.0 12345 mom yes rot no dist gaussian

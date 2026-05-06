@@ -20,7 +20,7 @@ group target type 2
 mass 1 92.90638
 mass 2 92.90638
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 timestep 0.001

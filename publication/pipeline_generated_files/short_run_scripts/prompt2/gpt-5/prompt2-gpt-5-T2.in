@@ -28,7 +28,7 @@ create_box 1 whole
 create_atoms 1 box
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 timestep ${dt}
 thermo 1000

@@ -1,5 +1,5 @@
-Script started on 2026-04-28 18:04:56-04:00 [TERM="xterm-256color" TTY="/dev/pts/53" COLUMNS="-1" LINES="-1"]
-[gilbreth-fe01.rcac.purdue.edu:2706851] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
+Script started on 2026-05-05 12:57:00-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1646621] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 units metal
@@ -21,10 +21,10 @@ Replication is creating a 10x10x10 = 1000 times larger system...
   orthogonal box = (0 0 0) to (35.2 35.2 35.2)
   1 by 1 by 1 MPI processor grid
   4000 atoms
-  replicate CPU = 0.000 seconds
+  replicate CPU = 0.001 seconds
 mass 1 58.6934
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 timestep 0.001
@@ -55,20 +55,20 @@ Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
    Step          Time           Temp          Press          PotEng         KinEng         TotEng        Enthalpy        Volume        Density           Lx             Ly             Lz      
          0   0              600            7594.6671     -4.45           0.077536698   -4.3724633     -4.3207781      43614.208      8.9411451      35.2           35.2           35.2         
         10   0.01           505.92314      14571.95      -4.4376148      0.065379349   -4.3722354     -4.2730319      43629.466      8.9380182      35.204104      35.204104      35.204104    
-Loop time of 0.0614343 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.0576445 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 14.064 ns/day, 1.707 hours/ns, 162.776 timesteps/s, 651.102 katom-step/s
+Performance: 14.988 ns/day, 1.601 hours/ns, 173.477 timesteps/s, 693.908 katom-step/s
 99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.059926   | 0.059926   | 0.059926   |   0.0 | 97.55
+Pair    | 0.056221   | 0.056221   | 0.056221   |   0.0 | 97.53
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00026289 | 0.00026289 | 0.00026289 |   0.0 |  0.43
-Output  | 6.5643e-05 | 6.5643e-05 | 6.5643e-05 |   0.0 |  0.11
-Modify  | 0.0010578  | 0.0010578  | 0.0010578  |   0.0 |  1.72
-Other   |            | 0.0001216  |            |       |  0.20
+Comm    | 0.00024761 | 0.00024761 | 0.00024761 |   0.0 |  0.43
+Output  | 5.354e-05  | 5.354e-05  | 5.354e-05  |   0.0 |  0.09
+Modify  | 0.0010197  | 0.0010197  | 0.0010197  |   0.0 |  1.77
+Other   |            | 0.0001028  |            |       |  0.18
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -85,4 +85,4 @@ write_data ni_melting_final.data
 System init for write_data ...
 Total wall time: 0:00:00
 
-Script done on 2026-04-28 18:04:58-04:00 [COMMAND_EXIT_CODE="0"]
+Script done on 2026-05-05 12:57:02-04:00 [COMMAND_EXIT_CODE="0"]

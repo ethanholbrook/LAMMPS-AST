@@ -41,7 +41,7 @@ create_atoms 1 region r_projectile
 group target region r_target
 group projectile region r_projectile
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 compute cthermo all temp
 thermo 1000
 thermo_style custom step time atoms temp pe ke etotal press pxx pyy pzz lx ly lz

@@ -15,7 +15,7 @@ create_atoms 1 box
 reset_timestep 0
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 thermo_style custom step temp press pe ke etotal vol
 thermo 1000

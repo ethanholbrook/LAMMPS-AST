@@ -19,11 +19,11 @@ Created 16400 atoms
 create_atoms 2 region target
 Created 32000 atoms
   using lattice units in orthogonal box = (0 0 0) to (66.016 66.016 202.9992)
-  create_atoms CPU = 0.004 seconds
+  create_atoms CPU = 0.003 seconds
 mass 1 92.90638
 mass 2 92.90638
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes
 velocity all create 300.0 12345 mom yes rot yes dist gaussian
@@ -48,20 +48,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.49 | 21.49 | 21.49 Mbytes
    Step          Temp          PotEng         KinEng         TotEng         Press     
          0   300           -340506.19      1876.8185     -338629.37      7020.3112    
         10   281.42771     -340389.79      1760.6291     -338629.16      7875.5187    
-Loop time of 0.213341 on 1 procs for 10 steps with 48400 atoms
+Loop time of 0.217853 on 1 procs for 10 steps with 48400 atoms
 
-Performance: 4.050 ns/day, 5.926 hours/ns, 46.873 timesteps/s, 2.269 Matom-step/s
+Performance: 3.966 ns/day, 6.051 hours/ns, 45.903 timesteps/s, 2.222 Matom-step/s
 99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.20441    | 0.20441    | 0.20441    |   0.0 | 95.81
+Pair    | 0.20911    | 0.20911    | 0.20911    |   0.0 | 95.99
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.001216   | 0.001216   | 0.001216   |   0.0 |  0.57
-Output  | 0.00019468 | 0.00019468 | 0.00019468 |   0.0 |  0.09
-Modify  | 0.0062457  | 0.0062457  | 0.0062457  |   0.0 |  2.93
-Other   |            | 0.001277   |            |       |  0.60
+Comm    | 0.0013297  | 0.0013297  | 0.0013297  |   0.0 |  0.61
+Output  | 0.0002238  | 0.0002238  | 0.0002238  |   0.0 |  0.10
+Modify  | 0.0060984  | 0.0060984  | 0.0060984  |   0.0 |  2.80
+Other   |            | 0.001089   |            |       |  0.50
 
 Nlocal:          48400 ave       48400 max       48400 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

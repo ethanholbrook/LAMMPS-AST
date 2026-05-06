@@ -19,7 +19,7 @@ change_box      all z final 0 61.5
 
 # Potential
 pair_style      eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 # Miscellaneous
 neighbor        2.0 bin

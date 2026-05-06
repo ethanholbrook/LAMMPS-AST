@@ -1,5 +1,5 @@
-Script started on 2026-04-28 18:04:45-04:00 [TERM="xterm-256color" TTY="/dev/pts/53" COLUMNS="-1" LINES="-1"]
-[gilbreth-fe01.rcac.purdue.edu:2705415] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
+Script started on 2026-05-05 12:54:50-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1622273] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 units metal
@@ -18,7 +18,7 @@ Created 500 atoms
   create_atoms CPU = 0.000 seconds
 mass 1 26.9815385
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes
 timestep 0.001
@@ -48,20 +48,20 @@ Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
    Step          Time           Temp          Press          PotEng         KinEng         TotEng         Volume           Lx             Ly             Lz      
          0   0              300           -8008.0096     -3.3592738      0.038700487   -3.3205733      8303.7656      20.25          20.25          20.25        
         10   0.01           257.42483     -6875.7623     -3.3538063      0.033208221   -3.3205981      8299.8735      20.246836      20.246836      20.246836    
-Loop time of 0.00314392 on 1 procs for 10 steps with 500 atoms
+Loop time of 0.00455925 on 1 procs for 10 steps with 500 atoms
 
-Performance: 274.816 ns/day, 0.087 hours/ns, 3180.739 timesteps/s, 1.590 Matom-step/s
-96.8% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 189.505 ns/day, 0.127 hours/ns, 2193.345 timesteps/s, 1.097 Matom-step/s
+72.7% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.0029047  | 0.0029047  | 0.0029047  |   0.0 | 92.39
+Pair    | 0.0043024  | 0.0043024  | 0.0043024  |   0.0 | 94.37
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 5.6656e-05 | 5.6656e-05 | 5.6656e-05 |   0.0 |  1.80
-Output  | 1.3585e-05 | 1.3585e-05 | 1.3585e-05 |   0.0 |  0.43
-Modify  | 0.00014115 | 0.00014115 | 0.00014115 |   0.0 |  4.49
-Other   |            | 2.786e-05  |            |       |  0.89
+Comm    | 6.4522e-05 | 6.4522e-05 | 6.4522e-05 |   0.0 |  1.42
+Output  | 1.7513e-05 | 1.7513e-05 | 1.7513e-05 |   0.0 |  0.38
+Modify  | 0.00015216 | 0.00015216 | 0.00015216 |   0.0 |  3.34
+Other   |            | 2.269e-05  |            |       |  0.50
 
 Nlocal:            500 ave         500 max         500 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -76,4 +76,4 @@ Neighbor list builds = 0
 Dangerous builds = 0
 Total wall time: 0:00:00
 
-Script done on 2026-04-28 18:04:47-04:00 [COMMAND_EXIT_CODE="0"]
+Script done on 2026-05-05 12:54:52-04:00 [COMMAND_EXIT_CODE="0"]

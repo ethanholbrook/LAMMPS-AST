@@ -14,7 +14,10 @@ neigh_modify delay 0 every 1 check yes
 thermo 1000
 thermo_style custom step temp press pe ke etotal vol
 timestep 0.001
+variable Trange equal 2500 - 300
+variable heatTime equal v_Trange/10
 reset_timestep 0
 velocity all create 600 12345 mom yes rot yes dist gaussian
 fix 1 all npt temp 300 2500 0.1 iso 1.01325 1.01325 1
+variable nsteps equal ceil(v_heatTime/0.001)
 run v_nsteps

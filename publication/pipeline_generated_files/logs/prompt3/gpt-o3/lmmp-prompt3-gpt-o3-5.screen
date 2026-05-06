@@ -1,4 +1,5 @@
-Script started on 2026-04-21 14:24:05-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+Script started on 2026-05-05 12:58:39-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1662495] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 units metal
@@ -27,7 +28,7 @@ group projectile region projectile
 group target region target
 32000 atoms in group target
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes
 velocity all create 300.0 12345 mom yes rot no dist gaussian
@@ -57,4 +58,4 @@ Per MPI rank memory allocation (min/avg/max) = 255.6 | 255.6 | 255.6 Mbytes
 ERROR: Lost atoms: original 48400 current 45600 (src/src/thermo.cpp:494)
 Last command: run 10
 
-Script done on 2026-04-21 14:24:22-04:00 [COMMAND_EXIT_CODE="1"]
+Script done on 2026-05-05 12:58:55-04:00 [COMMAND_EXIT_CODE="1"]

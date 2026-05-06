@@ -1,5 +1,5 @@
-Script started on 2026-04-28 18:05:17-04:00 [TERM="xterm-256color" TTY="/dev/pts/53" COLUMNS="-1" LINES="-1"]
-[gilbreth-fe01.rcac.purdue.edu:2713113] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
+Script started on 2026-05-05 13:00:01-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1676304] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 units metal
@@ -35,7 +35,7 @@ Created 16400 atoms
 create_atoms 2 region target_region
 Created 32400 atoms
   using lattice units in orthogonal box = (0 0 -0.0213) to (66 66 213.0213)
-  create_atoms CPU = 0.004 seconds
+  create_atoms CPU = 0.003 seconds
 group projectile type 1
 16400 atoms in group projectile
 group target type 2
@@ -43,7 +43,7 @@ group target type 2
 mass 1 92.90638
 mass 2 92.90638
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 timestep 0.001
@@ -75,20 +75,20 @@ Per MPI rank memory allocation (min/avg/max) = 21.5 | 21.5 | 21.5 Mbytes
    Step          Time           Temp          PotEng         KinEng         TotEng         Press           Pxx            Pyy            Pzz      
          0   0              300           -nan            1892.3297     -nan           -nan           -nan           -nan           -nan          
         10   0.01          -nan            0             -nan           -nan           -nan           -nan           -nan           -nan          
-Loop time of 0.0653412 on 1 procs for 10 steps with 48800 atoms
+Loop time of 0.0605183 on 1 procs for 10 steps with 48800 atoms
 
-Performance: 13.223 ns/day, 1.815 hours/ns, 153.043 timesteps/s, 7.468 Matom-step/s
-99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 14.277 ns/day, 1.681 hours/ns, 165.239 timesteps/s, 8.064 Matom-step/s
+99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.056537   | 0.056537   | 0.056537   |   0.0 | 86.53
+Pair    | 0.051975   | 0.051975   | 0.051975   |   0.0 | 85.88
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0012852  | 0.0012852  | 0.0012852  |   0.0 |  1.97
-Output  | 0.00039893 | 0.00039893 | 0.00039893 |   0.0 |  0.61
-Modify  | 0.006032   | 0.006032   | 0.006032   |   0.0 |  9.23
-Other   |            | 0.001089   |            |       |  1.67
+Comm    | 0.0012724  | 0.0012724  | 0.0012724  |   0.0 |  2.10
+Output  | 0.00041123 | 0.00041123 | 0.00041123 |   0.0 |  0.68
+Modify  | 0.0058719  | 0.0058719  | 0.0058719  |   0.0 |  9.70
+Other   |            | 0.000988   |            |       |  1.63
 
 Nlocal:          48800 ave       48800 max       48800 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -122,4 +122,4 @@ You may or may not see output from other processes, depending on
 exactly when Open MPI kills them.
 --------------------------------------------------------------------------
 
-Script done on 2026-04-28 18:05:18-04:00 [COMMAND_EXIT_CODE="1"]
+Script done on 2026-05-05 13:00:02-04:00 [COMMAND_EXIT_CODE="1"]

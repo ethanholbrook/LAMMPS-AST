@@ -11,7 +11,7 @@ create_atoms 1 region projectile
 create_atoms 1 region target
 mass 1 92.90638
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 group projectile region projectile
 group target region target
 timestep 0.001

@@ -18,7 +18,7 @@ Created 4000 atoms
 mass 1 58.6934
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes
@@ -45,20 +45,20 @@ Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
    Step          Temp          Press          PotEng         KinEng         TotEng        Density    
          0   600            7594.6671     -17800          310.14679     -17489.853      8.9411451    
         10   504.69812      14722.151     -17749.828      260.88417     -17488.943      8.9380088    
-Loop time of 0.0675381 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.0630101 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 12.793 ns/day, 1.876 hours/ns, 148.065 timesteps/s, 592.258 katom-step/s
-97.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 13.712 ns/day, 1.750 hours/ns, 158.705 timesteps/s, 634.818 katom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.065905   | 0.065905   | 0.065905   |   0.0 | 97.58
+Pair    | 0.061539   | 0.061539   | 0.061539   |   0.0 | 97.67
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00029704 | 0.00029704 | 0.00029704 |   0.0 |  0.44
-Output  | 4.286e-05  | 4.286e-05  | 4.286e-05  |   0.0 |  0.06
-Modify  | 0.0011556  | 0.0011556  | 0.0011556  |   0.0 |  1.71
-Other   |            | 0.0001377  |            |       |  0.20
+Comm    | 0.00025675 | 0.00025675 | 0.00025675 |   0.0 |  0.41
+Output  | 3.9815e-05 | 3.9815e-05 | 3.9815e-05 |   0.0 |  0.06
+Modify  | 0.0010675  | 0.0010675  | 0.0010675  |   0.0 |  1.69
+Other   |            | 0.0001068  |            |       |  0.17
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

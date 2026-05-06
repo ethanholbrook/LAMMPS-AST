@@ -16,7 +16,7 @@ Created orthogonal box = (0 0 0) to (66.016 66.016 66.016)
 create_atoms 1 box
 Created 16000 atoms
   using lattice units in orthogonal box = (0 0 0) to (66.016 66.016 66.016)
-  create_atoms CPU = 0.002 seconds
+  create_atoms CPU = 0.001 seconds
 group projectile region projectile
 16000 atoms in group projectile
 

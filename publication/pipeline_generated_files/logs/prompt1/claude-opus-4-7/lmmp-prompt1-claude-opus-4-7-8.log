@@ -12,9 +12,9 @@ Created orthogonal box = (0 0 0) to (20.25 20.25 20.25)
 create_atoms 1 box
 Created 500 atoms
   using lattice units in orthogonal box = (0 0 0) to (20.25 20.25 20.25)
-  create_atoms CPU = 0.001 seconds
+  create_atoms CPU = 0.000 seconds
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 mass 1 26.9815
 velocity all create 300.0 12345 mom yes rot yes dist gaussian
 timestep 0.001
@@ -38,20 +38,20 @@ Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
    Step          Temp          Press          PotEng         KinEng         TotEng         Volume    
          0   300           -8008.0096     -1679.6369      19.350244     -1660.2867      8303.7656    
         10   256.9479      -6878.2497     -1676.8723      16.573348     -1660.299       8299.8739    
-Loop time of 0.00322654 on 1 procs for 10 steps with 500 atoms
+Loop time of 0.00338173 on 1 procs for 10 steps with 500 atoms
 
-Performance: 267.779 ns/day, 0.090 hours/ns, 3099.299 timesteps/s, 1.550 Matom-step/s
-92.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 255.491 ns/day, 0.094 hours/ns, 2957.068 timesteps/s, 1.479 Matom-step/s
+99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.0029985  | 0.0029985  | 0.0029985  |   0.0 | 92.93
+Pair    | 0.0031248  | 0.0031248  | 0.0031248  |   0.0 | 92.40
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 5.6484e-05 | 5.6484e-05 | 5.6484e-05 |   0.0 |  1.75
-Output  | 7.113e-06  | 7.113e-06  | 7.113e-06  |   0.0 |  0.22
-Modify  | 0.00014362 | 0.00014362 | 0.00014362 |   0.0 |  4.45
-Other   |            | 2.081e-05  |            |       |  0.65
+Comm    | 6.9982e-05 | 6.9982e-05 | 6.9982e-05 |   0.0 |  2.07
+Output  | 1.3766e-05 | 1.3766e-05 | 1.3766e-05 |   0.0 |  0.41
+Modify  | 0.00015223 | 0.00015223 | 0.00015223 |   0.0 |  4.50
+Other   |            | 2.094e-05  |            |       |  0.62
 
 Nlocal:            500 ave         500 max         500 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

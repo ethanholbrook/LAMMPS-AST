@@ -1,3 +1,48 @@
 parse errors
+prompt1	gpt-o3	T2	sanitized=True, parsed=[{"line": 6, "column": 12, "token": "Token('_NEWLINE', '\\n')", "text": "lattice fcc"}]
+prompt1	gpt-o3	T3	sanitized=True, parsed=[{"line": 1, "column": 1, "token": "Token('VAR_NAME', 'Initialization')", "text": "Initialization"}, {"line": 14, "column": 1, "token": "Token('VAR_NAME', 'Potential')", "text": "Potential"}, {"line": 17, "column": 1, "token": "Token('VAR_NAME', 'Production')", "text": "Production Run"}]
+prompt1	gpt-o3	T6	sanitized=True, parsed=[{"line": 8, "column": 16, "token": "Token('VAR_NAME', 'prim')", "text": "create_atoms 1 prim"}]
+prompt1	gpt-o3	T8	sanitized=True, parsed=[{"line": 9, "column": 16, "token": "Token('VAR_NAME', 'unitcell')", "text": "create_atoms 1 unitcell"}]
+prompt2	gpt-4.1	T3	sanitized=True, parsed=[{"line": 1, "column": 1, "token": "Token('VAR_NAME', 'Initialization')", "text": "Initialization"}, {"line": 5, "column": 1, "token": "Token('VAR_NAME', 'System')", "text": "System Construction"}, {"line": 11, "column": 1, "token": "Token('VAR_NAME', 'Potential')", "text": "Potential"}, {"line": 14, "column": 1, "token": "Token('VAR_NAME', 'Miscellaneous')", "text": "Miscellaneous"}, {"line": 16, "column": 1, "token": "Token('VAR_NAME', 'Production')", "text": "Production Run"}]
+prompt2	gpt-4o	T2	sanitized=True, parsed=[{"line": 12, "column": 36, "token": "Token('_NEWLINE', '\\n')", "text": "velocity all create 600 482748 temp"}]
+prompt2	gpt-4o	T8	sanitized=True, parsed=[{"line": 13, "column": 37, "token": "Token('VAR_NAME', 'potential')", "text": "thermo_style custom step temp press potential energy"}]
+prompt2	gpt-4o	T9	sanitized=True, parsed=[{"line": 9, "column": 15, "token": "Token('VAR_NAME', '/cubic')", "text": "pair_style eam/cubic"}]
+prompt2	gpt-5	T1	sanitized=False, parsed=n/a, unresolved=v_nsteps, v_ttot
+prompt2	gpt-5	T2	sanitized=False, parsed=n/a, unresolved=v_nsteps, v_total_ps
+prompt2	gpt-5	T5	sanitized=False, parsed=n/a, unresolved=v_Trange, v_heatTime, v_nsteps
+prompt2	gpt-o3	T1	sanitized=False, parsed=n/a, unresolved=v_nsteps, v_runtime
+prompt2	gpt-o3	T6	sanitized=True, parsed=[{"line": 9, "column": 16, "token": "Token('VAR_NAME', 'unitcell')", "text": "create_atoms 1 unitcell"}]
+prompt2	gpt-5.4	T0	sanitized=True, parsed=[{"line": 18, "column": 29, "token": "Token('VAR_NAME', 'cTemp')", "text": "compute cPress all pressure cTemp"}]
 prompt2	gpt-5.5	T5	sanitized=False, parsed=n/a, unresolved=v_Ni_lattice, v_Ni_mass, v_Pdamp, v_Tdamp, v_potential_file, v_run_steps
+prompt3	gpt-4.1	T0	sanitized=True, parsed=[{"line": 1, "column": 1, "token": "Token('VAR_NAME', 'Initialization')", "text": "Initialization"}, {"line": 5, "column": 1, "token": "Token('VAR_NAME', 'System')", "text": "System Construction"}, {"line": 15, "column": 1, "token": "Token('VAR_NAME', 'Potential')", "text": "Potential"}, {"line": 18, "column": 1, "token": "Token('VAR_NAME', 'Miscellaneous')", "text": "Miscellaneous"}, {"line": 26, "column": 1, "token": "Token('VAR_NAME', 'Production')", "text": "Production Run"}]
+prompt3	gpt-4.1	T3	sanitized=True, parsed=[{"line": 1, "column": 1, "token": "Token('VAR_NAME', 'Initialization')", "text": "Initialization"}, {"line": 5, "column": 1, "token": "Token('VAR_NAME', 'System')", "text": "System Construction"}, {"line": 13, "column": 1, "token": "Token('VAR_NAME', 'Potential')", "text": "Potential"}, {"line": 16, "column": 1, "token": "Token('VAR_NAME', 'Miscellaneous')", "text": "Miscellaneous"}, {"line": 28, "column": 1, "token": "Token('VAR_NAME', 'Production')", "text": "Production Run"}]
+prompt3	gpt-4.1	T7	sanitized=True, parsed=[{"line": 8, "column": 25, "token": "Token('UNION', 'union')", "text": "create_box 1 projectile union target"}]
+prompt3	gpt-4.1	T8	sanitized=True, parsed=[{"line": 12, "column": 23, "token": "Token('VAR_NAME', 'projectile')", "text": "displace_atoms region projectile move 0 0 -1.5"}]
+prompt3	gpt-4.1	T9	sanitized=True, parsed=[{"line": 20, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 2000"}]
+prompt3	gpt-4o	T2	sanitized=True, parsed=[{"line": 19, "column": 16, "token": "Token('VAR_NAME', 'projectile')", "text": "velocity group projectile set 0 0 2000 units box"}]
+prompt3	gpt-4o	T7	sanitized=True, parsed=[{"line": 10, "column": 20, "token": "Token('REGION', 'region')", "text": "replicate 20 20 20 region proj_box"}, {"line": 11, "column": 20, "token": "Token('REGION', 'region')", "text": "replicate 20 20 40 region target_box"}]
+prompt3	gpt-4o	T8	sanitized=True, parsed=[{"line": 20, "column": 35, "token": "Token('REGION', 'region')", "text": "velocity all set 0 0 20 units box region projectile"}]
+prompt3	gpt-4o	T9	sanitized=True, parsed=[{"line": 18, "column": 16, "token": "Token('VELOCITY_VALUE', '1')", "text": "velocity group 1 set 0 0 2000 sum yes"}]
+prompt3	gpt-5	T0	sanitized=True, parsed=[{"line": 27, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 20"}]
+prompt3	gpt-5	T1	sanitized=True, parsed=[{"line": 25, "column": 26, "token": "Token('VELOCITY_VALUE', '0')", "text": "velocity projectile ramp 0 0 0 0 -20 -20 z sum yes"}]
+prompt3	gpt-5	T2	sanitized=True, parsed=[{"line": 29, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 20"}]
+prompt3	gpt-5	T4	sanitized=True, parsed=[{"line": 32, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 sum yes"}]
+prompt3	gpt-5	T5	sanitized=True, parsed=[{"line": 26, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 20 sum yes"}]
+prompt3	gpt-5	T6	sanitized=True, parsed=[{"line": 27, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 units box"}]
+prompt3	gpt-5	T7	sanitized=True, parsed=[{"line": 32, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20"}]
+prompt3	gpt-5	T8	sanitized=True, parsed=[{"line": 28, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 sum yes"}]
+prompt3	gpt-5	T9	sanitized=True, parsed=[{"line": 29, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 sum yes"}]
+prompt3	gpt-o3	T0	sanitized=True, parsed=[{"line": 27, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20"}]
+prompt3	gpt-o3	T1	sanitized=True, parsed=[{"line": 21, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20"}]
+prompt3	gpt-o3	T4	sanitized=True, parsed=[{"line": 26, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20"}]
+prompt3	gpt-o3	T6	sanitized=True, parsed=[{"line": 1, "column": 1, "token": "Token('VAR_NAME', 'Initialization')", "text": "Initialization"}, {"line": 7, "column": 1, "token": "Token('VAR_NAME', 'System')", "text": "System Construction"}, {"line": 17, "column": 1, "token": "Token('VAR_NAME', 'Potential')", "text": "Potential"}, {"line": 22, "column": 1, "token": "Token('VAR_NAME', 'Miscellaneous')", "text": "Miscellaneous"}, {"line": 25, "column": 1, "token": "Token('VAR_NAME', 'Production')", "text": "Production Run"}]
+prompt3	gpt-o3	T7	sanitized=True, parsed=[{"line": 24, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 sum yes"}]
+prompt3	gpt-o3	T8	sanitized=True, parsed=[{"line": 24, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -0.02 sum yes"}]
+prompt3	gpt-o3	T9	sanitized=True, parsed=[{"line": 25, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 sum yes units box"}]
+prompt3	claude-4-opus-20250514	T9	sanitized=True, parsed=[{"line": 8, "column": 20, "token": "Token('VELOCITY_VALUE', '2')", "text": "create_box 1 union 2 projectile target"}]
+prompt3	gpt-5.4	T0	sanitized=True, parsed=[{"line": 31, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 -20 units box"}]
+prompt3	gpt-5.4	T2	sanitized=False, parsed=n/a, unresolved=v_Lp, v_Lt, v_Lx, v_Ly, v_aNb, v_massNb, v_potfile, v_zthi, v_ztlo
+prompt3	gpt-5.4	T4	sanitized=False, parsed=n/a, unresolved=v_ntarget
+prompt3	gpt-5.4	T6	sanitized=True, parsed=[{"line": 21, "column": 28, "token": "Token('VAR_NAME', '/com')", "text": "compute ttarget target temp/com"}, {"line": 22, "column": 36, "token": "Token('VAR_NAME', '/com')", "text": "compute tprojectile projectile temp/com"}, {"line": 30, "column": 37, "token": "Token('VELOCITY_VALUE', 'c_ttarget ')", "text": "thermo_style custom step time atoms c_ttarget c_tprojectile pe ke etotal lx ly lz"}]
+prompt3	gpt-5.4	T9	sanitized=True, parsed=[{"line": 30, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 20 units box"}]
 prompt3	gpt-5.5	T5	sanitized=True, parsed=[{"line": 27, "column": 21, "token": "Token('VAR_NAME', 'add')", "text": "velocity projectile add 0 0 20 units box"}]

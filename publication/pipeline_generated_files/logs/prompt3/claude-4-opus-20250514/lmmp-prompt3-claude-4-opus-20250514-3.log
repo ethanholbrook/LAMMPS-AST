@@ -16,7 +16,7 @@ Created orthogonal box = (0 0 0) to (66.016 66.016 66.016)
 create_atoms 1 box
 Created 16000 atoms
   using lattice units in orthogonal box = (0 0 0) to (66.016 66.016 66.016)
-  create_atoms CPU = 0.002 seconds
+  create_atoms CPU = 0.001 seconds
 group projectile region projectile
 16000 atoms in group projectile
 
@@ -32,7 +32,7 @@ group target region target
 
 # Potential
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 # Miscellaneous
 timestep 0.001
@@ -55,20 +55,20 @@ Per MPI rank memory allocation (min/avg/max) = 8.263 | 8.263 | 8.263 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press     
          0   300           -112108.08      0             -111487.67      4244.535     
         10   282.07291     -112070.94      0             -111487.6       5113.4052    
-Loop time of 0.0716463 on 1 procs for 10 steps with 16000 atoms
+Loop time of 0.0642896 on 1 procs for 10 steps with 16000 atoms
 
-Performance: 12.059 ns/day, 1.990 hours/ns, 139.575 timesteps/s, 2.233 Matom-step/s
+Performance: 13.439 ns/day, 1.786 hours/ns, 155.546 timesteps/s, 2.489 Matom-step/s
 99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.068869   | 0.068869   | 0.068869   |   0.0 | 96.12
+Pair    | 0.061442   | 0.061442   | 0.061442   |   0.0 | 95.57
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0003515  | 0.0003515  | 0.0003515  |   0.0 |  0.49
-Output  | 7.1615e-05 | 7.1615e-05 | 7.1615e-05 |   0.0 |  0.10
-Modify  | 0.0020105  | 0.0020105  | 0.0020105  |   0.0 |  2.81
-Other   |            | 0.0003432  |            |       |  0.48
+Comm    | 0.0003373  | 0.0003373  | 0.0003373  |   0.0 |  0.52
+Output  | 7.3859e-05 | 7.3859e-05 | 7.3859e-05 |   0.0 |  0.11
+Modify  | 0.0021012  | 0.0021012  | 0.0021012  |   0.0 |  3.27
+Other   |            | 0.0003352  |            |       |  0.52
 
 Nlocal:          16000 ave       16000 max       16000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

@@ -15,7 +15,7 @@ Created 4000 atoms
   create_atoms CPU = 0.001 seconds
 mass 1 58.6934
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 velocity all create 600.0 12345 mom yes rot yes dist gaussian
 timestep 0.001
 fix 1 all npt temp 300.0 2500.0 0.1 iso 1.0 1.0 1.0
@@ -38,20 +38,20 @@ Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
    Step          Temp          Press          Volume         PotEng         KinEng         TotEng        Density    
          0   600            7594.6671      43614.208     -17800          310.14679     -17489.853      8.9411451    
         10   504.64364      14726.086      43629.513     -17749.8        260.85601     -17488.944      8.9380085    
-Loop time of 0.0651466 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.0602802 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 13.262 ns/day, 1.810 hours/ns, 153.500 timesteps/s, 614.000 katom-step/s
-99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 14.333 ns/day, 1.674 hours/ns, 165.892 timesteps/s, 663.568 katom-step/s
+99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.063633   | 0.063633   | 0.063633   |   0.0 | 97.68
+Pair    | 0.058866   | 0.058866   | 0.058866   |   0.0 | 97.65
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00026275 | 0.00026275 | 0.00026275 |   0.0 |  0.40
-Output  | 3.4866e-05 | 3.4866e-05 | 3.4866e-05 |   0.0 |  0.05
-Modify  | 0.0010863  | 0.0010863  | 0.0010863  |   0.0 |  1.67
-Other   |            | 0.0001301  |            |       |  0.20
+Comm    | 0.00025198 | 0.00025198 | 0.00025198 |   0.0 |  0.42
+Output  | 3.9254e-05 | 3.9254e-05 | 3.9254e-05 |   0.0 |  0.07
+Modify  | 0.0010213  | 0.0010213  | 0.0010213  |   0.0 |  1.69
+Other   |            | 0.0001015  |            |       |  0.17
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

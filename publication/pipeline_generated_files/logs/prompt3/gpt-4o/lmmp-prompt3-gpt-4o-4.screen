@@ -1,4 +1,5 @@
-Script started on 2026-04-21 14:23:17-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+Script started on 2026-05-05 12:57:46-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1654226] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 # Initialization
@@ -18,4 +19,4 @@ create_box 2 all
 ERROR: Create_box region all does not exist (src/src/create_box.cpp:55)
 Last command: create_box 2 all
 
-Script done on 2026-04-21 14:23:19-04:00 [COMMAND_EXIT_CODE="1"]
+Script done on 2026-05-05 12:57:47-04:00 [COMMAND_EXIT_CODE="1"]

@@ -2,6 +2,9 @@ units metal
 dimension 3
 boundary p p p
 atom_style atomic
+variable potential_file string ../../../potentials/prompt1.potential
+variable Ni_mass file Ni_mass.tmp
+variable Ni_lattice file Ni_lattice.tmp
 lattice fcc v_Ni_lattice
 region simulation_box block 0 10 0 10 0 10 units lattice
 create_box 1 simulation_box
@@ -13,6 +16,9 @@ neighbor 2 bin
 neigh_modify every 1 delay 10 check yes
 timestep 0.001
 reset_timestep 0
+variable Tdamp equal 100.0*dt
+variable Pdamp equal 1000.0*dt
+variable run_steps equal ceil((2500-300)/(10*dt))
 velocity all create 600 4928459 dist gaussian mom yes rot yes units box
 thermo 1000
 thermo_style custom step time temp press pe ke etotal enthalpy vol density

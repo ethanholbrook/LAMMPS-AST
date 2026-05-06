@@ -27,7 +27,7 @@ group projectile region projectile_region
 group mobile union target projectile
 mass 1 92.90638
 pair_style eam/fs
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 timestep ${dt}

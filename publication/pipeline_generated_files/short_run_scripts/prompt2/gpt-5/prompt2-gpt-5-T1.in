@@ -12,7 +12,7 @@ create_atoms 1 box
 mass 1 58.6934
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 timestep 0.005
 reset_timestep 0

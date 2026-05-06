@@ -19,7 +19,7 @@ Created 500 atoms
 
 # Potential
 pair_style      eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 # Miscellaneous
 neighbor        2.0 bin
@@ -47,20 +47,20 @@ Per MPI rank memory allocation (min/avg/max) = 3.394 | 3.394 | 3.394 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
          0   300           -1679.6369      0             -1660.2867     -8008.0096      8303.7656    
         10   256.98663     -1676.8748      0             -1660.299      -6878.2324      8299.8738    
-Loop time of 0.00321221 on 1 procs for 10 steps with 500 atoms
+Loop time of 0.00333118 on 1 procs for 10 steps with 500 atoms
 
-Performance: 268.974 ns/day, 0.089 hours/ns, 3113.122 timesteps/s, 1.557 Matom-step/s
-93.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 259.367 ns/day, 0.093 hours/ns, 3001.936 timesteps/s, 1.501 Matom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.0029778  | 0.0029778  | 0.0029778  |   0.0 | 92.70
+Pair    | 0.0030847  | 0.0030847  | 0.0030847  |   0.0 | 92.60
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 6.5126e-05 | 6.5126e-05 | 6.5126e-05 |   0.0 |  2.03
-Output  | 9.878e-06  | 9.878e-06  | 9.878e-06  |   0.0 |  0.31
-Modify  | 0.00014149 | 0.00014149 | 0.00014149 |   0.0 |  4.40
-Other   |            | 1.793e-05  |            |       |  0.56
+Comm    | 5.8511e-05 | 5.8511e-05 | 5.8511e-05 |   0.0 |  1.76
+Output  | 1.2574e-05 | 1.2574e-05 | 1.2574e-05 |   0.0 |  0.38
+Modify  | 0.00015447 | 0.00015447 | 0.00015447 |   0.0 |  4.64
+Other   |            | 2.094e-05  |            |       |  0.63
 
 Nlocal:            500 ave         500 max         500 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

@@ -3,11 +3,18 @@ dimension 3
 boundary p p m
 atom_style atomic
 run_style verlet
+variable potfile string ../../../potentials/prompt1.potential
 lattice bcc v_aNb orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+variable Lx equal 20*v_aNb
+variable Ly equal 20*v_aNb
+variable Lp equal 20*v_aNb
+variable Lt equal 40*v_aNb
+variable ztlo equal v_Lp+15
+variable zthi equal v_ztlo+v_Lt
 region whole block 0 v_Lx 0 v_Ly 0 v_zthi units box
 create_box 1 whole
 pair_style eam/alloy
-pair_coeff * * ../../../potentials/prompt1.potential Nb
+pair_coeff * * v_potfile Nb
 mass 1 v_massNb
 neighbor 2 bin
 neigh_modify delay 0 every 1 check yes

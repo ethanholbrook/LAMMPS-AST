@@ -12,7 +12,7 @@ create_atoms 2 region target
 mass 1 92.90638
 mass 2 92.90638
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb Nb
 velocity all create 300.0 12345 dist gaussian
 fix 1 all nvt temp 300.0 300.0 0.1
 timestep 0.001

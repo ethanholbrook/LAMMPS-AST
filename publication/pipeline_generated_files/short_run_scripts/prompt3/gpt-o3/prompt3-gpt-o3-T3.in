@@ -17,7 +17,7 @@ group projectile region projectile
 mass 1 92.906
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 neighbor 2.0 bin
 neigh_modify every 1 delay 0 check yes

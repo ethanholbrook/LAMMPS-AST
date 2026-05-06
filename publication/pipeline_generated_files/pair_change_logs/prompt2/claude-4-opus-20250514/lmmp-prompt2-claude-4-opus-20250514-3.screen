@@ -1,4 +1,5 @@
-Script started on 2026-04-21 14:26:58-04:00 [TERM="xterm-256color" TTY="/dev/pts/420" COLUMNS="-1" LINES="-1"]
+Script started on 2026-05-05 13:02:04-04:00 [TERM="xterm-256color" TTY="/dev/pts/171" COLUMNS="-1" LINES="-1"]
+[gilbreth-fe01.rcac.purdue.edu:1696171] mca_base_component_repository_open: unable to open mca_coll_hcoll: libhcoll.so.1: cannot open shared object file: No such file or directory (ignored)
 LAMMPS (29 Aug 2024)
   using 1 OpenMP thread(s) per MPI task
 # Initialization
@@ -63,20 +64,20 @@ Per MPI rank memory allocation (min/avg/max) = 10.96 | 10.96 | 10.96 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
          0   600            0              0              310.14679      7595.5356      43614.208    
         10   602.0088       0              0              311.18516      7618.6795      43627.294    
-Loop time of 0.00221712 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.00218221 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 389.695 ns/day, 0.062 hours/ns, 4510.362 timesteps/s, 18.041 Matom-step/s
-90.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 395.929 ns/day, 0.061 hours/ns, 4582.512 timesteps/s, 18.330 Matom-step/s
+93.8% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.00048923 | 0.00048923 | 0.00048923 |   0.0 | 22.07
+Pair    | 0.00046723 | 0.00046723 | 0.00046723 |   0.0 | 21.41
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00044698 | 0.00044698 | 0.00044698 |   0.0 | 20.16
-Output  | 2.5318e-05 | 2.5318e-05 | 2.5318e-05 |   0.0 |  1.14
-Modify  | 0.0011129  | 0.0011129  | 0.0011129  |   0.0 | 50.20
-Other   |            | 0.0001427  |            |       |  6.43
+Comm    | 0.00043583 | 0.00043583 | 0.00043583 |   0.0 | 19.97
+Output  | 2.4185e-05 | 2.4185e-05 | 2.4185e-05 |   0.0 |  1.11
+Modify  | 0.0011046  | 0.0011046  | 0.0011046  |   0.0 | 50.62
+Other   |            | 0.0001503  |            |       |  6.89
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -91,4 +92,4 @@ Neighbor list builds = 0
 Dangerous builds = 0
 Total wall time: 0:00:00
 
-Script done on 2026-04-21 14:27:01-04:00 [COMMAND_EXIT_CODE="0"]
+Script done on 2026-05-05 13:02:05-04:00 [COMMAND_EXIT_CODE="0"]

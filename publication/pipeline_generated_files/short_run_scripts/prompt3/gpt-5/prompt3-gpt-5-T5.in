@@ -26,7 +26,7 @@ group projectile region proj
 group target region targ
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes

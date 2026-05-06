@@ -36,7 +36,7 @@ neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 
 pair_style eam/fs
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 velocity all create 300.0 12345 mom yes rot yes dist gaussian
 

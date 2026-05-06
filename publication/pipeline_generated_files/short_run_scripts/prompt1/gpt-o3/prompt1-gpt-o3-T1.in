@@ -12,7 +12,7 @@ mass 1 26.9815
 velocity all create 300 12345 mom yes dist gaussian
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 
 thermo 1000
 thermo_style custom step temp press pe ke etotal

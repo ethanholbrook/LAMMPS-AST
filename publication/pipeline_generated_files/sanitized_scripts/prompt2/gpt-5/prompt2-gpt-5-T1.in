@@ -13,6 +13,8 @@ pair_coeff * * ../../../potentials/prompt1.potential Ni
 timestep 0.005
 reset_timestep 0
 velocity all create 600 4928459 mom yes rot yes dist gaussian
+variable ttot equal (2500 - 300)/10
+variable nsteps equal ceil(v_ttot/0.005)
 thermo 1000
 thermo_style custom step temp press pe ke etotal vol
 fix 1 all npt temp 300 2500 0.1 iso 1.01325 1.01325 1

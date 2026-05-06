@@ -33,7 +33,7 @@ group target region target
 group projectile region projectile
 
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt3.potential Nb
 
 thermo 1000
 thermo_style custom step time temp pe ke etotal press pxx pyy pzz

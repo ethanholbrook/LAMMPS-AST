@@ -31,7 +31,7 @@ Replication is creating a 10x10x10 = 1000 times larger system...
   replicate CPU = 0.001 seconds
 mass 1 58.6934
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 timestep ${dt}
@@ -67,20 +67,20 @@ Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
    Step          Temp          Press          PotEng         KinEng         TotEng         Volume           Lx             Ly             Lz      
          0   600            7594.6671     -17800          310.14679     -17489.853      43614.208      35.2           35.2           35.2         
         10   505.93246      14571.376     -17750.464      261.52222     -17488.942      43629.466      35.204104      35.204104      35.204104    
-Loop time of 0.0575502 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.0831408 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 15.013 ns/day, 1.599 hours/ns, 173.761 timesteps/s, 695.046 katom-step/s
-99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 10.392 ns/day, 2.309 hours/ns, 120.278 timesteps/s, 481.112 katom-step/s
+68.2% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.056108   | 0.056108   | 0.056108   |   0.0 | 97.49
+Pair    | 0.0817     | 0.0817     | 0.0817     |   0.0 | 98.27
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00026001 | 0.00026001 | 0.00026001 |   0.0 |  0.45
-Output  | 3.0748e-05 | 3.0748e-05 | 3.0748e-05 |   0.0 |  0.05
-Modify  | 0.001045   | 0.001045   | 0.001045   |   0.0 |  1.82
-Other   |            | 0.0001068  |            |       |  0.19
+Comm    | 0.00025062 | 0.00025062 | 0.00025062 |   0.0 |  0.30
+Output  | 3.9424e-05 | 3.9424e-05 | 3.9424e-05 |   0.0 |  0.05
+Modify  | 0.0010288  | 0.0010288  | 0.0010288  |   0.0 |  1.24
+Other   |            | 0.0001216  |            |       |  0.15
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

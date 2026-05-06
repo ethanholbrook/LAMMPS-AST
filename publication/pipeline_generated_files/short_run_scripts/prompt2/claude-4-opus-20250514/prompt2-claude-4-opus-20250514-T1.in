@@ -14,7 +14,7 @@ velocity all create 600.0 12345 dist gaussian
 
 # Potential
 pair_style eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 # Miscellaneous
 timestep 0.001

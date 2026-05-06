@@ -15,6 +15,7 @@ timestep 0.001
 region target block 0 66 0 66 33 165 units box
 region projectile block 0 66 0 66 165 231 units box
 create_atoms 1 region target
+variable ntarget equal count(all)
 group target id 1:v_ntarget
 create_atoms 1 region projectile
 group projectile subtract all target

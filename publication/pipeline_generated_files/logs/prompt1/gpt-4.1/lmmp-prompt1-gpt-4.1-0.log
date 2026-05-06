@@ -19,6 +19,6 @@ Created 500 atoms
 
 # Potential
 pair_style      eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 ERROR: Incorrect args for pair coefficients (src/src/MANYBODY/pair_eam.cpp:387)
-Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+Last command: pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al

@@ -19,7 +19,7 @@ Created 4000 atoms
 
 # Potential
 pair_style      eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 
 # Miscellaneous
 neighbor        2.0 bin
@@ -46,20 +46,20 @@ Per MPI rank memory allocation (min/avg/max) = 4.843 | 4.843 | 4.843 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
          0   600           -17800          0             -17489.853      7594.6671      43614.208    
         10   502.7979      -17749.761      0             -17489.859      15413.912      43614.827    
-Loop time of 0.0657605 on 1 procs for 10 steps with 4000 atoms
+Loop time of 0.0607673 on 1 procs for 10 steps with 4000 atoms
 
-Performance: 13.139 ns/day, 1.827 hours/ns, 152.067 timesteps/s, 608.268 katom-step/s
-98.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 14.218 ns/day, 1.688 hours/ns, 164.562 timesteps/s, 658.248 katom-step/s
+99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.064196   | 0.064196   | 0.064196   |   0.0 | 97.62
+Pair    | 0.059328   | 0.059328   | 0.059328   |   0.0 | 97.63
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.00028539 | 0.00028539 | 0.00028539 |   0.0 |  0.43
-Output  | 2.694e-05  | 2.694e-05  | 2.694e-05  |   0.0 |  0.04
-Modify  | 0.0011366  | 0.0011366  | 0.0011366  |   0.0 |  1.73
-Other   |            | 0.0001157  |            |       |  0.18
+Comm    | 0.00025148 | 0.00025148 | 0.00025148 |   0.0 |  0.41
+Output  | 2.5959e-05 | 2.5959e-05 | 2.5959e-05 |   0.0 |  0.04
+Modify  | 0.0010494  | 0.0010494  | 0.0010494  |   0.0 |  1.73
+Other   |            | 0.0001124  |            |       |  0.19
 
 Nlocal:           4000 ave        4000 max        4000 min
 Histogram: 1 0 0 0 0 0 0 0 0 0

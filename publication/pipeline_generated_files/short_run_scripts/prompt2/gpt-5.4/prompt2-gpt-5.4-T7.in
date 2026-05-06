@@ -18,7 +18,7 @@ create_box 1 unitcell
 create_atoms 1 region unitcell
 replicate 10 10 10
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 velocity all create ${tinit} ${seed} dist gaussian mom yes loop geom

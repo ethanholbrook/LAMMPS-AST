@@ -24,10 +24,10 @@ Replication is creating a 10x10x10 = 1000 times larger system...
   orthogonal box = (0 0 0) to (352 352 352)
   1 by 1 by 1 MPI processor grid
   4000000 atoms
-  replicate CPU = 0.267 seconds
+  replicate CPU = 0.145 seconds
 
 # Potential
 pair_style      eam
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
 ERROR: Incorrect args for pair coefficients (src/src/MANYBODY/pair_eam.cpp:387)
-Last command: pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni
+Last command: pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt2.potential Ni

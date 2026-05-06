@@ -14,7 +14,7 @@ replicate 5 5 5
 
 print "Potential"
 pair_style eam/alloy
-pair_coeff * * /home/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
+pair_coeff * * /scratch/gilbreth/holbrooe/LAMMPS-AST/publication/potentials/prompt1.potential Al
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 
