@@ -77,8 +77,8 @@ SYSTEM_PROMPT = (
     "Plan the LAMMPS input script structure using these sections: Initialization, System "
     "Construction, Potential, Miscellaneous if needed, and Production Run.\n\n"
     "Constraints:\n"
-    "- Assume that a potential file named '../../../potentials/prompt1.potential' is "
-    "available and ready to use.\n"
+    "- Assume that the required prompt potential file is available under "
+    "'../../pipeline_generated_files/potentials/' and ready to use.\n"
     "- Be specific with pair_style so it matches the potential format discussed.\n"
     "- Do not include any comments.\n"
     "- Explicitly define commands even when defaults would work.\n"
@@ -159,8 +159,9 @@ PROMPT_MODEL_MAP = {
 }
 
 
-GENERATED_SCRIPTS_DIR = PUBLICATION_DIR / "generated_scripts"
-PIPELINE_GENERATED_FILES_DIR = PUBLICATION_DIR / "pipeline_generated_files"
+PUBLICATION_PIPELINE_DIR = PUBLICATION_DIR / "pipeline"
+GENERATED_SCRIPTS_DIR = PUBLICATION_PIPELINE_DIR / "generated_scripts"
+PIPELINE_GENERATED_FILES_DIR = PUBLICATION_PIPELINE_DIR / "pipeline_generated_files"
 RAW_RESPONSES_DIR = PIPELINE_GENERATED_FILES_DIR / "raw_responses"
 SANITIZED_SCRIPTS_DIR = PIPELINE_GENERATED_FILES_DIR / "sanitized_scripts"
 ASTS_DIR = PIPELINE_GENERATED_FILES_DIR / "asts"
@@ -176,13 +177,13 @@ PARSING_DF_PATH = DATA_DIR / "parsing_df.pkl"
 FINAL_PAIR_DF_PATH = DATA_DIR / "final_pair_df.pkl"
 ACCURACY_DF_PATH = DATA_DIR / "accuracy_df_trees.pkl"
 
-RESULTS_DIR = PUBLICATION_DIR / "results"
+RESULTS_DIR = PUBLICATION_PIPELINE_DIR / "results"
 SUMMARY_CSV_PATH = RESULTS_DIR / "summary_table.csv"
 SUMMARY_MD_PATH = RESULTS_DIR / "summary_table.md"
 SANKEY_HTML_PATH = RESULTS_DIR / "final_sankey.html"
 SANKEY_PNG_PATH = RESULTS_DIR / "final_sankey.png"
 
-POTENTIALS_DIR = PUBLICATION_DIR / "potentials"
+POTENTIALS_DIR = PIPELINE_GENERATED_FILES_DIR / "potentials"
 
 
 LAMMPS_GRAMMAR_VERSION = os.getenv("LAMMPS_GRAMMAR_VERSION") or None
