@@ -1,0 +1,1 @@
+Potentials should be placed in this directory for pipeline function - could be changed. 
